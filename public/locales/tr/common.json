@@ -1,0 +1,47 @@
+{
+  "templateSelector": {
+    "title": "CV Şablonu Seçin",
+    "subtitle": "5 farklı ATS uyumlu profesyonel şablon arasından size en uygun olanı seçin. Tüm şablonlar başvuru takip sistemleri tarafından kolayca okunabilir.",
+    "preview": "Önizle",
+    "selectTemplate": "Bu Şablonu Seç",
+    "modalTitle": "Şablonu - Örnek CV",
+    "modalSubtitle": "Bu şablon ile CV'niz nasıl görünecek",
+    "close": "Kapat"
+  },
+  "templates": {
+    "modern": {
+      "name": "Modern",
+      "description": "İki sütun düzenli, temiz ve çağdaş tasarım",
+      "preview": "📄 Modern, profesyonel görünüm",
+      "features": ["İki sütun düzen", "Renk vurguları", "İkon destekli", "ATS uyumlu"]
+    },
+    "classic": {
+      "name": "Classic",
+      "description": "Geleneksel ve profesyonel tek sütun düzeni",
+      "preview": "📋 Klasik, güvenilir tasarım",
+      "features": ["Tek sütun", "Sade tasarım", "Kolay okunur", "Evrensel"]
+    },
+    "creative": {
+      "name": "Creative",
+      "description": "Yaratıcı pozisyonlar için özgün tasarım",
+      "preview": "🎨 Yaratıcı, farklı görünüm",
+      "features": ["Yan panel", "Grafik elemanlar", "Dikkat çekici", "Renkli"]
+    },
+    "professional": {
+      "name": "Professional",
+      "description": "Kurumsal pozisyonlar için ciddi tasarım",
+      "preview": "💼 Kurumsal, güçlü görünüm",
+      "features": ["Klasik düzen", "Net bölümler", "ATS optimize", "Kurumsal"]
+    },
+    "minimal": {
+      "name": "Minimal",
+      "description": "Sade ve şık minimalist tasarım",
+      "preview": "✨ Minimal, zarif görünüm",
+      "features": ["Minimalist", "Bol beyaz alan", "Okunabilir", "Zarif"]
+    }
+  },
+  "atsInfo": {
+    "title": "ATS Uyumluluk Nedir?",
+    "description": "ATS (Applicant Tracking System - Başvuru Takip Sistemi), şirketlerin CV'leri otomatik olarak taramasına olanak tanır. Tüm şablonlarımız bu sistemler tarafından kolayca okunabilecek şekilde tasarlanmıştır, böylece başvurunuzun insan kaynakları departmanına ulaşma şansı artar."
+  }
+}

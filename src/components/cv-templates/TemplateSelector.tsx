@@ -9,9 +9,10 @@
 'use client';
 
 import React, { useState } from 'react';
-import { CheckCircle2, FileText, Eye } from 'lucide-react';
+import { CheckCircle2, FileText, Eye, Zap, BookOpen, Palette, Briefcase, Circle } from 'lucide-react';
 import { ModernTemplate, ClassicTemplate, CreativeTemplate, ProfessionalTemplate, MinimalTemplate } from '@/components/cv-templates';
 import type { CVData } from '@/types/cv-builder';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface TemplateSelectorProps {
   selectedTemplate: 'modern' | 'classic' | 'creative' | 'professional' | 'minimal';
@@ -86,14 +87,14 @@ const sampleCVData: CVData = {
     },
   ],
   skills: [
-    { id: '1', name: 'JavaScript / TypeScript', level: 'expert' },
-    { id: '2', name: 'React.js / Next.js', level: 'expert' },
-    { id: '3', name: 'Node.js / Express', level: 'advanced' },
-    { id: '4', name: 'Python / Django', level: 'advanced' },
-    { id: '5', name: 'AWS / Cloud Services', level: 'advanced' },
-    { id: '6', name: 'MongoDB / PostgreSQL', level: 'advanced' },
-    { id: '7', name: 'Docker / Kubernetes', level: 'intermediate' },
-    { id: '8', name: 'Git / CI/CD', level: 'expert' },
+    { id: '1', name: 'JavaScript / TypeScript', level: 'expert', years: 8 },
+    { id: '2', name: 'React.js / Next.js', level: 'expert', years: 5 },
+    { id: '3', name: 'Node.js / Express', level: 'advanced', years: 6 },
+    { id: '4', name: 'Python / Django', level: 'advanced', years: 4 },
+    { id: '5', name: 'AWS / Cloud Services', level: 'advanced', years: 3 },
+    { id: '6', name: 'MongoDB / PostgreSQL', level: 'advanced', years: 5 },
+    { id: '7', name: 'Docker / Kubernetes', level: 'intermediate', years: 2 },
+    { id: '8', name: 'Git / CI/CD', level: 'expert', years: 7 },
   ],
   languages: [
     { id: '1', name: 'Türkçe', level: 'native' },
@@ -130,6 +131,7 @@ const templates = [
     description: 'İki sütun düzenli, temiz ve çağdaş tasarım',
     color: 'from-blue-500 to-blue-600',
     borderColor: 'border-blue-500',
+    icon: Zap,
     features: ['İki sütun düzen', 'Renk vurguları', 'İkon destekli', 'ATS uyumlu'],
     preview: '📄 Modern, profesyonel görünüm',
   },
@@ -139,6 +141,7 @@ const templates = [
     description: 'Geleneksel ve profesyonel tek sütun düzeni',
     color: 'from-gray-600 to-gray-700',
     borderColor: 'border-gray-600',
+    icon: BookOpen,
     features: ['Tek sütun', 'Sade tasarım', 'Kolay okunur', 'Evrensel'],
     preview: '📋 Klasik, güvenilir tasarım',
   },
@@ -148,6 +151,7 @@ const templates = [
     description: 'Yaratıcı pozisyonlar için özgün tasarım',
     color: 'from-purple-500 to-purple-600',
     borderColor: 'border-purple-500',
+    icon: Palette,
     features: ['Yan panel', 'Grafik elemanlar', 'Dikkat çekici', 'Renkli'],
     preview: '🎨 Yaratıcı, farklı görünüm',
   },
@@ -157,6 +161,7 @@ const templates = [
     description: 'Kurumsal pozisyonlar için ciddi tasarım',
     color: 'from-green-500 to-green-600',
     borderColor: 'border-green-500',
+    icon: Briefcase,
     features: ['Klasik düzen', 'Net bölümler', 'ATS optimize', 'Kurumsal'],
     preview: '💼 Kurumsal, güçlü görünüm',
   },
@@ -166,23 +171,24 @@ const templates = [
     description: 'Sade ve şık minimalist tasarım',
     color: 'from-orange-500 to-orange-600',
     borderColor: 'border-orange-500',
+    icon: Circle,
     features: ['Minimalist', 'Bol beyaz alan', 'Okunabilir', 'Zarif'],
     preview: '✨ Minimal, zarif görünüm',
   },
 ];
 
 export function TemplateSelector({ selectedTemplate, onSelectTemplate }: TemplateSelectorProps) {
+  const { t } = useLanguage();
   const [previewTemplate, setPreviewTemplate] = useState<string | null>(null);
 
   return (
     <div className="space-y-6">
       <div className="mb-6">
         <h3 className="text-lg font-bold text-foreground mb-2">
-          CV Şablonu Seçin
+          {t('templateSelector.title')}
         </h3>
         <p className="text-muted-foreground text-sm">
-          5 farklı ATS uyumlu profesyonel şablon arasından size en uygun olanı seçin.
-          Tüm şablonlar başvuru takip sistemleri tarafından kolayca okunabilir.
+          {t('templateSelector.subtitle')}
         </p>
       </div>
 
@@ -196,56 +202,74 @@ export function TemplateSelector({ selectedTemplate, onSelectTemplate }: Templat
               onClick={() => onSelectTemplate(template.id)}
               className={`
                 relative p-6 rounded-xl border-2 transition-all duration-300 text-left
+                hover:shadow-xl hover:-translate-y-1 group
                 ${isSelected 
-                  ? `${template.borderColor} shadow-lg scale-105` 
+                  ? `${template.borderColor} shadow-lg scale-105 bg-primary/5` 
                   : 'border-border hover:border-primary/50 hover:shadow-md'
                 }
               `}
             >
               {/* Selection Indicator */}
               {isSelected && (
-                <div className="absolute -top-3 -right-3 w-8 h-8 bg-primary rounded-full flex items-center justify-center shadow-lg">
+                <div className="absolute -top-3 -right-3 w-8 h-8 bg-primary rounded-full flex items-center justify-center shadow-lg animate-pulse">
                   <CheckCircle2 className="w-5 h-5 text-primary-foreground" />
                 </div>
               )}
 
-              {/* Template Preview */}
-              <div className={`h-32 bg-linear-to-br ${template.color} rounded-lg p-4 flex items-center justify-center relative overflow-hidden mb-4`}>
-                <div className="absolute inset-0 bg-white/10 backdrop-blur-sm"></div>
-                <FileText className="w-12 h-12 text-white/40 absolute" />
-                <div className="relative text-center">
-                  <h4 className="text-white font-bold text-lg mb-1">{template.name}</h4>
-                  <p className="text-white/90 text-xs">{template.preview}</p>
+              {/* Template Preview - CV Thumbnail */}
+              <div className="relative mb-4 group overflow-hidden rounded-lg">
+                {/* CV Thumbnail Container */}
+                <div className="h-40 bg-white dark:bg-gray-900 rounded-lg border border-border overflow-hidden shadow-sm group-hover:shadow-lg transition-all duration-500">
+                  {/* Actual CV Template Preview */}
+                  <div className="transform scale-[0.25] origin-top-left w-[400%] h-[400%] group-hover:scale-[0.28] transition-transform duration-500 ease-out">
+                    {template.id === 'modern' && <ModernTemplate data={sampleCVData} />}
+                    {template.id === 'classic' && <ClassicTemplate data={sampleCVData} />}
+                    {template.id === 'creative' && <CreativeTemplate data={sampleCVData} />}
+                    {template.id === 'professional' && <ProfessionalTemplate data={sampleCVData} />}
+                    {template.id === 'minimal' && <MinimalTemplate data={sampleCVData} />}
+                  </div>
+                  
+                  {/* Overlay Gradient */}
+                  <div className="absolute inset-0 bg-linear-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  
+                  {/* Template Name Badge - Top Right */}
+                  <div className="absolute top-2 right-2">
+                    <div className="bg-black/60 backdrop-blur-sm rounded-full px-2 py-1">
+                      <span className="text-white font-bold text-xs">{template.name}</span>
+                    </div>
+                  </div>
+                  
+                  {/* Icon Badge - Bottom Left */}
+                  <div className="absolute bottom-2 left-2">
+                    <div className="w-8 h-8 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-lg shadow-md flex items-center justify-center border border-white/20 group-hover:scale-110 transition-transform duration-300">
+                      <template.icon className={`w-4 h-4 ${template.borderColor.replace('border-', 'text-').replace('-500', '-700')} dark:${template.borderColor.replace('border-', 'text-').replace('-500', '-300')}`} />
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              {/* Template Info */}
-              <div>
-                <h4 className="font-bold text-foreground mb-2">{template.name}</h4>
-                <p className="text-sm text-muted-foreground mb-4">
-                  {template.description}
-                </p>
-
-                {/* Features */}
-                <ul className="space-y-1 mb-4">
-                  {template.features.map((feature, idx) => (
-                    <li key={idx} className="flex items-center gap-2 text-xs text-muted-foreground">
-                      <CheckCircle2 className="w-3 h-3 text-green-600 dark:text-green-400 shrink-0" />
+              {/* Template Info - Minimal */}
+              <div className="space-y-3">
+                {/* Features - Compact */}
+                <div className="flex flex-wrap gap-1">
+                  {template.features.slice(0, 3).map((feature, idx) => (
+                    <span key={idx} className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${template.borderColor.replace('border-', 'bg-').replace('-500', '-100')} ${template.borderColor.replace('border-', 'text-').replace('-500', '-700')} dark:${template.borderColor.replace('border-', 'text-').replace('-500', '-300')}`}>
+                      <div className={`w-1 h-1 rounded-full ${template.borderColor.replace('border-', 'bg-')}`}></div>
                       <span>{feature}</span>
-                    </li>
+                    </span>
                   ))}
-                </ul>
+                </div>
 
-                {/* Preview Button */}
+                {/* Preview Button - Minimal */}
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
                     setPreviewTemplate(template.id);
                   }}
-                  className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-gray-100 dark:bg-gray-800 text-foreground rounded-lg text-xs font-medium hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                  className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-gray-100 dark:bg-gray-800 text-foreground rounded-lg text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-200 hover:scale-105"
                 >
-                  <Eye className="w-3 h-3" />
-                  <span>Örnek CV Görüntüle</span>
+                  <Eye className="w-4 h-4" />
+                  <span>{t('templateSelector.preview')}</span>
                 </button>
               </div>
             </button>
@@ -257,12 +281,10 @@ export function TemplateSelector({ selectedTemplate, onSelectTemplate }: Templat
       <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
         <h4 className="font-semibold text-blue-900 dark:text-blue-100 mb-2 flex items-center gap-2">
           <FileText className="w-4 h-4" />
-          ATS Uyumluluk Nedir?
+          {t('atsInfo.title')}
         </h4>
         <p className="text-sm text-blue-800 dark:text-blue-200">
-          ATS (Applicant Tracking System - Başvuru Takip Sistemi), şirketlerin CV&apos;leri otomatik olarak 
-          taramasına olanak tanır. Tüm şablonlarımız bu sistemler tarafından kolayca okunabilecek 
-          şekilde tasarlanmıştır, böylece başvurunuzun insan kaynakları departmanına ulaşma şansı artar.
+          {t('atsInfo.description')}
         </p>
       </div>
 
@@ -280,10 +302,10 @@ export function TemplateSelector({ selectedTemplate, onSelectTemplate }: Templat
             <div className="sticky top-0 z-10 bg-white dark:bg-gray-900 border-b border-border px-6 py-4 flex items-center justify-between">
               <div>
                 <h3 className="text-xl font-bold text-foreground">
-                  {templates.find(t => t.id === previewTemplate)?.name} Şablonu - Örnek CV
+                  {templates.find(t => t.id === previewTemplate)?.name} {t('templateSelector.modalTitle')}
                 </h3>
                 <p className="text-sm text-muted-foreground">
-                  Bu şablon ile CV&apos;niz nasıl görünecek
+                  {t('templateSelector.modalSubtitle')}
                 </p>
               </div>
               <div className="flex items-center gap-3">
@@ -294,7 +316,7 @@ export function TemplateSelector({ selectedTemplate, onSelectTemplate }: Templat
                   }}
                   className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors"
                 >
-                  Bu Şablonu Seç
+                  {t('templateSelector.selectTemplate')}
                 </button>
                 <button
                   onClick={() => setPreviewTemplate(null)}
@@ -308,7 +330,7 @@ export function TemplateSelector({ selectedTemplate, onSelectTemplate }: Templat
             </div>
 
             {/* Modal Content - CV Preview */}
-            <div className="overflow-auto p-8 bg-gray-100 dark:bg-gray-800">
+            <div className="overflow-auto p-8 bg-gray-100 dark:bg-gray-800 max-h-[calc(90vh-80px)]">
               <div className="transform scale-75 origin-top mx-auto">
                 {previewTemplate === 'modern' && <ModernTemplate data={sampleCVData} />}
                 {previewTemplate === 'classic' && <ClassicTemplate data={sampleCVData} />}

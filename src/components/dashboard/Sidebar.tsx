@@ -51,35 +51,35 @@ export function Sidebar({ userName = 'User', userEmail, userAvatar }: SidebarPro
   const [isLanguageOpen, setIsLanguageOpen] = useState(false);
   const pathname = usePathname();
   const { theme, setTheme } = useTheme();
-  const { language, setLanguage } = useLanguage();
+  const { language, setLanguage, t } = useLanguage();
 
   /**
    * Navigation items configuration
    */
   const navItems = [
     {
-      label: 'Ana Sayfa',
+      label: t('sidebar.home'),
       href: '/dashboard',
       icon: Home,
     },
     {
-      label: 'CV\'lerim',
+      label: t('sidebar.myCVs'),
       href: '/cvs',
       icon: FileText,
     },
     {
-      label: 'Yeni CV Oluştur',
+      label: t('sidebar.createCV'),
       href: '/cv/create',
       icon: Plus,
       highlight: true,
     },
     {
-      label: 'Profil',
+      label: t('sidebar.profile'),
       href: '/profile',
       icon: User,
     },
     {
-      label: 'Ayarlar',
+      label: t('sidebar.settings'),
       href: '/settings',
       icon: Settings,
     },
@@ -132,8 +132,8 @@ export function Sidebar({ userName = 'User', userEmail, userAvatar }: SidebarPro
                 className="transition-transform group-hover:scale-110"
               />
               <div>
-                <h2 className="text-lg font-bold text-foreground">CV Maker</h2>
-                <p className="text-xs text-muted-foreground">Professional CVs</p>
+                <h2 className="text-lg font-bold text-foreground">{t('sidebar.brand')}</h2>
+                <p className="text-xs text-muted-foreground">{t('sidebar.tagline')}</p>
               </div>
             </Link>
           )}
@@ -258,7 +258,7 @@ export function Sidebar({ userName = 'User', userEmail, userAvatar }: SidebarPro
               <Moon className="w-5 h-5 flex-shrink-0" />
             )}
             {!isCollapsed && (
-              <span>{theme === 'dark' ? 'Aydınlık Mod' : 'Karanlık Mod'}</span>
+              <span>{theme === 'dark' ? t('sidebar.lightMode') : t('sidebar.darkMode')}</span>
             )}
           </button>
 
@@ -321,7 +321,7 @@ export function Sidebar({ userName = 'User', userEmail, userAvatar }: SidebarPro
             `}
           >
             <LogOut className="w-5 h-5 flex-shrink-0" />
-            {!isCollapsed && <span>Çıkış Yap</span>}
+            {!isCollapsed && <span>{t('sidebar.logout')}</span>}
           </button>
         </div>
       </div>

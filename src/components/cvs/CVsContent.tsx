@@ -8,7 +8,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { CVCard } from '@/components/dashboard/CVCard';
 import { Plus } from 'lucide-react';
 import Link from 'next/link';
@@ -21,24 +21,67 @@ interface CVsContentProps {
 export function CVsContent({ initialCVs }: CVsContentProps) {
   const [cvs, setCvs] = useState(initialCVs);
 
+  // Fetch CVs from API
+  useEffect(() => {
+    const fetchCVs = async () => {
+      try {
+        const response = await fetch('/api/cv');
+        if (response.ok) {
+          const data = await response.json();
+          const apiCVs = data.cvs || data;
+          const transformedCVs: CVCardType[] = apiCVs.map((cv: { _id: string; title: string; template: string; updatedAt: string; createdAt: string; status: string }) => ({
+            id: cv._id,
+            title: cv.title,
+            template: cv.template as CVCardType['template'],
+            lastModified: new Date(cv.updatedAt),
+            createdAt: new Date(cv.createdAt),
+            isComplete: cv.status === 'completed',
+          }));
+          setCvs(transformedCVs);
+        } else {
+          console.error('API Error:', response.status, response.statusText);
+        }
+      } catch (error) {
+        console.error('Error fetching CVs:', error);
+        // Keep initial CVs on error
+      }
+    };
+
+    fetchCVs();
+  }, []);
+
   /**
    * Handle CV edit
    */
   const handleEdit = (id: string) => {
-    console.log('Edit CV:', id);
-    // TODO: Navigate to edit page
+    // Navigate to edit page with CV data
+    window.location.href = `/cv/edit/${id}`;
   };
 
   /**
    * Handle CV delete
    */
   const handleDelete = async (id: string) => {
+    if (!confirm('Bu CV\'yi silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.')) {
+      return;
+    }
+
     try {
-      // TODO: API call to delete CV
+      const response = await fetch(`/api/cv/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'CV silinemedi');
+      }
+
+      // Remove from local state
       setCvs(cvs.filter(cv => cv.id !== id));
-      console.log('Deleted CV:', id);
+      alert('CV başarıyla silindi');
     } catch (error) {
       console.error('Delete error:', error);
+      alert('CV silinirken bir hata oluştu');
     }
   };
 
@@ -47,21 +90,64 @@ export function CVsContent({ initialCVs }: CVsContentProps) {
    */
   const handleDuplicate = async (id: string) => {
     try {
-      // TODO: API call to duplicate CV
-      const originalCV = cvs.find(cv => cv.id === id);
-      if (originalCV) {
-        const newCV: CVCardType = {
-          ...originalCV,
-          id: Math.random().toString(36).substr(2, 9),
-          title: `${originalCV.title} (Kopya)`,
-          createdAt: new Date(),
-          lastModified: new Date(),
-        };
-        setCvs([newCV, ...cvs]);
+      // First get the original CV
+      const response = await fetch(`/api/cv/${id}`);
+      if (!response.ok) {
+        throw new Error('CV bulunamadı');
       }
-      console.log('Duplicated CV:', id);
+
+      const data = await response.json();
+      const originalCV = data.cv;
+
+      // Create duplicate payload
+      const duplicatePayload = {
+        title: `${originalCV.title} (Kopya)`,
+        template: originalCV.template,
+        status: 'draft',
+        personalInfo: originalCV.personalInfo,
+        summary: originalCV.summary,
+        workExperience: originalCV.workExperience || [],
+        education: originalCV.education || [],
+        skills: originalCV.skills || [],
+        languages: originalCV.languages || [],
+        certifications: originalCV.certifications || [],
+        projects: originalCV.projects || [],
+      };
+
+      // Create new CV
+      const createResponse = await fetch('/api/cv', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(duplicatePayload),
+      });
+
+      if (!createResponse.ok) {
+        const errorData = await createResponse.json();
+        throw new Error(errorData.error || 'CV kopyalanamadı');
+      }
+
+      // Refresh CV list
+      const refreshResponse = await fetch('/api/cv');
+      if (refreshResponse.ok) {
+        const refreshData = await refreshResponse.json();
+        const apiCVs = refreshData.cvs || refreshData;
+        const transformedCVs: CVCardType[] = apiCVs.map((cv: { _id: string; title: string; template: string; updatedAt: string; createdAt: string; status: string }) => ({
+          id: cv._id,
+          title: cv.title,
+          template: cv.template as CVCardType['template'],
+          lastModified: new Date(cv.updatedAt),
+          createdAt: new Date(cv.createdAt),
+          isComplete: cv.status === 'completed',
+        }));
+        setCvs(transformedCVs);
+      }
+
+      alert('CV başarıyla kopyalandı');
     } catch (error) {
       console.error('Duplicate error:', error);
+      alert('CV kopyalanırken bir hata oluştu');
     }
   };
 
@@ -70,10 +156,18 @@ export function CVsContent({ initialCVs }: CVsContentProps) {
    */
   const handleDownload = async (id: string) => {
     try {
-      // TODO: API call to generate PDF
-      console.log('Download CV:', id);
+      // Create a temporary link to download the PDF
+      const link = document.createElement('a');
+      link.href = `/api/cv/${id}/download`;
+      link.download = `cv_${id}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      alert('PDF indirme işlemi başlatıldı!');
     } catch (error) {
       console.error('Download error:', error);
+      alert('PDF indirilirken bir hata oluştu');
     }
   };
 

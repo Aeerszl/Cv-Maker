@@ -12,6 +12,8 @@ export interface IPersonalInfo {
   location: string;
   photo?: string;
   linkedin?: string;
+  github?: string;
+  instagram?: string;
   website?: string;
   summary: string;
 }
@@ -36,7 +38,6 @@ export interface IEducation {
   endDate?: string;
   current: boolean;
   gpa?: string;
-  description?: string;
 }
 
 // Yetenek
@@ -71,15 +72,21 @@ export interface IProject {
 
 export interface ICV extends Document {
   userId: mongoose.Types.ObjectId;
+  templateId?: mongoose.Types.ObjectId; // FK to Templates
   title: string;
   template: CVTemplate;
+  colorPalette?: string; // JSON string of hex colors
+  status: 'draft' | 'completed' | 'published';
   personalInfo: IPersonalInfo;
+  summary?: string; // Özet alanı ayrı
   workExperience: IWorkExperience[];
   education: IEducation[];
   skills: ISkill[];
   languages: ILanguage[];
   certifications: ICertification[];
   projects: IProject[];
+  viewCount: number;
+  lastModified: Date;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -91,6 +98,10 @@ const CVSchema: Schema<ICV> = new Schema(
       ref: 'User',
       required: true,
     },
+    templateId: {
+      type: Schema.Types.ObjectId,
+      ref: 'Template',
+    },
     title: {
       type: String,
       required: [true, 'CV başlığı gereklidir'],
@@ -101,6 +112,14 @@ const CVSchema: Schema<ICV> = new Schema(
       enum: ['modern', 'classic', 'creative', 'professional', 'minimal'],
       default: 'modern',
     },
+    colorPalette: {
+      type: String, // JSON string
+    },
+    status: {
+      type: String,
+      enum: ['draft', 'completed', 'published'],
+      default: 'draft',
+    },
     personalInfo: {
       fullName: { type: String, required: true },
       title: { type: String, required: true },
@@ -109,8 +128,13 @@ const CVSchema: Schema<ICV> = new Schema(
       location: { type: String, required: true },
       photo: { type: String },
       linkedin: { type: String },
+      github: { type: String },
+      instagram: { type: String },
       website: { type: String },
       summary: { type: String, required: true },
+    },
+    summary: {
+      type: String,
     },
     workExperience: [
       {
@@ -119,8 +143,9 @@ const CVSchema: Schema<ICV> = new Schema(
         startDate: { type: String, required: true },
         endDate: { type: String },
         current: { type: Boolean, default: false },
-        description: { type: String, required: true },
+        description: { type: String }, // Optional yapıldı
         location: { type: String },
+        _id: false, // Subdocument _id'sini kaldır
       },
     ],
     education: [
@@ -132,7 +157,7 @@ const CVSchema: Schema<ICV> = new Schema(
         endDate: { type: String },
         current: { type: Boolean, default: false },
         gpa: { type: String },
-        description: { type: String },
+        _id: false,
       },
     ],
     skills: [
@@ -143,6 +168,7 @@ const CVSchema: Schema<ICV> = new Schema(
           enum: ['beginner', 'intermediate', 'advanced', 'expert'],
           default: 'intermediate',
         },
+        _id: false,
       },
     ],
     languages: [
@@ -153,6 +179,7 @@ const CVSchema: Schema<ICV> = new Schema(
           enum: ['basic', 'intermediate', 'fluent', 'native'],
           default: 'intermediate',
         },
+        _id: false,
       },
     ],
     certifications: [
@@ -161,6 +188,7 @@ const CVSchema: Schema<ICV> = new Schema(
         issuer: { type: String, required: true },
         date: { type: String, required: true },
         url: { type: String },
+        _id: false,
       },
     ],
     projects: [
@@ -171,8 +199,17 @@ const CVSchema: Schema<ICV> = new Schema(
         url: { type: String },
         startDate: { type: String },
         endDate: { type: String },
+        _id: false,
       },
     ],
+    viewCount: {
+      type: Number,
+      default: 0,
+    },
+    lastModified: {
+      type: Date,
+      default: Date.now,
+    },
   },
   {
     timestamps: true,
@@ -181,6 +218,8 @@ const CVSchema: Schema<ICV> = new Schema(
 
 // Index oluştur - daha hızlı sorgu için
 CVSchema.index({ userId: 1, createdAt: -1 });
+CVSchema.index({ templateId: 1 });
+CVSchema.index({ status: 1 });
 
 const CV: Model<ICV> = mongoose.models.CV || mongoose.model<ICV>('CV', CVSchema);
 

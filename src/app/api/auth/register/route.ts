@@ -2,15 +2,17 @@ import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import connectDB from '@/lib/mongodb';
 import User from '@/models/User';
+import UserActivity from '@/models/UserActivity';
 
 export async function POST(req: NextRequest) {
   try {
-    const { name, email, password } = await req.json();
+    const body = await req.json();
+    const { fullName, email, password, phone } = body;
 
     // Validasyon
-    if (!name || !email || !password) {
+    if (!fullName || !email || !password) {
       return NextResponse.json(
-        { error: 'Tüm alanları doldurunuz' },
+        { error: 'Ad, email ve şifre zorunludur' },
         { status: 400 }
       );
     }
@@ -47,17 +49,32 @@ export async function POST(req: NextRequest) {
 
     // Yeni kullanıcı oluştur
     const user = await User.create({
-      name,
+      fullName,
       email: email.toLowerCase(),
-      password: hashedPassword,
+      passwordHash: hashedPassword,
+      phone: phone || '', // Optional phone
+      role: 'user',
+      isActive: true,
     });
+
+    // Register aktivitesini kaydet (optional - hata olsa bile kayıt başarılı)
+    try {
+      await UserActivity.create({
+        userId: user._id,
+        activityType: 'user_register', // Şimdi enum'da var
+        activityDetails: { action: 'register', email: user.email },
+      });
+    } catch (activityError) {
+      console.error('Activity logging failed:', activityError);
+      // Activity log hatası kayıt işlemini etkilemesin
+    }
 
     return NextResponse.json(
       {
         message: 'Kayıt başarılı!',
         user: {
           id: user._id,
-          name: user.name,
+          fullName: user.fullName,
           email: user.email,
         },
       },
@@ -66,9 +83,9 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.error('Register error:', error);
     return NextResponse.json(
-      { 
-        error: 'Kayıt sırasında bir hata oluştu', 
-        details: error instanceof Error ? error.message : 'Unknown error' 
+      {
+        error: 'Kayıt sırasında bir hata oluştu',
+        details: error instanceof Error ? error.message : 'Unknown error'
       },
       { status: 500 }
     );

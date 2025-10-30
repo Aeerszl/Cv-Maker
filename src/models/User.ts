@@ -1,21 +1,20 @@
 import mongoose, { Schema, Document, Model } from 'mongoose';
 
 export interface IUser extends Document {
-  name: string;
   email: string;
-  password: string;
-  image?: string;
+  passwordHash: string;
+  fullName: string;
+  phone?: string;
+  profilePhoto?: string;
+  role: 'user' | 'admin';
+  isActive: boolean;
+  lastLogin?: Date;
   createdAt: Date;
   updatedAt: Date;
 }
 
 const UserSchema: Schema<IUser> = new Schema(
   {
-    name: {
-      type: String,
-      required: [true, 'İsim gereklidir'],
-      trim: true,
-    },
     email: {
       type: String,
       required: [true, 'Email gereklidir'],
@@ -27,14 +26,34 @@ const UserSchema: Schema<IUser> = new Schema(
         'Geçerli bir email adresi giriniz',
       ],
     },
-    password: {
+    passwordHash: {
       type: String,
-      required: [true, 'Şifre gereklidir'],
-      minlength: [6, 'Şifre en az 6 karakter olmalıdır'],
+      required: [true, 'Şifre hash gereklidir'],
     },
-    image: {
+    fullName: {
       type: String,
-      default: null,
+      required: [true, 'Ad Soyad gereklidir'],
+      trim: true,
+    },
+    phone: {
+      type: String,
+      trim: true,
+    },
+    profilePhoto: {
+      type: String,
+      trim: true,
+    },
+    role: {
+      type: String,
+      enum: ['user', 'admin'],
+      default: 'user',
+    },
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
+    lastLogin: {
+      type: Date,
     },
   },
   {
@@ -42,8 +61,11 @@ const UserSchema: Schema<IUser> = new Schema(
   }
 );
 
+// İndeksler
+UserSchema.index({ role: 1 });
+
 // Model'i tekrar oluşturmayı önle (Next.js hot reload için)
-const User: Model<IUser> = 
+const User: Model<IUser> =
   mongoose.models.User || mongoose.model<IUser>('User', UserSchema);
 
 export default User;

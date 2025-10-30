@@ -7,7 +7,7 @@
  */
 
 /**
- * Personal Information
+ * Personal Information - Updated to match backend schema
  */
 export interface PersonalInfo {
   firstName: string;
@@ -20,6 +20,8 @@ export interface PersonalInfo {
   postalCode: string;
   title: string; // Job title
   linkedIn?: string;
+  github?: string;
+  instagram?: string;
   website?: string;
   photo?: string;
 }
@@ -58,7 +60,6 @@ export interface Education {
   endDate: string;
   current: boolean;
   gpa?: string;
-  description?: string;
 }
 
 /**
@@ -76,7 +77,7 @@ export interface Skill {
 export interface Language {
   id: string;
   name: string;
-  level: 'basic' | 'conversational' | 'fluent' | 'native';
+  level: 'basic' | 'intermediate' | 'fluent' | 'native';
 }
 
 /**

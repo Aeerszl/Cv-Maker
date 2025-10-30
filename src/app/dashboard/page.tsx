@@ -22,16 +22,15 @@ import type { CVCard as CVCardType } from '@/types/dashboard';
 
 /**
  * Get user's CVs from database
- * TODO: Implement actual database query
  */
-async function getUserCVs(_userId: string): Promise<CVCardType[]> {
-  // Mock data for now
-  // In production, query database: await CV.find({ userId }).sort({ lastModified: -1 })
+async function getUserCVs(): Promise<CVCardType[]> {
+  // For now, return mock data
+  // TODO: Implement proper server-side data fetching with authentication
   return [
     {
       id: '1',
       title: 'Yazılım Geliştirici CV',
-      template: 'modern',
+      template: 'modern' as const,
       lastModified: new Date(Date.now() - 1000 * 60 * 60 * 2), // 2 hours ago
       createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 5), // 5 days ago
       isComplete: true,
@@ -39,7 +38,7 @@ async function getUserCVs(_userId: string): Promise<CVCardType[]> {
     {
       id: '2',
       title: 'Frontend Developer Resume',
-      template: 'professional',
+      template: 'professional' as const,
       lastModified: new Date(Date.now() - 1000 * 60 * 60 * 24), // 1 day ago
       createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 3), // 3 days ago
       isComplete: false,
@@ -47,7 +46,7 @@ async function getUserCVs(_userId: string): Promise<CVCardType[]> {
     {
       id: '3',
       title: 'Full Stack Developer CV',
-      template: 'creative',
+      template: 'creative' as const,
       lastModified: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7), // 1 week ago
       createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 10), // 10 days ago
       isComplete: true,
@@ -67,7 +66,7 @@ export default async function DashboardPage() {
   }
 
   // Get user's CVs
-  const cvs = await getUserCVs(session.user.id);
+  const cvs = await getUserCVs();
 
   return (
     <div className="min-h-screen bg-background">

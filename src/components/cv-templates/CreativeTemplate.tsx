@@ -16,15 +16,6 @@ interface CreativeTemplateProps {
 export function CreativeTemplate({ data }: CreativeTemplateProps) {
   const { personalInfo, summary, experience, education, skills, languages, certificates } = data;
 
-  const getLevelPercentage = (level: string) => {
-    switch (level) {
-      case 'expert': return '100%';
-      case 'advanced': return '75%';
-      case 'intermediate': return '50%';
-      default: return '25%';
-    }
-  };
-
   return (
     <div className="w-[210mm] min-h-[297mm] bg-white text-gray-900 shadow-lg mx-auto flex">
       {/* Left Sidebar */}
@@ -89,14 +80,14 @@ export function CreativeTemplate({ data }: CreativeTemplateProps) {
             </h2>
             <div className="space-y-3">
               {skills.map((skill) => (
-                <div key={skill.id}>
-                  <p className="text-sm mb-1">{skill.name}</p>
-                  <div className="w-full bg-white/20 rounded-full h-1.5">
-                    <div
-                      className="bg-white h-1.5 rounded-full transition-all"
-                      style={{ width: getLevelPercentage(skill.level) }}
-                    ></div>
-                  </div>
+                <div key={skill.id} className="flex justify-between items-center">
+                  <span className="text-sm">{skill.name}</span>
+                  <span className="text-purple-200 text-xs">
+                    {skill.years ? `${skill.years}y` : 
+                     skill.level === 'expert' ? 'Uzman' :
+                     skill.level === 'advanced' ? 'İleri' :
+                     skill.level === 'intermediate' ? 'Orta' : 'Başlangıç'}
+                  </span>
                 </div>
               ))}
             </div>

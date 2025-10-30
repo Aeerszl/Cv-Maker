@@ -8,7 +8,8 @@
 
 'use client';
 
-import { Plus, CheckCircle, Target, FileText, Zap, Award } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Plus, CheckCircle, Target, FileText, Zap, Hash, Mail, GraduationCap, Briefcase, Code, Globe, Sparkles, Search } from 'lucide-react';
 import Link from 'next/link';
 import type { CVCard as CVCardType } from '@/types/dashboard';
 
@@ -23,37 +24,86 @@ const cvTips = [
   {
     icon: CheckCircle,
     title: 'Net ve Öz Olun',
-    description: 'CV\'niz 1-2 sayfa arasında olmalı. Gereksiz detaylardan kaçının.',
+    description: 'CV\'niz 1-2 sayfa arasında olmalı. Gereksiz detaylardan kaçının ve önemli bilgilere odaklanın.',
     color: 'text-blue-600 dark:text-blue-400',
     bgColor: 'bg-blue-100 dark:bg-blue-900/20',
   },
   {
     icon: Target,
     title: 'İş İlanına Uygun',
-    description: 'Her pozisyon için CV\'nizi özelleştirin. İlgili becerileri vurgulayın.',
+    description: 'Her pozisyon için CV\'nizi özelleştirin. İlgili becerileri ve deneyimleri öne çıkarın.',
     color: 'text-green-600 dark:text-green-400',
     bgColor: 'bg-green-100 dark:bg-green-900/20',
   },
   {
     icon: FileText,
     title: 'ATS Uyumlu Format',
-    description: 'Başvuru sistemleri CV\'nizi okuyabilmeli. Standart başlıklar kullanın.',
+    description: 'Başvuru sistemleri CV\'nizi okuyabilmeli. Standart başlıklar ve düzenli formatlar kullanın.',
     color: 'text-purple-600 dark:text-purple-400',
     bgColor: 'bg-purple-100 dark:bg-purple-900/20',
   },
   {
     icon: Zap,
     title: 'Başarılarınızı Ölçün',
-    description: 'Sayılarla desteklenmiş başarılar ekleyin. "Satışları %30 artırdım" gibi.',
+    description: 'Sayılarla desteklenmiş başarılar ekleyin. "Satışları %30 artırdım" gibi somut örnekler verin.',
     color: 'text-orange-600 dark:text-orange-400',
     bgColor: 'bg-orange-100 dark:bg-orange-900/20',
   },
   {
-    icon: Award,
+    icon: Hash,
     title: 'Anahtar Kelimeler',
-    description: 'İş ilanındaki anahtar kelimeleri CV\'nize dahil edin.',
+    description: 'İş ilanındaki anahtar kelimeleri CV\'nize dahil edin. Bu, sistemler tarafından fark edilmenizi sağlar.',
     color: 'text-red-600 dark:text-red-400',
     bgColor: 'bg-red-100 dark:bg-red-900/20',
+  },
+  {
+    icon: Mail,
+    title: 'İletişim Bilgileri',
+    description: 'Güncel telefon, e-posta ve LinkedIn profilinizi ekleyin. Profesyonel bir e-posta adresi kullanın.',
+    color: 'text-cyan-600 dark:text-cyan-400',
+    bgColor: 'bg-cyan-100 dark:bg-cyan-900/20',
+  },
+  {
+    icon: GraduationCap,
+    title: 'Eğitim ve Sertifikalar',
+    description: 'Mezuniyet bilgilerinizi, önemli sertifikalarınızı ve eğitim programlarınızı belirtin.',
+    color: 'text-indigo-600 dark:text-indigo-400',
+    bgColor: 'bg-indigo-100 dark:bg-indigo-900/20',
+  },
+  {
+    icon: Briefcase,
+    title: 'İş Deneyimi',
+    description: 'Son pozisyondan başlayarak çalışma geçmişinizi kronolojik sırayla listeleyin.',
+    color: 'text-pink-600 dark:text-pink-400',
+    bgColor: 'bg-pink-100 dark:bg-pink-900/20',
+  },
+  {
+    icon: Code,
+    title: 'Teknik Beceriler',
+    description: 'Pozisyonla ilgili yazılım, araç ve teknolojilerdeki yetkinliklerinizi gösterin.',
+    color: 'text-emerald-600 dark:text-emerald-400',
+    bgColor: 'bg-emerald-100 dark:bg-emerald-900/20',
+  },
+  {
+    icon: Globe,
+    title: 'Dil Becerileri',
+    description: 'Yabancı dil seviyelerinizi (A1-C2) veya sertifikalarınızı (TOEFL, IELTS) belirtin.',
+    color: 'text-teal-600 dark:text-teal-400',
+    bgColor: 'bg-teal-100 dark:bg-teal-900/20',
+  },
+  {
+    icon: Sparkles,
+    title: 'Temiz Tasarım',
+    description: 'Okunabilir fontlar, yeterli boşluklar ve profesyonel bir görünüm kullanın.',
+    color: 'text-violet-600 dark:text-violet-400',
+    bgColor: 'bg-violet-100 dark:bg-violet-900/20',
+  },
+  {
+    icon: Search,
+    title: 'Hatasız İçerik',
+    description: 'Yazım ve dilbilgisi hatalarını kontrol edin. CV\'nizi başkasına okutarak gözden geçirin.',
+    color: 'text-amber-600 dark:text-amber-400',
+    bgColor: 'bg-amber-100 dark:bg-amber-900/20',
   },
 ];
 
@@ -61,11 +111,42 @@ const cvTips = [
  * Dashboard Content Component
  */
 export function DashboardContent({ initialCVs }: DashboardContentProps) {
+  const [cvs, setCvs] = useState<CVCardType[]>(initialCVs);
+
+  // Fetch CVs from API
+  useEffect(() => {
+    const fetchCVs = async () => {
+      try {
+        const response = await fetch('/api/cv');
+        if (response.ok) {
+          const data = await response.json();
+          const apiCVs = data.cvs || data;
+          const transformedCVs: CVCardType[] = apiCVs.map((cv: { _id: string; title: string; template: string; updatedAt: string; createdAt: string; status: string }) => ({
+            id: cv._id,
+            title: cv.title,
+            template: cv.template as CVCardType['template'],
+            lastModified: new Date(cv.updatedAt),
+            createdAt: new Date(cv.createdAt),
+            isComplete: cv.status === 'completed',
+          }));
+          setCvs(transformedCVs);
+        } else {
+          console.error('API Error:', response.status, response.statusText);
+        }
+      } catch (error) {
+        console.error('Error fetching CVs:', error);
+        // Keep initial CVs on error
+      }
+    };
+
+    fetchCVs();
+  }, []);
+
   // Calculate statistics
-  const totalCVs = initialCVs.length;
-  const completedCVs = initialCVs.filter(cv => cv.isComplete).length;
-  const lastModified = initialCVs.length > 0 
-    ? initialCVs.reduce((latest, cv) => cv.lastModified > latest ? cv.lastModified : latest, initialCVs[0].lastModified)
+  const totalCVs = cvs.length;
+  const completedCVs = cvs.filter(cv => cv.isComplete).length;
+  const lastModified = cvs.length > 0 
+    ? cvs.reduce((latest, cv) => cv.lastModified > latest ? cv.lastModified : latest, cvs[0].lastModified)
     : null;
 
   return (
@@ -135,7 +216,7 @@ export function DashboardContent({ initialCVs }: DashboardContentProps) {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {cvTips.map((tip, index) => {
             const Icon = tip.icon;
             return (

@@ -1,0 +1,47 @@
+{
+  "templateSelector": {
+    "title": "Choose CV Template",
+    "subtitle": "Choose the most suitable one from 5 different ATS-friendly professional templates. All templates can be easily read by application tracking systems.",
+    "preview": "Preview",
+    "selectTemplate": "Select This Template",
+    "modalTitle": "Template - Sample CV",
+    "modalSubtitle": "How your CV will look with this template",
+    "close": "Close"
+  },
+  "templates": {
+    "modern": {
+      "name": "Modern",
+      "description": "Two-column layout, clean and contemporary design",
+      "preview": "📄 Modern, professional look",
+      "features": ["Two-column layout", "Color highlights", "Icon support", "ATS compatible"]
+    },
+    "classic": {
+      "name": "Classic",
+      "description": "Traditional and professional single-column layout",
+      "preview": "📋 Classic, reliable design",
+      "features": ["Single column", "Simple design", "Easy to read", "Universal"]
+    },
+    "creative": {
+      "name": "Creative",
+      "description": "Unique design for creative positions",
+      "preview": "🎨 Creative, different look",
+      "features": ["Side panel", "Graphic elements", "Eye-catching", "Colorful"]
+    },
+    "professional": {
+      "name": "Professional",
+      "description": "Serious design for corporate positions",
+      "preview": "💼 Corporate, strong look",
+      "features": ["Classic layout", "Clear sections", "ATS optimized", "Corporate"]
+    },
+    "minimal": {
+      "name": "Minimal",
+      "description": "Simple and elegant minimalist design",
+      "preview": "✨ Minimal, elegant look",
+      "features": ["Minimalist", "Plenty of white space", "Readable", "Elegant"]
+    }
+  },
+  "atsInfo": {
+    "title": "What is ATS Compatibility?",
+    "description": "ATS (Applicant Tracking System) allows companies to automatically scan CVs. All our templates are designed to be easily readable by these systems, thus increasing the chance of your application reaching human resources."
+  }
+}

@@ -160,17 +160,12 @@ export function ModernTemplate({ data }: ModernTemplateProps) {
                   <div key={skill.id}>
                     <div className="flex justify-between mb-1">
                       <span className="font-medium text-gray-800">{skill.name}</span>
-                      <span className="text-sm text-gray-600">{skill.level}</span>
-                    </div>
-                    <div className="w-full bg-gray-300 rounded-full h-2">
-                      <div
-                        className="bg-blue-600 h-2 rounded-full transition-all"
-                        style={{
-                          width: skill.level === 'expert' ? '100%' : 
-                                 skill.level === 'advanced' ? '75%' : 
-                                 skill.level === 'intermediate' ? '50%' : '25%'
-                        }}
-                      ></div>
+                      <span className="text-sm text-gray-600">
+                        {skill.years ? `${skill.years} yıl` : 
+                         skill.level === 'expert' ? 'Uzman' :
+                         skill.level === 'advanced' ? 'İleri' :
+                         skill.level === 'intermediate' ? 'Orta' : 'Başlangıç'}
+                      </span>
                     </div>
                   </div>
                 ))}

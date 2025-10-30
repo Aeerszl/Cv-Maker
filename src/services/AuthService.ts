@@ -75,12 +75,19 @@ export class AuthService {
    */
   public async register(data: RegisterData): Promise<ApiResponse> {
     try {
+      // Transform data to match API expectations
+      const apiData = {
+        fullName: data.name, // API expects fullName, not name
+        email: data.email,
+        password: data.password,
+      };
+
       const response = await fetch(`${this.baseUrl}/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(apiData),
       });
 
       const result = await response.json();
