@@ -37,13 +37,13 @@ export function ProfessionalTemplate({ data }: ProfessionalTemplateProps) {
 
       <div className="px-12 py-8">
         {/* Professional Summary */}
-        {summary.text && (
+        {summary && (
           <section className="mb-8">
             <div className="flex items-center gap-3 mb-3">
               <div className="w-2 h-8 bg-green-600"></div>
               <h2 className="text-2xl font-bold text-gray-900">EXECUTIVE SUMMARY</h2>
             </div>
-            <p className="text-gray-700 leading-relaxed ml-5">{summary.text}</p>
+            <p className="text-gray-700 leading-relaxed ml-5">{summary}</p>
           </section>
         )}
 
@@ -103,7 +103,6 @@ export function ProfessionalTemplate({ data }: ProfessionalTemplateProps) {
                       {edu.startDate} - {edu.endDate || 'Present'}
                     </p>
                   </div>
-                  {edu.description && <p className="text-gray-700 mt-1">{edu.description}</p>}
                 </div>
               ))}
             </div>

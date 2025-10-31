@@ -83,8 +83,7 @@ export function CreativeTemplate({ data }: CreativeTemplateProps) {
                 <div key={skill.id} className="flex justify-between items-center">
                   <span className="text-sm">{skill.name}</span>
                   <span className="text-purple-200 text-xs">
-                    {skill.years ? `${skill.years}y` : 
-                     skill.level === 'expert' ? 'Uzman' :
+                    {skill.level === 'expert' ? 'Uzman' :
                      skill.level === 'advanced' ? 'İleri' :
                      skill.level === 'intermediate' ? 'Orta' : 'Başlangıç'}
                   </span>
@@ -133,13 +132,13 @@ export function CreativeTemplate({ data }: CreativeTemplateProps) {
       {/* Main Content */}
       <div className="flex-1 p-10">
         {/* Professional Summary */}
-        {summary.text && (
+        {summary && (
           <section className="mb-8">
             <h2 className="text-2xl font-bold text-purple-700 mb-3 relative">
               <span className="relative z-10">ÖZET</span>
               <div className="absolute bottom-0 left-0 w-20 h-3 bg-purple-200 -z-0"></div>
             </h2>
-            <p className="text-gray-700 leading-relaxed">{summary.text}</p>
+            <p className="text-gray-700 leading-relaxed">{summary}</p>
           </section>
         )}
 
@@ -196,7 +195,6 @@ export function CreativeTemplate({ data }: CreativeTemplateProps) {
                   </p>
                   {edu.field && <p className="text-gray-700">{edu.field}</p>}
                   {edu.gpa && <p className="text-gray-600 text-sm">GPA: {edu.gpa}</p>}
-                  {edu.description && <p className="text-gray-700 mt-1">{edu.description}</p>}
                 </div>
               ))}
             </div>

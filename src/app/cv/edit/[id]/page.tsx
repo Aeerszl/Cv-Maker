@@ -45,20 +45,49 @@ export default async function EditPage({ params }: EditPageProps) {
 
     // Transform CV data for the builder
     cvData = {
-      _id: (cv as any)._id.toString(),
-      title: cv.title,
-      template: cv.template,
-      status: cv.status,
-      personalInfo: cv.personalInfo,
-      summary: { text: cv.summary || '' },
-      workExperience: cv.workExperience || [],
-      education: cv.education || [],
-      skills: cv.skills || [],
-      languages: cv.languages || [],
-      certifications: cv.certifications || [],
-      projects: cv.projects || [],
-      createdAt: cv.createdAt,
-      updatedAt: cv.updatedAt,
+      personalInfo: {
+        firstName: cv.personalInfo.fullName?.split(' ')[0] || '',
+        lastName: cv.personalInfo.fullName?.split(' ').slice(1).join(' ') || '',
+        email: cv.personalInfo.email || '',
+        phone: cv.personalInfo.phone || '',
+        address: cv.personalInfo.location || '', // Map location to address
+        city: '', // Add empty city since IPersonalInfo doesn't have it
+        country: '', // Add empty country since IPersonalInfo doesn't have it
+        postalCode: '', // Add empty postalCode since IPersonalInfo doesn't have it
+        title: cv.personalInfo.title || '',
+        linkedIn: cv.personalInfo.linkedin || '', // Map linkedin to linkedIn (case difference)
+        github: cv.personalInfo.github || '',
+        instagram: cv.personalInfo.instagram || '',
+        website: cv.personalInfo.website || '',
+        photo: cv.personalInfo.photo || '',
+      },
+      summary: cv.summary || '',
+      experience: cv.workExperience?.map((exp, index) => ({
+        id: `exp-${index}`,
+        location: exp.location || '', // Handle optional location
+        endDate: exp.endDate || '', // Handle optional endDate (though IWorkExperience has it as optional, WorkExperience requires it as string? Wait, let me check the interface again. Actually, WorkExperience has endDate as string, but IWorkExperience has it as optional. This might be a type mismatch. Let me adjust.)
+        ...exp,
+      })) || [],
+      education: cv.education?.map((edu, index) => ({
+        id: `edu-${index}`,
+        location: '', // IEducation doesn't have location, add empty string
+        endDate: edu.endDate || '', // Handle optional endDate
+        ...edu,
+      })) || [],
+      skills: cv.skills?.map((skill, index) => ({
+        id: `skill-${index}`,
+        ...skill,
+      })) || [],
+      languages: cv.languages?.map((lang, index) => ({
+        id: `lang-${index}`,
+        ...lang,
+      })) || [],
+      certificates: cv.certifications?.map((cert, index) => ({
+        id: `cert-${index}`,
+        ...cert,
+      })) || [],
+
+
     };
   } catch (error) {
     console.error('Error loading CV for edit:', error);

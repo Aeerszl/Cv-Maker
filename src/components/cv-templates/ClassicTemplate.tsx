@@ -43,12 +43,12 @@ export function ClassicTemplate({ data }: ClassicTemplateProps) {
       </header>
 
       {/* Professional Summary */}
-      {summary.text && (
+      {summary && (
         <section className="mb-8">
           <h2 className="text-xl font-bold text-gray-900 mb-3 uppercase tracking-wide border-b border-gray-300 pb-1">
             Profesyonel Özet
           </h2>
-          <p className="text-gray-700 leading-relaxed text-justify">{summary.text}</p>
+          <p className="text-gray-700 leading-relaxed text-justify">{summary}</p>
         </section>
       )}
 
@@ -103,7 +103,6 @@ export function ClassicTemplate({ data }: ClassicTemplateProps) {
                 </p>
                 {edu.field && <p className="text-gray-600">{edu.field}</p>}
                 {edu.gpa && <p className="text-gray-600">GPA: {edu.gpa}</p>}
-                {edu.description && <p className="text-gray-700 mt-1">{edu.description}</p>}
               </div>
             ))}
           </div>

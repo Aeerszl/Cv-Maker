@@ -70,12 +70,12 @@ export function ModernTemplate({ data }: ModernTemplateProps) {
         {/* Left Column - Main Content */}
         <div className="flex-1 px-12 py-8">
           {/* Professional Summary */}
-          {summary.text && (
+          {summary && (
             <section className="mb-8">
               <h2 className="text-2xl font-bold text-blue-700 mb-3 pb-2 border-b-2 border-blue-200">
                 ÖZET
               </h2>
-              <p className="text-gray-700 leading-relaxed">{summary.text}</p>
+              <p className="text-gray-700 leading-relaxed">{summary}</p>
             </section>
           )}
 
@@ -136,9 +136,6 @@ export function ModernTemplate({ data }: ModernTemplateProps) {
                         </div>
                       </div>
                     </div>
-                    {edu.description && (
-                      <p className="text-gray-700 mt-2">{edu.description}</p>
-                    )}
                   </div>
                 ))}
               </div>
@@ -161,8 +158,7 @@ export function ModernTemplate({ data }: ModernTemplateProps) {
                     <div className="flex justify-between mb-1">
                       <span className="font-medium text-gray-800">{skill.name}</span>
                       <span className="text-sm text-gray-600">
-                        {skill.years ? `${skill.years} yıl` : 
-                         skill.level === 'expert' ? 'Uzman' :
+                        {skill.level === 'expert' ? 'Uzman' :
                          skill.level === 'advanced' ? 'İleri' :
                          skill.level === 'intermediate' ? 'Orta' : 'Başlangıç'}
                       </span>

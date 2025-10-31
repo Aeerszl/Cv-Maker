@@ -1,4 +1,11 @@
 {
+  "nav": {
+    "features": "Why Us",
+    "templates": "Templates",
+    "about": "About Us",
+    "signin": "Sign In",
+    "signup": "Get Started Free"
+  },
   "templateSelector": {
     "title": "Choose CV Template",
     "subtitle": "Choose the most suitable one from 5 different ATS-friendly professional templates. All templates can be easily read by application tracking systems.",
@@ -43,5 +50,90 @@
   "atsInfo": {
     "title": "What is ATS Compatibility?",
     "description": "ATS (Applicant Tracking System) allows companies to automatically scan CVs. All our templates are designed to be easily readable by these systems, thus increasing the chance of your application reaching human resources."
+  },
+  "about": {
+    "hero": {
+      "badge": "About Us",
+      "title": "Reliable Solution for Professional CVs",
+      "description": "Create ATS-compatible, modern and impressive CVs with CvMaker.Aliee. Get free, fast and professional results."
+    },
+    "stats": {
+      "templates": "Templates",
+      "ats": "ATS Compatible",
+      "support": "Support",
+      "price": "Price"
+    },
+    "features": {
+      "title": "Why CvMaker.Aliee?",
+      "subtitle": "We redefine the CV creation experience with modern technologies and user-friendly design.",
+      "templates": {
+        "title": "5 Professional Templates",
+        "description": "Choose from Modern, Classic, Creative, Professional and Minimal designs."
+      },
+      "ats": {
+        "title": "Full ATS Compatibility",
+        "description": "All our templates are easily readable by ATS systems, increasing the chance of your applications being evaluated."
+      },
+      "fast": {
+        "title": "Fast and Easy",
+        "description": "Create a professional CV in just a few minutes and download it as PDF."
+      },
+      "free": {
+        "title": "Completely Free",
+        "description": "All our services including premium features are free. No hidden fees."
+      }
+    },
+    "ats": {
+      "benefits": {
+        "title": "ATS Benefits",
+        "keyword": "Keyword optimization",
+        "format": "Standard format support",
+        "speed": "Automatic scanning speed"
+      },
+      "templates": {
+        "title": "ATS Compatible Templates",
+        "description": "All our templates are optimized for ATS systems:"
+      }
+    },
+    "cta": {
+      "title": "Create Your CV Now",
+      "description": "Evaluate your career opportunities with a professional CV. Start free!",
+      "button": "Get Started Free",
+      "templates": "View Templates"
+    },
+    "page": {
+      "hero": {
+        "title": "About the Project",
+        "description": "I developed this platform myself so that people can create and download modern CVs quickly and effortlessly."
+      },
+      "why": {
+        "title": "Why Did I Make This Project?",
+        "description": "I know how important CV preparation is in career journey. However, most people struggle for hours in Word, face format issues, or need design knowledge to achieve a professional look. To solve this problem, I developed this platform. My goal is for everyone to create a free and professional CV in 5 minutes."
+      },
+      "ats": {
+        "title": "What is ATS Format?",
+        "description": "ATS (Applicant Tracking System) are software that allow companies to automatically scan CVs. 75% of applications pass through ATS systems and CVs that are not in the appropriate format are eliminated.",
+        "correct": "Correct Format",
+        "wrong": "Wrong Format",
+        "correctItems": {
+          "0": "Standard fonts (Arial, Calibri)",
+          "1": "Keyword optimization",
+          "2": "Clean, organized structure"
+        },
+        "wrongItems": {
+          "0": "Fancy fonts",
+          "1": "Tables, images",
+          "2": "Complex layouts"
+        }
+      },
+      "aboutMe": {
+        "title": "About Me",
+        "description": "Hello! I am Aliee, the software developer who developed this application. I love producing user-friendly solutions with modern technologies. CV Maker is one of my personal projects and now it helps thousands of people in their career journey.",
+        "visitWebsite": "Visit My Website"
+      },
+      "footer": {
+        "message": "I hope this application works for you!",
+        "signature": "— CvMaker.Aliee"
+      }
+    }
   }
-}

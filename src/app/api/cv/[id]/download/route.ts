@@ -14,9 +14,9 @@ import CV from '@/models/CV';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 
 interface RouteParams {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 export async function GET(req: NextRequest, { params }: RouteParams) {

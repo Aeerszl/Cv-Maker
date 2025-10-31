@@ -13,7 +13,7 @@ import { useRouter } from 'next/navigation';
 import { Sidebar } from '@/components/dashboard/Sidebar';
 import { TemplateSelector } from '@/components/cv-templates/TemplateSelector';
 import { ModernTemplate, ClassicTemplate, CreativeTemplate, ProfessionalTemplate, MinimalTemplate } from '@/components/cv-templates';
-import type { CVData, FormStep } from '@/types/cv-builder';
+import type { CVData, FormStep, WorkExperience } from '@/types/cv-builder';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 interface CVBuilderClientProps {
@@ -40,9 +40,7 @@ const initialCVData: CVData = {
     linkedIn: '',
     website: '',
   },
-  summary: {
-    text: '',
-  },
+  summary: '',
   experience: [],
   education: [],
   skills: [],
@@ -63,24 +61,22 @@ export default function CVBuilderClient({ userName, userEmail, initialData, isEd
       // Transform backend data to frontend format
       return {
         personalInfo: {
-          firstName: initialData.personalInfo?.fullName?.split(' ')[0] || '',
-          lastName: initialData.personalInfo?.fullName?.split(' ').slice(1).join(' ') || '',
+          firstName: initialData.personalInfo?.firstName || '',
+          lastName: initialData.personalInfo?.lastName || '',
           email: initialData.personalInfo?.email || '',
           phone: initialData.personalInfo?.phone || '',
           address: '',
-          city: initialData.personalInfo?.location || '',
+          city: initialData.personalInfo?.city || '',
           country: '',
           postalCode: '',
           title: initialData.personalInfo?.title || '',
-          linkedIn: initialData.personalInfo?.linkedin || '',
+          linkedIn: initialData.personalInfo?.linkedIn || '',
           github: initialData.personalInfo?.github || '',
           instagram: initialData.personalInfo?.instagram || '',
           website: '',
         },
-        summary: {
-          text: initialData.summary || '',
-        },
-        experience: initialData.workExperience?.map(exp => ({
+        summary: initialData.summary || '',
+        experience: initialData.experience?.map((exp: WorkExperience) => ({
           id: Date.now().toString() + Math.random(),
           company: exp.company || '',
           position: exp.position || '',
@@ -244,9 +240,9 @@ export default function CVBuilderClient({ userName, userEmail, initialData, isEd
           linkedin: cvData.personalInfo.linkedIn,
           github: cvData.personalInfo.github,
           instagram: cvData.personalInfo.instagram,
-          summary: cvData.summary.text,
+        summary: cvData.summary,
         },
-        summary: cvData.summary.text,
+        summary: cvData.summary,
         workExperience: filteredWorkExperience.map(exp => ({
           company: exp.company,
           position: exp.position,
@@ -579,17 +575,17 @@ export default function CVBuilderClient({ userName, userEmail, initialData, isEd
                     {t('cvBuilder.summary.label')} *
                   </label>
                   <textarea
-                    value={cvData.summary.text}
+                    value={cvData.summary}
                     onChange={(e) => setCVData({
                       ...cvData,
-                      summary: { text: e.target.value }
+                      summary: e.target.value
                     })}
                     rows={8}
                     className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary resize-none"
                     placeholder={t('cvBuilder.summary.placeholder')}
                   />
                   <p className="text-sm text-muted-foreground mt-2">
-                    {cvData.summary.text.length} / 500 {t('cvBuilder.summary.characterLimit')}
+                    {cvData.summary.length} / 500 {t('cvBuilder.summary.characterLimit')}
                   </p>
                 </div>
               </div>

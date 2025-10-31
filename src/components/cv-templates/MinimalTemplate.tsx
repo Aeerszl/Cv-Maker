@@ -42,12 +42,12 @@ export function MinimalTemplate({ data }: MinimalTemplateProps) {
       </header>
 
       {/* Professional Summary */}
-      {summary.text && (
+      {summary && (
         <section className="mb-12">
           <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-4">
             About
           </h2>
-          <p className="text-gray-700 leading-loose font-light">{summary.text}</p>
+          <p className="text-gray-700 leading-loose font-light">{summary}</p>
         </section>
       )}
 
@@ -102,7 +102,6 @@ export function MinimalTemplate({ data }: MinimalTemplateProps) {
                 </p>
                 {edu.field && <p className="text-gray-600 font-light">{edu.field}</p>}
                 {edu.gpa && <p className="text-gray-600 font-light">GPA: {edu.gpa}</p>}
-                {edu.description && <p className="text-gray-700 mt-2 font-light">{edu.description}</p>}
               </div>
             ))}
           </div>

@@ -36,9 +36,7 @@ const sampleCVData: CVData = {
     linkedIn: 'linkedin.com/in/ahmetyilmaz',
     website: 'www.ahmetyilmaz.com',
   },
-  summary: {
-    text: '8+ yıllık deneyime sahip, full-stack yazılım geliştirici. React, Node.js ve cloud teknolojilerinde uzman. Agile metodolojileri kullanarak yüksek performanslı web uygulamaları geliştirme konusunda kanıtlanmış başarı kaydı. Takım liderliği ve mentorluk deneyimi.',
-  },
+  summary: '8+ yıllık deneyime sahip, full-stack yazılım geliştirici. React, Node.js ve cloud teknolojilerinde uzman. Agile metodolojileri kullanarak yüksek performanslı web uygulamaları geliştirme konusunda kanıtlanmış başarı kaydı. Takım liderliği ve mentorluk deneyimi.',
   experience: [
     {
       id: '1',
@@ -72,7 +70,6 @@ const sampleCVData: CVData = {
       endDate: '06/2017',
       current: false,
       gpa: '3.8/4.0',
-      description: 'Tez: Makine Öğrenmesi Algoritmalarının Web Uygulamalarında Kullanımı',
     },
     {
       id: '2',
@@ -87,19 +84,19 @@ const sampleCVData: CVData = {
     },
   ],
   skills: [
-    { id: '1', name: 'JavaScript / TypeScript', level: 'expert', years: 8 },
-    { id: '2', name: 'React.js / Next.js', level: 'expert', years: 5 },
-    { id: '3', name: 'Node.js / Express', level: 'advanced', years: 6 },
-    { id: '4', name: 'Python / Django', level: 'advanced', years: 4 },
-    { id: '5', name: 'AWS / Cloud Services', level: 'advanced', years: 3 },
-    { id: '6', name: 'MongoDB / PostgreSQL', level: 'advanced', years: 5 },
-    { id: '7', name: 'Docker / Kubernetes', level: 'intermediate', years: 2 },
-    { id: '8', name: 'Git / CI/CD', level: 'expert', years: 7 },
+    { id: '1', name: 'JavaScript / TypeScript', level: 'expert' },
+    { id: '2', name: 'React.js / Next.js', level: 'expert' },
+    { id: '3', name: 'Node.js / Express', level: 'advanced' },
+    { id: '4', name: 'Python / Django', level: 'advanced' },
+    { id: '5', name: 'AWS / Cloud Services', level: 'advanced' },
+    { id: '6', name: 'MongoDB / PostgreSQL', level: 'advanced' },
+    { id: '7', name: 'Docker / Kubernetes', level: 'intermediate' },
+    { id: '8', name: 'Git / CI/CD', level: 'expert' },
   ],
   languages: [
     { id: '1', name: 'Türkçe', level: 'native' },
     { id: '2', name: 'İngilizce', level: 'fluent' },
-    { id: '3', name: 'Almanca', level: 'conversational' },
+    { id: '3', name: 'Almanca', level: 'intermediate' },
   ],
   certificates: [
     {

@@ -13,7 +13,8 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Moon, Sun, Languages, Sparkles } from 'lucide-react';
@@ -30,6 +31,7 @@ export function Header() {
   const [mounted, setMounted] = useState(false);
   const { theme, setTheme } = useTheme();
   const { language, setLanguage, t } = useLanguage();
+  const pathname = usePathname();
 
   useEffect(() => {
     // Use a microtask to avoid sync state update
@@ -57,7 +59,7 @@ export function Header() {
   return (
     <nav className="fixed top-0 w-full glass z-50 border-b border-border/50 backdrop-blur-md shadow-lg dark:shadow-primary/5">
       {/* Animated underline */}
-      <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-primary to-transparent animate-shimmer" />
+      <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-linear-to-r from-transparent via-primary to-transparent animate-shimmer" />
       
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20 sm:h-22">
@@ -75,7 +77,7 @@ export function Header() {
               />
             </div>
             <div className="flex flex-col">
-              <span className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-primary via-primary/80 to-primary bg-clip-text text-transparent">
+              <span className="text-2xl sm:text-3xl font-bold bg-linear-to-r from-primary via-primary/80 to-primary bg-clip-text text-transparent">
                 CvMaker
               </span>
               <span className="text-sm sm:text-base font-medium text-muted-foreground -mt-1">
@@ -87,25 +89,25 @@ export function Header() {
           {/* Desktop Menu */}
           <div className="hidden md:flex items-center gap-8">
             <Link
-              href="#features"
+              href={pathname === '/' ? '#features' : '/#features'}
               className="text-sm font-semibold text-foreground/80 hover:text-foreground transition-colors relative group"
             >
               {t('nav.features')}
-              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-primary to-primary/50 transition-all duration-300 group-hover:w-full" />
+              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-linear-to-r from-primary to-primary/50 transition-all duration-300 group-hover:w-full" />
             </Link>
             <Link
-              href="#templates"
+              href={pathname === '/' ? '#templates' : '/#templates'}
               className="text-sm font-semibold text-foreground/80 hover:text-foreground transition-colors relative group"
             >
               {t('nav.templates')}
-              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-primary to-primary/50 transition-all duration-300 group-hover:w-full" />
+              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-linear-to-r from-primary to-primary/50 transition-all duration-300 group-hover:w-full" />
             </Link>
             <Link
-              href="#pricing"
+              href="/about"
               className="text-sm font-semibold text-foreground/80 hover:text-foreground transition-colors relative group"
             >
-              {t('nav.pricing')}
-              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-primary to-primary/50 transition-all duration-300 group-hover:w-full" />
+              {t('nav.about')}
+              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-linear-to-r from-primary to-primary/50 transition-all duration-300 group-hover:w-full" />
             </Link>
           </div>
           
@@ -162,7 +164,7 @@ export function Header() {
                 <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 {t('nav.signup')}
               </span>
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <div className="absolute inset-0 bg-linear-to-r from-blue-600 via-purple-600 to-pink-600 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             </Link>
           </div>
         </div>

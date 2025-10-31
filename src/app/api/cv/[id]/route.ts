@@ -6,9 +6,9 @@ import UserActivity from '@/models/UserActivity';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 
 interface RouteParams {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 // GET /api/cv/[id] - CV detaylarını getir

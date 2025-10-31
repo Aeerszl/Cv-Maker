@@ -96,7 +96,7 @@ export interface Certificate {
  */
 export interface CVData {
   personalInfo: PersonalInfo;
-  summary: Summary;
+  summary: string;
   experience: WorkExperience[];
   education: Education[];
   skills: Skill[];
