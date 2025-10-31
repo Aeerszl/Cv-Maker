@@ -31,7 +31,7 @@ const translations = {
     
     // Hero
     'hero.badge': 'AI destekli CV oluşturucu',
-    'hero.title1': 'Profesyonel',
+    'hero.title1': 'Profesyonel ve Ücretsiz',
     'hero.title2': "CV'nizi Oluşturun",
     'hero.description': 'ATS uyumlu şablonlar, yapay zeka destekli öneriler ve profesyonel PDF çıktısı ile',
     'hero.description2': 'iş başvurularınızda fark yaratın',
