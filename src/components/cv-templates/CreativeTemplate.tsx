@@ -14,18 +14,18 @@ interface CreativeTemplateProps {
 }
 
 export function CreativeTemplate({ data }: CreativeTemplateProps) {
-  const { personalInfo, summary, experience, education, skills, languages, certificates } = data;
+  const { personalInfo, summary, experience, education, skills, languages, certificates, projects } = data;
 
   return (
     <div className="w-[210mm] min-h-[297mm] bg-white text-gray-900 shadow-lg mx-auto flex">
       {/* Left Sidebar */}
-      <div className="w-1/3 bg-linear-to-br from-purple-600 to-purple-800 text-white p-8">
+      <div className="w-1/3 bg-linear-to-br from-purple-600 to-purple-800 text-white p-6">
         {/* Profile */}
-        <div className="mb-8">
-          <div className="w-32 h-32 mx-auto mb-4 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-5xl font-bold">
+        <div className="mb-5">
+          <div className="w-24 h-24 mx-auto mb-3 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-4xl font-bold">
             {personalInfo.firstName.charAt(0)}{personalInfo.lastName.charAt(0)}
           </div>
-          <h1 className="text-2xl font-bold text-center mb-2">
+          <h1 className="text-xl font-bold text-center mb-2">
             {personalInfo.firstName}<br/>{personalInfo.lastName}
           </h1>
           {personalInfo.title && (
@@ -34,11 +34,11 @@ export function CreativeTemplate({ data }: CreativeTemplateProps) {
         </div>
 
         {/* Contact */}
-        <div className="mb-8">
-          <h2 className="text-lg font-bold mb-3 pb-2 border-b border-white/30">
+        <div className="mb-3">
+          <h2 className="text-base font-bold mb-3 pb-2 border-b border-white/30">
             İLETİŞİM
           </h2>
-          <div className="space-y-2 text-sm">
+          <div className="space-y-1.5 text-xs">
             {personalInfo.email && (
               <div>
                 <p className="text-purple-200 text-xs">Email</p>
@@ -60,7 +60,27 @@ export function CreativeTemplate({ data }: CreativeTemplateProps) {
             {personalInfo.linkedIn && (
               <div>
                 <p className="text-purple-200 text-xs">LinkedIn</p>
-                <p className="break-words text-xs">{personalInfo.linkedIn}</p>
+                <a 
+                  href={personalInfo.linkedIn.startsWith('http') ? personalInfo.linkedIn : `https://linkedin.com/in/${personalInfo.linkedIn}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-white text-xs hover:underline break-all block"
+                >
+                  LinkedIn
+                </a>
+              </div>
+            )}
+            {personalInfo.github && (
+              <div>
+                <p className="text-purple-200 text-xs">GitHub</p>
+                <a 
+                  href={personalInfo.github.startsWith('http') ? personalInfo.github : `https://github.com/${personalInfo.github}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-white text-xs hover:underline break-all block"
+                >
+                  GitHub
+                </a>
               </div>
             )}
             {personalInfo.website && (
@@ -72,21 +92,20 @@ export function CreativeTemplate({ data }: CreativeTemplateProps) {
           </div>
         </div>
 
-        {/* Skills */}
-        {skills.length > 0 && (
-          <div className="mb-8">
-            <h2 className="text-lg font-bold mb-3 pb-2 border-b border-white/30">
-              YETENEKLER
+        {/* Education */}
+        {education.length > 0 && (
+          <div className="mb-3">
+            <h2 className="text-base font-bold mb-3 pb-2 border-b border-white/30">
+              EĞİTİM
             </h2>
-            <div className="space-y-3">
-              {skills.map((skill) => (
-                <div key={skill.id} className="flex justify-between items-center">
-                  <span className="text-sm">{skill.name}</span>
-                  <span className="text-purple-200 text-xs">
-                    {skill.level === 'expert' ? 'Uzman' :
-                     skill.level === 'advanced' ? 'İleri' :
-                     skill.level === 'intermediate' ? 'Orta' : 'Başlangıç'}
-                  </span>
+            <div className="space-y-2">
+              {education.map((edu) => (
+                <div key={edu.id} className="break-inside-avoid">
+                  <p className="text-sm font-bold">{edu.degree}</p>
+                  <p className="text-purple-200 text-xs">{edu.school}</p>
+                  <p className="text-purple-300 text-xs">
+                    {edu.startDate} - {edu.endDate || 'Devam'}
+                  </p>
                 </div>
               ))}
             </div>
@@ -95,11 +114,11 @@ export function CreativeTemplate({ data }: CreativeTemplateProps) {
 
         {/* Languages */}
         {languages.length > 0 && (
-          <div className="mb-8">
-            <h2 className="text-lg font-bold mb-3 pb-2 border-b border-white/30">
+          <div className="mb-3">
+            <h2 className="text-base font-bold mb-3 pb-2 border-b border-white/30">
               DİLLER
             </h2>
-            <div className="space-y-2 text-sm">
+            <div className="space-y-1.5 text-xs">
               {languages.map((lang) => (
                 <div key={lang.id} className="flex justify-between">
                   <span>{lang.name}</span>
@@ -110,18 +129,39 @@ export function CreativeTemplate({ data }: CreativeTemplateProps) {
           </div>
         )}
 
-        {/* Certificates */}
-        {certificates.length > 0 && (
+        {/* Projects */}
+        {projects && projects.length > 0 && (
           <div>
-            <h2 className="text-lg font-bold mb-3 pb-2 border-b border-white/30">
-              SERTİFİKALAR
+            <h2 className="text-base font-bold mb-3 pb-2 border-b border-white/30">
+              PROJELER
             </h2>
-            <div className="space-y-3 text-sm">
-              {certificates.map((cert) => (
-                <div key={cert.id}>
-                  <p className="font-semibold">{cert.name}</p>
-                  <p className="text-purple-200 text-xs">{cert.issuer}</p>
-                  {cert.date && <p className="text-purple-300 text-xs">{cert.date}</p>}
+            <div className="space-y-2">
+              {projects.map((project) => (
+                <div key={project.id} className="break-inside-avoid">
+                  <p className="text-sm font-bold">{project.title}</p>
+                  {project.link && (
+                    <a 
+                      href={project.link} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-purple-200 text-xs hover:underline block"
+                    >
+                      {project.link.includes('github') ? '→ GitHub' : '→ Project Link'}
+                    </a>
+                  )}
+                  <p className="text-xs text-purple-100 mt-1 leading-tight">{project.description}</p>
+                  {project.technologies && project.technologies.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      {project.technologies.map((tech, idx) => (
+                        <span
+                          key={idx}
+                          className="text-[9px] text-purple-200"
+                        >
+                          • {tech}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
@@ -133,10 +173,10 @@ export function CreativeTemplate({ data }: CreativeTemplateProps) {
       <div className="flex-1 p-10">
         {/* Professional Summary */}
         {summary && (
-          <section className="mb-8">
-            <h2 className="text-2xl font-bold text-purple-700 mb-3 relative">
+          <section className="mb-3">
+            <h2 className="text-xl font-bold text-purple-700 mb-3 relative">
               <span className="relative z-10">ÖZET</span>
-              <div className="absolute bottom-0 left-0 w-20 h-3 bg-purple-200 -z-0"></div>
+              <div className="absolute bottom-0 left-0 w-20 h-3 bg-purple-200 z-0"></div>
             </h2>
             <p className="text-gray-700 leading-relaxed">{summary}</p>
           </section>
@@ -144,17 +184,17 @@ export function CreativeTemplate({ data }: CreativeTemplateProps) {
 
         {/* Work Experience */}
         {experience.length > 0 && (
-          <section className="mb-8">
-            <h2 className="text-2xl font-bold text-purple-700 mb-3 relative">
+          <section className="mb-3">
+            <h2 className="text-xl font-bold text-purple-700 mb-3 relative">
               <span className="relative z-10">DENEYIM</span>
-              <div className="absolute bottom-0 left-0 w-20 h-3 bg-purple-200 -z-0"></div>
+              <div className="absolute bottom-0 left-0 w-20 h-3 bg-purple-200 z-0"></div>
             </h2>
-            <div className="space-y-6">
+            <div className="space-y-3">
               {experience.map((exp) => (
-                <div key={exp.id} className="relative pl-6 border-l-2 border-purple-300">
+                <div key={exp.id} className="relative pl-6 border-l-2 border-purple-300 break-inside-avoid">
                   <div className="absolute -left-2 top-0 w-4 h-4 rounded-full bg-purple-600"></div>
                   <div className="mb-1">
-                    <h3 className="text-lg font-bold text-gray-900">{exp.position}</h3>
+                    <h3 className="text-base font-bold text-gray-900">{exp.position}</h3>
                     <p className="text-purple-600 font-semibold">{exp.company}</p>
                   </div>
                   <p className="text-sm text-gray-600 mb-2">
@@ -174,27 +214,39 @@ export function CreativeTemplate({ data }: CreativeTemplateProps) {
           </section>
         )}
 
-        {/* Education */}
-        {education.length > 0 && (
-          <section>
-            <h2 className="text-2xl font-bold text-purple-700 mb-3 relative">
-              <span className="relative z-10">EĞİTİM</span>
-              <div className="absolute bottom-0 left-0 w-20 h-3 bg-purple-200 -z-0"></div>
+        {/* Skills */}
+        {skills.length > 0 && (
+          <section className="mb-3">
+            <h2 className="text-xl font-bold text-purple-700 mb-3 relative">
+              <span className="relative z-10">YETENEKLER</span>
+              <div className="absolute bottom-0 left-0 w-20 h-3 bg-purple-200 z-0"></div>
             </h2>
-            <div className="space-y-4">
-              {education.map((edu) => (
-                <div key={edu.id} className="relative pl-6 border-l-2 border-purple-300">
-                  <div className="absolute -left-2 top-0 w-4 h-4 rounded-full bg-purple-600"></div>
-                  <div className="mb-1">
-                    <h3 className="text-lg font-bold text-gray-900">{edu.degree}</h3>
-                    <p className="text-purple-600 font-semibold">{edu.school}</p>
-                  </div>
-                  <p className="text-sm text-gray-600">
-                    {edu.startDate} - {edu.endDate || 'Devam Ediyor'}
-                    {edu.location && ` • ${edu.location}`}
-                  </p>
-                  {edu.field && <p className="text-gray-700">{edu.field}</p>}
-                  {edu.gpa && <p className="text-gray-600 text-sm">GPA: {edu.gpa}</p>}
+            <div className="grid grid-cols-2 gap-3">
+              {skills.map((skill) => (
+                <div key={skill.id} className="flex justify-between items-center bg-purple-50 px-3 py-2 rounded">
+                  <span className="text-gray-800 font-medium">{skill.name}</span>
+                  <span className="text-purple-600 text-sm font-semibold">
+                    {skill.years ? `${skill.years} yıl` : '1 yıl'}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Certificates */}
+        {certificates.length > 0 && (
+          <section className="mb-3">
+            <h2 className="text-xl font-bold text-purple-700 mb-3 relative">
+              <span className="relative z-10">SERTİFİKALAR</span>
+              <div className="absolute bottom-0 left-0 w-20 h-3 bg-purple-200 z-0"></div>
+            </h2>
+            <div className="space-y-2">
+              {certificates.map((cert) => (
+                <div key={cert.id} className="break-inside-avoid bg-purple-50 p-3 rounded">
+                  <p className="font-bold text-gray-900">{cert.name}</p>
+                  <p className="text-purple-600 text-sm">{cert.issuer}</p>
+                  {cert.date && <p className="text-gray-600 text-sm">{cert.date}</p>}
                 </div>
               ))}
             </div>

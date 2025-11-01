@@ -1,7 +1,7 @@
 /**
  * Next.js Middleware
  * 
- * Handles route protection and authentication checks
+ * Handles route protection, authentication checks, and page view analytics
  * 
  * @module middleware
  */
@@ -28,13 +28,69 @@ const PUBLIC_ROUTES = [
 ];
 
 /**
- * Middleware function to protect routes
+ * Routes to exclude from analytics tracking
+ */
+const ANALYTICS_EXCLUDE = [
+  '/api/',
+  '/_next/',
+  '/favicon.ico',
+  '/robots.txt',
+  '/sitemap.xml',
+];
+
+/**
+ * Track page view asynchronously (fire and forget)
+ * 
+ * @param request - Next.js request object
+ */
+async function trackPageView(request: NextRequest): Promise<void> {
+  try {
+    const { pathname } = request.nextUrl;
+    
+    // Skip analytics for excluded routes
+    if (ANALYTICS_EXCLUDE.some(route => pathname.startsWith(route))) {
+      return;
+    }
+    
+    // Get client info
+    const ip = request.headers.get('x-forwarded-for')?.split(',')[0].trim() || 
+               request.headers.get('x-real-ip') || 
+               'unknown';
+    const userAgent = request.headers.get('user-agent') || 'unknown';
+    const referrer = request.headers.get('referer') || '';
+    
+    // Make async call to analytics API (fire and forget)
+    const baseUrl = request.nextUrl.origin;
+    fetch(`${baseUrl}/api/analytics/track-page`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        page: pathname,
+        ip,
+        userAgent,
+        referrer,
+      }),
+    }).catch((error) => {
+      console.error('Failed to track page view:', error);
+    });
+  } catch (error) {
+    console.error('Error in trackPageView:', error);
+  }
+}
+
+/**
+ * Middleware function to protect routes and track analytics
  * 
  * @param request - Next.js request object
  * @returns NextResponse
  */
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  
+  // Track page view (async, non-blocking)
+  trackPageView(request);
   
   // Get token from cookies (NextAuth sets this)
   const token = request.cookies.get('next-auth.session-token')?.value ||

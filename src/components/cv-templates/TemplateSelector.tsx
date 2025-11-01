@@ -9,14 +9,24 @@
 'use client';
 
 import React, { useState } from 'react';
-import { CheckCircle2, FileText, Eye, Zap, BookOpen, Palette, Briefcase, Circle } from 'lucide-react';
-import { ModernTemplate, ClassicTemplate, CreativeTemplate, ProfessionalTemplate, MinimalTemplate } from '@/components/cv-templates';
+import { CheckCircle2, FileText, Eye, Zap, BookOpen, Palette, Briefcase, Circle, Crown, Code, Sparkles, Bold as BoldIcon } from 'lucide-react';
+import { 
+  ModernTemplate, 
+  ClassicTemplate, 
+  CreativeTemplate, 
+  ProfessionalTemplate, 
+  MinimalTemplate,
+  ExecutiveTemplate,
+  TechProTemplate,
+  ElegantTemplate,
+  BoldTemplate
+} from '@/components/cv-templates';
 import type { CVData } from '@/types/cv-builder';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 interface TemplateSelectorProps {
-  selectedTemplate: 'modern' | 'classic' | 'creative' | 'professional' | 'minimal';
-  onSelectTemplate: (template: 'modern' | 'classic' | 'creative' | 'professional' | 'minimal') => void;
+  selectedTemplate: 'modern' | 'classic' | 'creative' | 'professional' | 'minimal' | 'executive' | 'techpro' | 'elegant' | 'bold';
+  onSelectTemplate: (template: 'modern' | 'classic' | 'creative' | 'professional' | 'minimal' | 'executive' | 'techpro' | 'elegant' | 'bold') => void;
 }
 
 /**
@@ -84,14 +94,14 @@ const sampleCVData: CVData = {
     },
   ],
   skills: [
-    { id: '1', name: 'JavaScript / TypeScript', level: 'expert' },
-    { id: '2', name: 'React.js / Next.js', level: 'expert' },
-    { id: '3', name: 'Node.js / Express', level: 'advanced' },
-    { id: '4', name: 'Python / Django', level: 'advanced' },
-    { id: '5', name: 'AWS / Cloud Services', level: 'advanced' },
-    { id: '6', name: 'MongoDB / PostgreSQL', level: 'advanced' },
-    { id: '7', name: 'Docker / Kubernetes', level: 'intermediate' },
-    { id: '8', name: 'Git / CI/CD', level: 'expert' },
+    { id: '1', name: 'JavaScript / TypeScript', level: 'expert', years: 8 },
+    { id: '2', name: 'React.js / Next.js', level: 'expert', years: 6 },
+    { id: '3', name: 'Node.js / Express', level: 'advanced', years: 7 },
+    { id: '4', name: 'Python / Django', level: 'advanced', years: 5 },
+    { id: '5', name: 'AWS / Cloud Services', level: 'advanced', years: 4 },
+    { id: '6', name: 'MongoDB / PostgreSQL', level: 'advanced', years: 6 },
+    { id: '7', name: 'Docker / Kubernetes', level: 'intermediate', years: 3 },
+    { id: '8', name: 'Git / CI/CD', level: 'expert', years: 8 },
   ],
   languages: [
     { id: '1', name: 'Türkçe', level: 'native' },
@@ -172,6 +182,46 @@ const templates = [
     features: ['Minimalist', 'Bol beyaz alan', 'Okunabilir', 'Zarif'],
     preview: '✨ Minimal, zarif görünüm',
   },
+  {
+    id: 'executive' as const,
+    name: 'Executive',
+    description: 'Üst düzey yönetici pozisyonları için',
+    color: 'from-indigo-500 to-indigo-600',
+    borderColor: 'border-indigo-500',
+    icon: Crown,
+    features: ['3 sütun düzen', 'Kompakt', 'Lider odaklı', 'Premium'],
+    preview: '👔 Yönetici, prestijli görünüm',
+  },
+  {
+    id: 'techpro' as const,
+    name: 'Tech Pro',
+    description: 'Teknoloji sektörü profesyonelleri için',
+    color: 'from-cyan-500 to-cyan-600',
+    borderColor: 'border-cyan-500',
+    icon: Code,
+    features: ['Gradient header', 'Progress barlar', 'Modern', 'Tech odaklı'],
+    preview: '💻 Teknoloji, yenilikçi görünüm',
+  },
+  {
+    id: 'elegant' as const,
+    name: 'Elegant',
+    description: 'Serif font ile zarif ve sofistike tasarım',
+    color: 'from-rose-500 to-rose-600',
+    borderColor: 'border-rose-500',
+    icon: Sparkles,
+    features: ['Serif font', 'Merkezli header', 'Zarif', 'Sofistike'],
+    preview: '🌹 Zarif, sofistike görünüm',
+  },
+  {
+    id: 'bold' as const,
+    name: 'Bold',
+    description: 'Güçlü vurgular ile cesur tasarım',
+    color: 'from-yellow-500 to-yellow-600',
+    borderColor: 'border-yellow-500',
+    icon: BoldIcon,
+    features: ['Siyah/Sarı', 'Cesur tipografi', 'Dikkat çekici', 'Güçlü'],
+    preview: '⚡ Cesur, güçlü görünüm',
+  },
 ];
 
 export function TemplateSelector({ selectedTemplate, onSelectTemplate }: TemplateSelectorProps) {
@@ -194,17 +244,17 @@ export function TemplateSelector({ selectedTemplate, onSelectTemplate }: Templat
           const isSelected = selectedTemplate === template.id;
           
           return (
-            <button
+            <div
               key={template.id}
-              onClick={() => onSelectTemplate(template.id)}
               className={`
                 relative p-6 rounded-xl border-2 transition-all duration-300 text-left
-                hover:shadow-xl hover:-translate-y-1 group
+                hover:shadow-xl hover:-translate-y-1 group cursor-pointer
                 ${isSelected 
                   ? `${template.borderColor} shadow-lg scale-105 bg-primary/5` 
                   : 'border-border hover:border-primary/50 hover:shadow-md'
                 }
               `}
+              onClick={() => onSelectTemplate(template.id)}
             >
               {/* Selection Indicator */}
               {isSelected && (
@@ -224,6 +274,10 @@ export function TemplateSelector({ selectedTemplate, onSelectTemplate }: Templat
                     {template.id === 'creative' && <CreativeTemplate data={sampleCVData} />}
                     {template.id === 'professional' && <ProfessionalTemplate data={sampleCVData} />}
                     {template.id === 'minimal' && <MinimalTemplate data={sampleCVData} />}
+                    {template.id === 'executive' && <ExecutiveTemplate data={sampleCVData} />}
+                    {template.id === 'techpro' && <TechProTemplate data={sampleCVData} />}
+                    {template.id === 'elegant' && <ElegantTemplate data={sampleCVData} />}
+                    {template.id === 'bold' && <BoldTemplate data={sampleCVData} />}
                   </div>
                   
                   {/* Overlay Gradient */}
@@ -269,7 +323,7 @@ export function TemplateSelector({ selectedTemplate, onSelectTemplate }: Templat
                   <span>{t('templateSelector.preview')}</span>
                 </button>
               </div>
-            </button>
+            </div>
           );
         })}
       </div>
@@ -308,7 +362,7 @@ export function TemplateSelector({ selectedTemplate, onSelectTemplate }: Templat
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => {
-                    onSelectTemplate(previewTemplate as 'modern' | 'classic' | 'creative' | 'professional' | 'minimal');
+                    onSelectTemplate(previewTemplate as 'modern' | 'classic' | 'creative' | 'professional' | 'minimal' | 'executive' | 'techpro' | 'elegant' | 'bold');
                     setPreviewTemplate(null);
                   }}
                   className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors"
@@ -334,6 +388,10 @@ export function TemplateSelector({ selectedTemplate, onSelectTemplate }: Templat
                 {previewTemplate === 'creative' && <CreativeTemplate data={sampleCVData} />}
                 {previewTemplate === 'professional' && <ProfessionalTemplate data={sampleCVData} />}
                 {previewTemplate === 'minimal' && <MinimalTemplate data={sampleCVData} />}
+                {previewTemplate === 'executive' && <ExecutiveTemplate data={sampleCVData} />}
+                {previewTemplate === 'techpro' && <TechProTemplate data={sampleCVData} />}
+                {previewTemplate === 'elegant' && <ElegantTemplate data={sampleCVData} />}
+                {previewTemplate === 'bold' && <BoldTemplate data={sampleCVData} />}
               </div>
             </div>
           </div>

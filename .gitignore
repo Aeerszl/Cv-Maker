@@ -39,3 +39,18 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Admin scripts - NEVER COMMIT THESE
+/scripts/create-admin.js
+/scripts/admin-*.js
+
+# Database backups
+*.dump
+*.sql
+/backups/
+
+# Sensitive files
+credentials.json
+secrets.json
+admin-info.txt
+ADMIN_CREDENTIALS.md

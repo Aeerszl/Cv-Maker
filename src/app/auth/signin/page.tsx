@@ -55,7 +55,12 @@ export default function SignInPage() {
       });
 
       if (result?.error) {
-        setError('E-posta veya şifre hatalı');
+        // Email doğrulama hatası kontrolü
+        if (result.error.includes('email')) {
+          setError(result.error);
+        } else {
+          setError('E-posta veya şifre hatalı');
+        }
         return;
       }
 
@@ -130,9 +135,21 @@ export default function SignInPage() {
 
             {/* Error Message */}
             {error && (
-              <div className="flex items-start gap-3 p-4 bg-red-50 border border-red-200 rounded-lg animate-slide-down">
-                <AlertCircle size={18} className="text-red-600 flex-shrink-0 mt-0.5" />
-                <p className="text-sm text-red-600">{error}</p>
+              <div className="p-4 bg-red-50 border border-red-200 rounded-lg animate-slide-down">
+                <div className="flex items-start gap-3">
+                  <AlertCircle size={18} className="text-red-600 shrink-0 mt-0.5" />
+                  <div className="flex-1">
+                    <p className="text-sm text-red-600">{error}</p>
+                    {error.includes('email') && (
+                      <Link
+                        href="/auth/verify-email"
+                        className="inline-block mt-2 text-sm font-medium text-blue-600 hover:text-blue-700 underline"
+                      >
+                        Email doğrulama sayfasına git →
+                      </Link>
+                    )}
+                  </div>
+                </div>
               </div>
             )}
 

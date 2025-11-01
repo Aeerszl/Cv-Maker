@@ -32,9 +32,12 @@ import {
   ChevronRight,
   Moon,
   Sun,
-  Globe
+  Globe,
+  Shield,
+  BarChart3,
+  Users
 } from 'lucide-react';
-import { signOut } from 'next-auth/react';
+import { signOut, useSession } from 'next-auth/react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 interface SidebarProps {
@@ -52,6 +55,9 @@ export function Sidebar({ userName = 'User', userEmail, userAvatar }: SidebarPro
   const pathname = usePathname();
   const { theme, setTheme } = useTheme();
   const { language, setLanguage, t } = useLanguage();
+  const { data: session } = useSession();
+  
+  const isAdmin = session?.user?.role === 'admin';
 
   /**
    * Navigation items configuration
@@ -82,6 +88,30 @@ export function Sidebar({ userName = 'User', userEmail, userAvatar }: SidebarPro
       label: t('sidebar.settings'),
       href: '/settings',
       icon: Settings,
+    },
+  ];
+
+  /**
+   * Admin-only navigation items
+   */
+  const adminNavItems = [
+    {
+      label: 'Admin Dashboard',
+      href: '/admin/dashboard',
+      icon: Shield,
+      adminOnly: true,
+    },
+    {
+      label: 'Analytics',
+      href: '/admin/analytics',
+      icon: BarChart3,
+      adminOnly: true,
+    },
+    {
+      label: 'User Management',
+      href: '/admin/users',
+      icon: Users,
+      adminOnly: true,
     },
   ];
 
@@ -166,7 +196,7 @@ export function Sidebar({ userName = 'User', userEmail, userAvatar }: SidebarPro
         {/* User Profile Section */}
         <div className={`p-4 border-b border-border ${isCollapsed ? 'flex justify-center' : ''}`}>
           <div className={`flex items-center ${isCollapsed ? 'flex-col' : 'gap-3'}`}>
-            <div className="relative w-12 h-12 rounded-full overflow-hidden bg-linear-to-br from-blue-500 to-purple-500 flex items-center justify-center flex-shrink-0 ring-2 ring-primary/20">
+            <div className="relative w-12 h-12 rounded-full overflow-hidden bg-linear-to-br from-blue-500 to-purple-500 flex items-center justify-center shrink-0 ring-2 ring-primary/20">
               {userAvatar ? (
                 <Image
                   src={userAvatar}
@@ -182,9 +212,16 @@ export function Sidebar({ userName = 'User', userEmail, userAvatar }: SidebarPro
             </div>
             {!isCollapsed && (
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-foreground truncate">
-                  {userName}
-                </p>
+                <div className="flex items-center gap-2">
+                  <p className="text-sm font-semibold text-foreground truncate">
+                    {userName}
+                  </p>
+                  {isAdmin && (
+                    <span className="px-2 py-0.5 text-xs font-bold bg-orange-500 text-white rounded-full">
+                      ADMIN
+                    </span>
+                  )}
+                </div>
                 {userEmail && (
                   <p className="text-xs text-muted-foreground truncate">
                     {userEmail}
@@ -217,7 +254,7 @@ export function Sidebar({ userName = 'User', userEmail, userAvatar }: SidebarPro
                   ${isCollapsed ? 'justify-center' : ''}
                 `}
               >
-                <Icon className={`w-5 h-5 flex-shrink-0 ${active ? 'animate-pulse' : ''}`} />
+                <Icon className={`w-5 h-5 shrink-0 ${active ? 'animate-pulse' : ''}`} />
                 {!isCollapsed && (
                   <span className="truncate">{item.label}</span>
                 )}
@@ -238,6 +275,60 @@ export function Sidebar({ userName = 'User', userEmail, userAvatar }: SidebarPro
               </Link>
             );
           })}
+
+          {/* Admin Section */}
+          {isAdmin && (
+            <>
+              <div className="pt-4 pb-2">
+                {!isCollapsed && (
+                  <div className="px-3 mb-2">
+                    <div className="flex items-center gap-2">
+                      <Shield className="w-4 h-4 text-orange-500" />
+                      <span className="text-xs font-bold text-orange-500 uppercase tracking-wider">
+                        Admin Panel
+                      </span>
+                    </div>
+                  </div>
+                )}
+                {isCollapsed && (
+                  <div className="h-px bg-orange-500/30 mx-3 mb-2" />
+                )}
+              </div>
+
+              {adminNavItems.map((item) => {
+                const Icon = item.icon;
+                const active = isActive(item.href);
+
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={`
+                      group relative flex items-center gap-3 px-3 py-3 rounded-xl
+                      text-sm font-medium transition-all duration-200
+                      ${active 
+                        ? 'bg-orange-500 text-white shadow-lg scale-105' 
+                        : 'text-muted-foreground hover:bg-orange-500/10 hover:text-orange-600 dark:hover:text-orange-400 hover:scale-105'
+                      }
+                      ${isCollapsed ? 'justify-center' : ''}
+                    `}
+                  >
+                    <Icon className={`w-5 h-5 shrink-0 ${active ? 'animate-pulse' : ''}`} />
+                    {!isCollapsed && (
+                      <span className="truncate">{item.label}</span>
+                    )}
+                    
+                    {/* Tooltip for collapsed state */}
+                    {isCollapsed && (
+                      <div className="absolute left-full ml-2 px-3 py-2 bg-orange-600 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+                        {item.label}
+                      </div>
+                    )}
+                  </Link>
+                );
+              })}
+            </>
+          )}
         </nav>
 
         {/* Settings Section */}
@@ -253,9 +344,9 @@ export function Sidebar({ userName = 'User', userEmail, userAvatar }: SidebarPro
             `}
           >
             {theme === 'dark' ? (
-              <Sun className="w-5 h-5 flex-shrink-0" />
+              <Sun className="w-5 h-5 shrink-0" />
             ) : (
-              <Moon className="w-5 h-5 flex-shrink-0" />
+              <Moon className="w-5 h-5 shrink-0" />
             )}
             {!isCollapsed && (
               <span>{theme === 'dark' ? t('sidebar.lightMode') : t('sidebar.darkMode')}</span>
@@ -273,7 +364,7 @@ export function Sidebar({ userName = 'User', userEmail, userAvatar }: SidebarPro
                 ${isCollapsed ? 'justify-center' : ''}
               `}
             >
-              <Globe className="w-5 h-5 flex-shrink-0" />
+              <Globe className="w-5 h-5 shrink-0" />
               {!isCollapsed && (
                 <span>{language === 'tr' ? 'Türkçe' : 'English'}</span>
               )}
@@ -320,7 +411,7 @@ export function Sidebar({ userName = 'User', userEmail, userAvatar }: SidebarPro
               ${isCollapsed ? 'justify-center' : ''}
             `}
           >
-            <LogOut className="w-5 h-5 flex-shrink-0" />
+            <LogOut className="w-5 h-5 shrink-0" />
             {!isCollapsed && <span>{t('sidebar.logout')}</span>}
           </button>
         </div>

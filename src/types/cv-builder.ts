@@ -69,6 +69,7 @@ export interface Skill {
   id: string;
   name: string;
   level: 'beginner' | 'intermediate' | 'advanced' | 'expert';
+  years?: number; // Tecrübe yılı (opsiyonel - geriye dönük uyumluluk için)
 }
 
 /**
@@ -92,6 +93,19 @@ export interface Certificate {
 }
 
 /**
+ * Project Entry
+ */
+export interface Project {
+  id: string;
+  title: string;
+  description: string;
+  link?: string;  // GitHub, demo, vb.
+  startDate?: string;
+  endDate?: string;
+  technologies?: string[];  // Kullanılan teknolojiler
+}
+
+/**
  * Complete CV Data
  */
 export interface CVData {
@@ -102,7 +116,17 @@ export interface CVData {
   skills: Skill[];
   languages: Language[];
   certificates: Certificate[];
-  template: 'modern' | 'classic' | 'creative' | 'professional' | 'minimal';
+  projects?: Project[];  // Opsiyonel
+  template: 
+    | 'modern' 
+    | 'classic' 
+    | 'creative' 
+    | 'professional' 
+    | 'minimal'
+    | 'executive'
+    | 'techpro'
+    | 'elegant'
+    | 'bold';
 }
 
 /**

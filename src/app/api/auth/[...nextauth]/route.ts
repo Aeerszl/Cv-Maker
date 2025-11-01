@@ -31,6 +31,11 @@ export const authOptions: NextAuthOptions = {
           throw new Error('Hesabınız askıya alınmış');
         }
 
+        // Email doğrulaması kontrolü
+        if (!user.emailVerified) {
+          throw new Error('Lütfen önce email adresinizi doğrulayın');
+        }
+
         const isPasswordValid = await bcrypt.compare(
           credentials.password,
           user.passwordHash

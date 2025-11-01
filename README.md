@@ -79,6 +79,17 @@ Projenin tasarımı **nevsoft.com** tarzında:
 
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## 🔐 Security Notice
+
+**IMPORTANT**: This project contains sensitive files that should NEVER be committed to Git:
+- `/scripts/create-admin.js` - Admin creation script
+- `.env.local` - Environment variables
+- `ADMIN_CREDENTIALS.md` - Admin login details
+
+These files are already in `.gitignore`. Keep them private!
+
+---
+
 ## Getting Started
 
 First, run the development server:

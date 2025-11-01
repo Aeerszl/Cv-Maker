@@ -38,7 +38,6 @@ export default function SignUpPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string>('');
-  const [success, setSuccess] = useState(false);
 
   const {
     register,
@@ -73,13 +72,11 @@ export default function SignUpPage() {
         return;
       }
 
-      // Show success message
-      setSuccess(true);
-
-      // Redirect to sign in after 2 seconds
-      setTimeout(() => {
-        router.push('/auth/signin');
-      }, 2000);
+      // Redirect to verification page
+      const email = data.email;
+      const devCode = result.devCode; // Development mode code
+      const url = `/auth/verify-email?email=${encodeURIComponent(email)}${devCode ? `&code=${devCode}` : ''}`;
+      router.push(url);
     } catch (err) {
       setError('Bir hata oluştu. Lütfen tekrar deneyin.');
       console.error('Sign up error:', err);
@@ -88,29 +85,8 @@ export default function SignUpPage() {
     }
   };
 
-  // If successful, show success message
-  if (success) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 px-4">
-        <Card className="max-w-md w-full p-8 text-center animate-scale-in">
-          <div className="flex justify-center mb-4">
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
-              <CheckCircle2 className="w-8 h-8 text-green-600" />
-            </div>
-          </div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">
-            Kayıt Başarılı!
-          </h2>
-          <p className="text-gray-600">
-            Hesabınız oluşturuldu. Giriş sayfasına yönlendiriliyorsunuz...
-          </p>
-        </Card>
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 px-4 py-12">
+    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-gray-50 to-gray-100 px-4 py-12">
       <div className="max-w-md w-full space-y-8 animate-fade-in">
         {/* Header */}
         <div className="text-center">
