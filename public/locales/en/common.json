@@ -104,7 +104,7 @@
     "page": {
       "hero": {
         "title": "About the Project",
-        "description": "I developed this platform myself so that people can create and download modern CVs quickly and effortlessly."
+        "description": "I developed this CV creation platform to simplify the job application process. The platform allows users to enter their personal information, experiences, and skills to choose from 5 different professional CV templates that are compatible with ATS (Applicant Tracking System). All services are completely free and extremely easy to use."
       },
       "why": {
         "title": "Why Did I Make This Project?",

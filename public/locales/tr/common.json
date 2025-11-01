@@ -103,7 +103,7 @@
     "page": {
       "hero": {
         "title": "Proje Hakkında",
-        "description": "Bu platformu insanların hızlı ve zahmetsizce modern bir CV oluşturup indirebilmesi için tek başıma geliştirdim."
+        "description": "İş başvuru sürecini kolaylaştırmak amacıyla bu CV oluşturma platformunu geliştirdim. Platform, kullanıcıların kişisel bilgilerini, deneyimlerini ve yeteneklerini girerek ATS (Applicant Tracking System) uyumlu 5 farklı profesyonel CV şablonu arasından seçim yapmasına olanak tanıyor. Tüm hizmetler tamamen ücretsiz ve kullanımı son derece basit."
       },
       "why": {
         "title": "Neden Bu Projeyi Yaptım?",
