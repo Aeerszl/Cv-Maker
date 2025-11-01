@@ -195,7 +195,7 @@ const translations = {
 
     // About Page New Sections
     'about.page.hero.title': 'Proje Hakkında',
-    'about.page.hero.description': 'Bu platformu insanların hızlı ve zahmetsizce modern bir CV oluşturup indirebilmesi için tek başıma geliştirdim.',
+    'about.page.hero.description': 'İş başvuru sürecini kolaylaştırmak amacıyla bu CV oluşturma platformunu geliştirdim. Platform, kullanıcıların kişisel bilgilerini, deneyimlerini ve yeteneklerini girerek ATS (Applicant Tracking System) uyumlu 5 farklı profesyonel CV şablonu arasından seçim yapmasına olanak tanıyor. Tüm hizmetler tamamen ücretsiz ve kullanımı son derece basit.',
     'about.page.why.title': 'Neden Bu Projeyi Yaptım?',
     'about.page.why.description': 'Kariyer yolculuğunda CV hazırlamanın ne kadar önemli olduğunu biliyorum. Ancak çoğu insan Word\'de saatlerce uğraşır, format sorunları yaşar veya profesyonel görünüm elde etmek için tasarım bilgisi gerektirir. Bu sorunu çözmek için bu platformu geliştirdim. Amacım, herkesin 5 dakika içinde ücretsiz ve profesyonel bir CV oluşturabilmesi.',
     'about.page.ats.title': 'ATS Format Nedir?',
@@ -388,7 +388,7 @@ const translations = {
 
     // About Page New Sections
     'about.page.hero.title': 'About the Project',
-    'about.page.hero.description': 'I developed this platform myself so that people can create and download modern CVs quickly and effortlessly.',
+    'about.page.hero.description': 'I developed this CV creation platform to simplify the job application process. The platform allows users to enter their personal information, experiences, and skills to choose from 5 different professional CV templates that are compatible with ATS (Applicant Tracking System). All services are completely free and extremely easy to use.',
     'about.page.why.title': 'Why Did I Make This Project?',
     'about.page.why.description': 'I know how important CV preparation is in career journey. However, most people struggle for hours in Word, face format issues, or need design knowledge to achieve a professional look. To solve this problem, I developed this platform. My goal is for everyone to create a free and professional CV in 5 minutes.',
     'about.page.ats.title': 'What is ATS Format?',
