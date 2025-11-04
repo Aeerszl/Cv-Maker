@@ -75,6 +75,7 @@ export interface ICV extends Document {
   templateId?: mongoose.Types.ObjectId; // FK to Templates
   title: string;
   template: CVTemplate;
+  cvLanguage?: 'tr' | 'en'; // CV Language
   colorPalette?: string; // JSON string of hex colors
   status: 'draft' | 'completed' | 'published';
   personalInfo: IPersonalInfo;
@@ -111,6 +112,11 @@ const CVSchema: Schema<ICV> = new Schema(
       type: String,
       enum: ['modern', 'classic', 'creative', 'professional', 'minimal'],
       default: 'modern',
+    },
+    cvLanguage: {
+      type: String,
+      enum: ['tr', 'en'],
+      default: 'tr',
     },
     colorPalette: {
       type: String, // JSON string

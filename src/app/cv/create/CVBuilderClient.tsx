@@ -8,12 +8,24 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import domtoimage from 'dom-to-image-more';
+import jsPDF from 'jspdf';
 import { Sidebar } from '@/components/dashboard/Sidebar';
 import { TemplateSelector } from '@/components/cv-templates/TemplateSelector';
-import { ModernTemplate, ClassicTemplate, CreativeTemplate, ProfessionalTemplate, MinimalTemplate } from '@/components/cv-templates';
-import type { CVData, FormStep, WorkExperience } from '@/types/cv-builder';
+import { 
+  ModernTemplate, 
+  ClassicTemplate, 
+  CreativeTemplate, 
+  ProfessionalTemplate, 
+  MinimalTemplate,
+  ExecutiveTemplate,
+  TechProTemplate,
+  ElegantTemplate,
+  BoldTemplate
+} from '@/components/cv-templates';
+import type { CVData, FormStep, WorkExperience, Education } from '@/types/cv-builder';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 interface CVBuilderClientProps {
@@ -46,6 +58,8 @@ const initialCVData: CVData = {
   skills: [],
   languages: [],
   certificates: [],
+  projects: [],
+  cvLanguage: 'tr',
   template: 'modern',
 };
 
@@ -59,7 +73,7 @@ export default function CVBuilderClient({ userName, userEmail, initialData, isEd
   const [cvData, setCVData] = useState<CVData>(() => {
     if (initialData) {
       // Transform backend data to frontend format
-      return {
+      const transformedData: CVData = {
         personalInfo: {
           firstName: initialData.personalInfo?.firstName || '',
           lastName: initialData.personalInfo?.lastName || '',
@@ -89,7 +103,7 @@ export default function CVBuilderClient({ userName, userEmail, initialData, isEd
         education: initialData.education?.map(edu => ({
           id: Date.now().toString() + Math.random(),
           school: edu.school || '',
-          degree: edu.degree || '',
+          degree: (edu.degree as Education['degree']) || 'bachelor',
           field: edu.field || '',
           location: edu.location || '',
           startDate: edu.startDate || '',
@@ -101,6 +115,7 @@ export default function CVBuilderClient({ userName, userEmail, initialData, isEd
           id: Date.now().toString() + Math.random(),
           name: skill.name || '',
           level: skill.level || 'intermediate',
+          years: skill.years,
         })) || [],
         languages: initialData.languages?.map(lang => ({
           id: Date.now().toString() + Math.random(),
@@ -114,11 +129,52 @@ export default function CVBuilderClient({ userName, userEmail, initialData, isEd
           date: cert.date || '',
           url: cert.url || '',
         })) || [],
+        projects: initialData.projects?.map(project => ({
+          id: Date.now().toString() + Math.random(),
+          title: project.title || '',
+          description: project.description || '',
+          link: project.link || '',
+          technologies: project.technologies || [],
+        })) || [],
+        cvLanguage: initialData.cvLanguage || 'tr',
         template: initialData.template || 'modern',
       };
+      return transformedData;
     }
     return initialCVData;
   });
+
+  // Ref for CV preview element (used for PDF generation)
+  const cvPreviewRef = useRef<HTMLDivElement>(null);
+
+  /**
+   * Handle PDF download using browser's print functionality
+   */
+  const handleDownloadPDF = () => {
+    if (!cvPreviewRef.current) {
+      alert('CV önizleme bulunamadı. Lütfen sayfayı yenileyin.');
+      return;
+    }
+
+    // Show instructions to user
+    const message = `PDF İndirme Talimatları:
+
+1. Açılan pencerede hedef olarak "PDF'ye Kaydet" veya "Microsoft Print to PDF" seçin
+2. Ayarlar bölümünde:
+   - Sayfa: A4
+   - Kenar boşlukları: Varsayılan
+   - Arka plan grafikleri: AÇIK (önemli!)
+3. "Kaydet" butonuna basın
+
+Devam etmek için Tamam'a basın...`;
+
+    if (confirm(message)) {
+      // Trigger browser print dialog
+      setTimeout(() => {
+        window.print();
+      }, 100);
+    }
+  };
 
   /**
    * Step configuration
@@ -130,6 +186,7 @@ export default function CVBuilderClient({ userName, userEmail, initialData, isEd
     'experience',
     'education',
     'skills',
+    'projects',
     'preview',
   ];
 
@@ -139,6 +196,7 @@ export default function CVBuilderClient({ userName, userEmail, initialData, isEd
     experience: t('cvBuilder.steps.experience'),
     education: t('cvBuilder.steps.education'),
     skills: t('cvBuilder.steps.skills'),
+    projects: t('cvBuilder.steps.projects'),
     template: t('cvBuilder.steps.template'),
     preview: t('cvBuilder.steps.preview'),
   };
@@ -174,40 +232,66 @@ export default function CVBuilderClient({ userName, userEmail, initialData, isEd
     try {
       // Validate required fields before submission
       if (!cvData.personalInfo.firstName || !cvData.personalInfo.lastName) {
-        alert('Ad ve soyad zorunludur');
+        alert(t('cvBuilder.validation.nameRequired'));
         return;
       }
       if (!cvData.personalInfo.title) {
-        alert('Ünvan zorunludur');
+        alert(t('cvBuilder.validation.titleRequired'));
         return;
       }
       if (!cvData.personalInfo.email) {
-        alert('Email zorunludur');
+        alert(t('cvBuilder.validation.emailRequired'));
         return;
       }
       if (!cvData.personalInfo.phone) {
-        alert('Telefon zorunludur');
+        alert(t('cvBuilder.validation.phoneRequired'));
         return;
       }
       if (!cvData.personalInfo.city) {
-        alert('Şehir zorunludur');
+        alert(t('cvBuilder.validation.cityRequired'));
         return;
       }
-      // Validate work experience
-      const invalidWorkExperience = cvData.experience.some(exp => 
-        !exp.company.trim() || !exp.position.trim() || !exp.startDate
-      );
-      if (invalidWorkExperience) {
-        alert('İş deneyimi bilgileri eksik: Şirket, pozisyon ve başlangıç tarihi zorunludur');
+      
+      // Validate summary (required)
+      if (!cvData.summary || cvData.summary.trim().length === 0) {
+        alert(t('cvBuilder.validation.summaryRequired'));
         return;
       }
-
-      // Validate education
+      
+      // Validate at least one education entry (required)
+      if (cvData.education.length === 0) {
+        alert(t('cvBuilder.validation.educationRequired'));
+        return;
+      }
+      
+      // Validate education entries
       const invalidEducation = cvData.education.some(edu => 
         !edu.school.trim() || !edu.degree.trim() || !edu.field.trim() || !edu.startDate
       );
       if (invalidEducation) {
-        alert('Eğitim bilgileri eksik: Okul, derece, bölüm ve başlangıç tarihi zorunludur');
+        alert(t('cvBuilder.validation.educationIncomplete'));
+        return;
+      }
+      
+      // Validate at least one skill (required)
+      if (cvData.skills.length === 0) {
+        alert(t('cvBuilder.validation.skillsRequired'));
+        return;
+      }
+      
+      // Validate skills
+      const invalidSkills = cvData.skills.some(skill => !skill.name.trim());
+      if (invalidSkills) {
+        alert(t('cvBuilder.validation.skillsIncomplete'));
+        return;
+      }
+
+      // Validate work experience (if provided)
+      const invalidWorkExperience = cvData.experience.some(exp => 
+        !exp.company.trim() || !exp.position.trim() || !exp.startDate
+      );
+      if (invalidWorkExperience) {
+        alert(t('cvBuilder.validation.experienceIncomplete'));
         return;
       }
 
@@ -230,6 +314,7 @@ export default function CVBuilderClient({ userName, userEmail, initialData, isEd
       const cvPayload = {
         title: `${cvData.personalInfo.firstName} ${cvData.personalInfo.lastName} - CV`,
         template: cvData.template,
+        cvLanguage: cvData.cvLanguage || 'tr',
         status: 'completed' as const,
         personalInfo: {
           fullName: `${cvData.personalInfo.firstName} ${cvData.personalInfo.lastName}`,
@@ -277,7 +362,14 @@ export default function CVBuilderClient({ userName, userEmail, initialData, isEd
           date: cert.date,
           url: cert.url,
         })),
-        projects: [], // Empty for now
+        projects: cvData.projects
+          .filter(project => project.title.trim() !== '') // Filter out empty projects
+          .map(project => ({
+            name: project.title, // Backend expects 'name' not 'title'
+            description: project.description,
+            technologies: project.technologies || [],
+            url: project.link, // Backend expects 'url' not 'link'
+          })),
       };
 
       console.log('Sending CV payload:', cvPayload);
@@ -387,6 +479,45 @@ export default function CVBuilderClient({ userName, userEmail, initialData, isEd
           <div className="bg-white dark:bg-gray-900 rounded-xl border border-border p-8 mb-8">
             {currentStep === 'template' && (
               <div className="space-y-6">
+                {/* CV Language Selection */}
+                <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-6 mb-6">
+                  <h3 className="text-lg font-bold text-foreground mb-4 flex items-center gap-2">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
+                    </svg>
+                    CV Language Selection
+                  </h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                    Select the language for your CV. Section headings will be displayed in the selected language.
+                  </p>
+                  <div className="grid grid-cols-2 gap-4">
+                    <button
+                      onClick={() => setCVData({ ...cvData, cvLanguage: 'tr' })}
+                      className={`p-4 rounded-lg border-2 transition-all ${
+                        cvData.cvLanguage === 'tr' || !cvData.cvLanguage
+                          ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/30'
+                          : 'border-gray-300 dark:border-gray-700 hover:border-blue-300'
+                      }`}
+                    >
+                      <div className="text-3xl mb-2">🇹🇷</div>
+                      <div className="font-bold">Türkçe</div>
+                      <div className="text-xs text-gray-600 dark:text-gray-400">Turkish CV</div>
+                    </button>
+                    <button
+                      onClick={() => setCVData({ ...cvData, cvLanguage: 'en' })}
+                      className={`p-4 rounded-lg border-2 transition-all ${
+                        cvData.cvLanguage === 'en'
+                          ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/30'
+                          : 'border-gray-300 dark:border-gray-700 hover:border-blue-300'
+                      }`}
+                    >
+                      <div className="text-3xl mb-2">🇬🇧</div>
+                      <div className="font-bold">English</div>
+                      <div className="text-xs text-gray-600 dark:text-gray-400">English CV</div>
+                    </button>
+                  </div>
+                </div>
+
                 <TemplateSelector
                   selectedTemplate={cvData.template}
                   onSelectTemplate={(template) => setCVData({ ...cvData, template })}
@@ -631,7 +762,7 @@ export default function CVBuilderClient({ userName, userEmail, initialData, isEd
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                           <div>
                             <label className="block text-sm font-medium text-foreground mb-2">
-                              Şirket *
+                              {t('cvBuilder.experience.company')} *
                             </label>
                             <input
                               type="text"
@@ -642,12 +773,12 @@ export default function CVBuilderClient({ userName, userEmail, initialData, isEd
                                 setCVData({ ...cvData, experience: updated });
                               }}
                               className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                              placeholder="Şirket adı"
+                              placeholder={t('cvBuilder.experience.companyPlaceholder')}
                             />
                           </div>
                           <div>
                             <label className="block text-sm font-medium text-foreground mb-2">
-                              Pozisyon *
+                              {t('cvBuilder.experience.position')} *
                             </label>
                             <input
                               type="text"
@@ -658,12 +789,12 @@ export default function CVBuilderClient({ userName, userEmail, initialData, isEd
                                 setCVData({ ...cvData, experience: updated });
                               }}
                               className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                              placeholder="Pozisyon adı"
+                              placeholder={t('cvBuilder.experience.positionPlaceholder')}
                             />
                           </div>
                           <div>
                             <label className="block text-sm font-medium text-foreground mb-2">
-                              Başlangıç Tarihi *
+                              {t('cvBuilder.experience.startDate')} *
                             </label>
                             <input
                               type="date"
@@ -678,7 +809,7 @@ export default function CVBuilderClient({ userName, userEmail, initialData, isEd
                           </div>
                           <div>
                             <label className="block text-sm font-medium text-foreground mb-2">
-                              Bitiş Tarihi
+                              {t('cvBuilder.experience.endDate')}
                             </label>
                             <input
                               type="date"
@@ -708,12 +839,12 @@ export default function CVBuilderClient({ userName, userEmail, initialData, isEd
                               }}
                               className="rounded border-border"
                             />
-                            <span className="text-sm font-medium text-foreground">Hala bu pozisyonda çalışıyorum</span>
+                            <span className="text-sm font-medium text-foreground">{t('cvBuilder.experience.current')}</span>
                           </label>
                         </div>
                         <div className="mb-4">
                           <label className="block text-sm font-medium text-foreground mb-2">
-                            Açıklama *
+                            {t('cvBuilder.experience.description')} *
                           </label>
                           <textarea
                             value={exp.description}
@@ -724,7 +855,7 @@ export default function CVBuilderClient({ userName, userEmail, initialData, isEd
                             }}
                             rows={4}
                             className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary resize-none"
-                            placeholder="Görev ve sorumluluklarınızı açıklayın..."
+                            placeholder={t('cvBuilder.experience.descriptionPlaceholder')}
                           />
                         </div>
                         <div className="flex justify-end">
@@ -735,7 +866,7 @@ export default function CVBuilderClient({ userName, userEmail, initialData, isEd
                             }}
                             className="px-4 py-2 text-red-600 hover:text-red-700 transition-colors"
                           >
-                            Sil
+                            {t('cvBuilder.experience.delete')}
                           </button>
                         </div>
                       </div>
@@ -759,7 +890,7 @@ export default function CVBuilderClient({ userName, userEmail, initialData, isEd
                         });
                       }}
                     >
-                      + Başka İş Deneyimi Ekle
+                      + {t('cvBuilder.experience.addAnother')}
                     </button>
                   </div>
                 )}
@@ -780,10 +911,10 @@ export default function CVBuilderClient({ userName, userEmail, initialData, isEd
                     <button 
                       className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
                       onClick={() => {
-                        const newEducation = {
+                        const newEducation: Education = {
                           id: Date.now().toString(),
                           school: '',
-                          degree: '',
+                          degree: 'bachelor',
                           field: '',
                           location: '',
                           startDate: '',
@@ -807,7 +938,7 @@ export default function CVBuilderClient({ userName, userEmail, initialData, isEd
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                           <div>
                             <label className="block text-sm font-medium text-foreground mb-2">
-                              Okul *
+                              {t('cvBuilder.education.school')} *
                             </label>
                             <input
                               type="text"
@@ -818,28 +949,34 @@ export default function CVBuilderClient({ userName, userEmail, initialData, isEd
                                 setCVData({ ...cvData, education: updated });
                               }}
                               className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                              placeholder="Üniversite/okul adı"
+                              placeholder={t('cvBuilder.education.schoolPlaceholder')}
                             />
                           </div>
                           <div>
                             <label className="block text-sm font-medium text-foreground mb-2">
-                              Derece *
+                              {t('cvBuilder.education.degree')} *
                             </label>
-                            <input
-                              type="text"
+                            <select
                               value={edu.degree}
                               onChange={(e) => {
                                 const updated = [...cvData.education];
-                                updated[index].degree = e.target.value;
+                                updated[index].degree = e.target.value as Education['degree'];
                                 setCVData({ ...cvData, education: updated });
                               }}
                               className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                              placeholder="Lisans, Yüksek Lisans, vb."
-                            />
+                            >
+                              <option value="">{t('cvBuilder.education.degreeSelect')}</option>
+                              <option value="high-school">{t('cvBuilder.education.degree.highSchool')}</option>
+                              <option value="associate">{t('cvBuilder.education.degree.associate')}</option>
+                              <option value="bachelor">{t('cvBuilder.education.degree.bachelor')}</option>
+                              <option value="master">{t('cvBuilder.education.degree.master')}</option>
+                              <option value="phd">{t('cvBuilder.education.degree.phd')}</option>
+                              <option value="other">{t('cvBuilder.education.degree.other')}</option>
+                            </select>
                           </div>
                           <div>
                             <label className="block text-sm font-medium text-foreground mb-2">
-                              Bölüm *
+                              {t('cvBuilder.education.field')} *
                             </label>
                             <input
                               type="text"
@@ -850,12 +987,12 @@ export default function CVBuilderClient({ userName, userEmail, initialData, isEd
                                 setCVData({ ...cvData, education: updated });
                               }}
                               className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                              placeholder="Bilgisayar Mühendisliği, vb."
+                              placeholder={t('cvBuilder.education.fieldPlaceholder')}
                             />
                           </div>
                           <div>
                             <label className="block text-sm font-medium text-foreground mb-2">
-                              Not Ortalaması
+                              {t('cvBuilder.education.gpa')}
                             </label>
                             <input
                               type="text"
@@ -866,12 +1003,12 @@ export default function CVBuilderClient({ userName, userEmail, initialData, isEd
                                 setCVData({ ...cvData, education: updated });
                               }}
                               className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                              placeholder="3.5/4.0"
+                              placeholder={t('cvBuilder.education.gpaPlaceholder')}
                             />
                           </div>
                           <div>
                             <label className="block text-sm font-medium text-foreground mb-2">
-                              Başlangıç Tarihi *
+                              {t('cvBuilder.education.startDate')} *
                             </label>
                             <input
                               type="date"
@@ -886,7 +1023,7 @@ export default function CVBuilderClient({ userName, userEmail, initialData, isEd
                           </div>
                           <div>
                             <label className="block text-sm font-medium text-foreground mb-2">
-                              Mezuniyet Tarihi
+                              {t('cvBuilder.education.endDate')}
                             </label>
                             <input
                               type="date"
@@ -916,7 +1053,7 @@ export default function CVBuilderClient({ userName, userEmail, initialData, isEd
                               }}
                               className="rounded border-border"
                             />
-                            <span className="text-sm font-medium text-foreground">Hala bu eğitim kurumundayım</span>
+                            <span className="text-sm font-medium text-foreground">{t('cvBuilder.education.current')}</span>
                           </label>
                         </div>
                         <div className="flex justify-end">
@@ -927,7 +1064,7 @@ export default function CVBuilderClient({ userName, userEmail, initialData, isEd
                             }}
                             className="px-4 py-2 text-red-600 hover:text-red-700 transition-colors"
                           >
-                            Sil
+                            {t('cvBuilder.education.delete')}
                           </button>
                         </div>
                       </div>
@@ -935,10 +1072,10 @@ export default function CVBuilderClient({ userName, userEmail, initialData, isEd
                     <button 
                       className="w-full py-3 border-2 border-dashed border-border rounded-lg text-muted-foreground hover:border-primary hover:text-primary transition-colors"
                       onClick={() => {
-                        const newEducation = {
+                        const newEducation: Education = {
                           id: Date.now().toString(),
                           school: '',
-                          degree: '',
+                          degree: 'bachelor',
                           field: '',
                           location: '',
                           startDate: '',
@@ -952,7 +1089,7 @@ export default function CVBuilderClient({ userName, userEmail, initialData, isEd
                         });
                       }}
                     >
-                      + Başka Eğitim Bilgisi Ekle
+                      + {t('cvBuilder.education.addAnother')}
                     </button>
                   </div>
                 )}
@@ -994,7 +1131,7 @@ export default function CVBuilderClient({ userName, userEmail, initialData, isEd
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                           <div className="md:col-span-2">
                             <label className="block text-sm font-medium text-foreground mb-2">
-                              Yetenek Adı *
+                              {t('cvBuilder.skills.name')} *
                             </label>
                             <input
                               type="text"
@@ -1005,27 +1142,26 @@ export default function CVBuilderClient({ userName, userEmail, initialData, isEd
                                 setCVData({ ...cvData, skills: updated });
                               }}
                               className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                              placeholder="JavaScript, Python, vb."
+                              placeholder={t('cvBuilder.skills.namePlaceholder')}
                             />
                           </div>
                           <div>
                             <label className="block text-sm font-medium text-foreground mb-2">
-                              Seviye *
+                              {t('cvBuilder.skills.years')}
                             </label>
-                            <select
-                              value={skill.level}
+                            <input
+                              type="number"
+                              min="0"
+                              max="50"
+                              value={skill.years || ''}
                               onChange={(e) => {
                                 const updated = [...cvData.skills];
-                                updated[index].level = e.target.value as typeof skill.level;
+                                updated[index].years = e.target.value ? parseInt(e.target.value) : undefined;
                                 setCVData({ ...cvData, skills: updated });
                               }}
                               className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                            >
-                              <option value="beginner">Başlangıç</option>
-                              <option value="intermediate">Orta</option>
-                              <option value="advanced">İleri</option>
-                              <option value="expert">Uzman</option>
-                            </select>
+                              placeholder={t('cvBuilder.skills.yearsPlaceholder')}
+                            />
                           </div>
                         </div>
                         <div className="flex justify-end">
@@ -1036,7 +1172,7 @@ export default function CVBuilderClient({ userName, userEmail, initialData, isEd
                             }}
                             className="px-4 py-2 text-red-600 hover:text-red-700 transition-colors"
                           >
-                            Sil
+                            {t('cvBuilder.skills.delete')}
                           </button>
                         </div>
                       </div>
@@ -1048,6 +1184,7 @@ export default function CVBuilderClient({ userName, userEmail, initialData, isEd
                           id: Date.now().toString(),
                           name: '',
                           level: 'intermediate' as const,
+                          years: undefined,
                         };
                         setCVData({
                           ...cvData,
@@ -1055,19 +1192,19 @@ export default function CVBuilderClient({ userName, userEmail, initialData, isEd
                         });
                       }}
                     >
-                      + Başka Yetenek Ekle
+                      + {t('cvBuilder.skills.addAnother')}
                     </button>
                   </div>
                 )}
 
                 {/* Languages Section */}
                 <div className="mt-8">
-                  <h3 className="text-lg font-bold text-foreground mb-4">Dil Bilgileri</h3>
+                  <h3 className="text-lg font-bold text-foreground mb-4">{t('cvBuilder.skills.languages')}</h3>
                   
                   {cvData.languages.length === 0 ? (
                     <div className="text-center py-8 bg-gray-50 dark:bg-gray-800 rounded-lg">
                       <p className="text-muted-foreground mb-4">
-                        Henüz dil bilgisi eklenmedi
+                        {t('cvBuilder.skills.languagesEmpty')}
                       </p>
                       <button 
                         className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
@@ -1083,7 +1220,7 @@ export default function CVBuilderClient({ userName, userEmail, initialData, isEd
                           });
                         }}
                       >
-                        + Dil Ekle
+                        + {t('cvBuilder.skills.languageAdd')}
                       </button>
                     </div>
                   ) : (
@@ -1093,7 +1230,7 @@ export default function CVBuilderClient({ userName, userEmail, initialData, isEd
                           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div className="md:col-span-2">
                               <label className="block text-sm font-medium text-foreground mb-2">
-                                Dil *
+                                {t('cvBuilder.skills.languageName')} *
                               </label>
                               <input
                                 type="text"
@@ -1104,12 +1241,12 @@ export default function CVBuilderClient({ userName, userEmail, initialData, isEd
                                   setCVData({ ...cvData, languages: updated });
                                 }}
                                 className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                                placeholder="İngilizce, Almanca, vb."
+                                placeholder={t('cvBuilder.skills.languageNamePlaceholder')}
                               />
                             </div>
                             <div>
                               <label className="block text-sm font-medium text-foreground mb-2">
-                                Seviye *
+                                {t('cvBuilder.skills.languageLevel')} *
                               </label>
                               <select
                                 value={lang.level}
@@ -1120,10 +1257,10 @@ export default function CVBuilderClient({ userName, userEmail, initialData, isEd
                                 }}
                                 className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                               >
-                                <option value="basic">Temel</option>
-                                <option value="intermediate">Orta</option>
-                                <option value="fluent">Akıcı</option>
-                                <option value="native">Anadil</option>
+                                <option value="basic">{t('cvBuilder.skills.languageLevel.basic')}</option>
+                                <option value="intermediate">{t('cvBuilder.skills.languageLevel.intermediate')}</option>
+                                <option value="fluent">{t('cvBuilder.skills.languageLevel.fluent')}</option>
+                                <option value="native">{t('cvBuilder.skills.languageLevel.native')}</option>
                               </select>
                             </div>
                           </div>
@@ -1135,7 +1272,7 @@ export default function CVBuilderClient({ userName, userEmail, initialData, isEd
                               }}
                               className="px-4 py-2 text-red-600 hover:text-red-700 transition-colors"
                             >
-                              Sil
+                              {t('cvBuilder.skills.languageDelete')}
                             </button>
                           </div>
                         </div>
@@ -1154,33 +1291,169 @@ export default function CVBuilderClient({ userName, userEmail, initialData, isEd
                           });
                         }}
                       >
-                        + Başka Dil Ekle
-                      </button>
-                    </div>
+                      + {t('cvBuilder.skills.languageAddAnother')}
+                    </button>
+                  </div>
                   )}
                 </div>
               </div>
             )}
 
-            {currentStep === 'preview' && (
+            {currentStep === 'projects' && (
+              <div className="space-y-6">
+                <h2 className="text-xl font-bold text-foreground mb-4">
+                  {t('cvBuilder.projects.title')}
+                </h2>
+                
+                {cvData.projects.length === 0 ? (
+                  <div className="text-center py-12 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                    <p className="text-muted-foreground mb-4">
+                      {t('cvBuilder.projects.empty')}
+                    </p>
+                    <button 
+                      className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
+                      onClick={() => {
+                        const newProject = {
+                          id: Date.now().toString(),
+                          title: '',
+                          description: '',
+                          link: '',
+                        };
+                        setCVData({
+                          ...cvData,
+                          projects: [...cvData.projects, newProject]
+                        });
+                      }}
+                    >
+                      + {t('cvBuilder.projects.add')}
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {cvData.projects.map((project, index) => (
+                      <div key={project.id} className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg">
+                        <div className="space-y-4">
+                          <div>
+                            <label className="block text-sm font-medium text-foreground mb-2">
+                              {t('cvBuilder.projects.projectTitle')} *
+                            </label>
+                            <input
+                              type="text"
+                              value={project.title}
+                              onChange={(e) => {
+                                const updated = [...cvData.projects];
+                                updated[index].title = e.target.value;
+                                setCVData({ ...cvData, projects: updated });
+                              }}
+                              className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                              placeholder={t('cvBuilder.projects.projectTitlePlaceholder')}
+                            />
+                          </div>
+                          
+                          <div>
+                            <label className="block text-sm font-medium text-foreground mb-2">
+                              {t('cvBuilder.projects.description')} *
+                            </label>
+                            <textarea
+                              value={project.description}
+                              onChange={(e) => {
+                                const updated = [...cvData.projects];
+                                updated[index].description = e.target.value;
+                                setCVData({ ...cvData, projects: updated });
+                              }}
+                              rows={3}
+                              className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary resize-none"
+                              placeholder={t('cvBuilder.projects.descriptionPlaceholder')}
+                            />
+                          </div>
+                          
+                          <div>
+                            <label className="block text-sm font-medium text-foreground mb-2">
+                              {t('cvBuilder.projects.link')}
+                            </label>
+                            <input
+                              type="url"
+                              value={project.link || ''}
+                              onChange={(e) => {
+                                const updated = [...cvData.projects];
+                                updated[index].link = e.target.value;
+                                setCVData({ ...cvData, projects: updated });
+                              }}
+                              className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                              placeholder={t('cvBuilder.projects.linkPlaceholder')}
+                            />
+                          </div>
+                        </div>
+                        
+                        <div className="flex justify-end mt-4">
+                          <button
+                            onClick={() => {
+                              const updated = (cvData.projects || []).filter((_, i) => i !== index);
+                              setCVData({ ...cvData, projects: updated });
+                            }}
+                            className="px-4 py-2 text-red-600 hover:text-red-700 transition-colors"
+                          >
+                            {t('cvBuilder.projects.delete')}
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                    <button 
+                      className="w-full py-3 border-2 border-dashed border-border rounded-lg text-muted-foreground hover:border-primary hover:text-primary transition-colors"
+                      onClick={() => {
+                        const newProject = {
+                          id: Date.now().toString(),
+                          title: '',
+                          description: '',
+                          link: '',
+                        };
+                        setCVData({
+                          ...cvData,
+                          projects: [...(cvData.projects || []), newProject]
+                        });
+                      }}
+                    >
+                      + {t('cvBuilder.projects.addAnother')}
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}            {currentStep === 'preview' && (
               <div className="space-y-6">
                 <div className="mb-6">
-                  <h2 className="text-xl font-bold text-foreground mb-2">
-                    {t('cvBuilder.preview.title')}
-                  </h2>
-                  <p className="text-muted-foreground text-sm">
-                    {t('cvBuilder.preview.subtitle')} {cvData.template} {t('cvBuilder.preview.subtitleEnd')}
-                  </p>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h2 className="text-xl font-bold text-foreground mb-2">
+                        {t('cvBuilder.preview.title')}
+                      </h2>
+                      <p className="text-muted-foreground text-sm">
+                        {t('cvBuilder.preview.subtitle')} {cvData.template} {t('cvBuilder.preview.subtitleEnd')}
+                      </p>
+                    </div>
+                    <button
+                      onClick={handleDownloadPDF}
+                      className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2"
+                    >
+                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                      </svg>
+                      PDF İndir
+                    </button>
+                  </div>
                 </div>
 
                 {/* Template Preview */}
-                <div className="bg-gray-100 dark:bg-gray-800 p-8 rounded-lg overflow-auto max-h-[800px]">
+                <div id="cv-preview" ref={cvPreviewRef} className="bg-gray-100 dark:bg-gray-800 p-8 rounded-lg overflow-auto max-h-[800px]">
                   <div className="transform scale-75 origin-top">
                     {cvData.template === 'modern' && <ModernTemplate data={cvData} />}
                     {cvData.template === 'classic' && <ClassicTemplate data={cvData} />}
                     {cvData.template === 'creative' && <CreativeTemplate data={cvData} />}
                     {cvData.template === 'professional' && <ProfessionalTemplate data={cvData} />}
                     {cvData.template === 'minimal' && <MinimalTemplate data={cvData} />}
+                    {cvData.template === 'executive' && <ExecutiveTemplate data={cvData} />}
+                    {cvData.template === 'techpro' && <TechProTemplate data={cvData} />}
+                    {cvData.template === 'elegant' && <ElegantTemplate data={cvData} />}
+                    {cvData.template === 'bold' && <BoldTemplate data={cvData} />}
                   </div>
                 </div>
               </div>

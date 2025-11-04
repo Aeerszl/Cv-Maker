@@ -26,15 +26,22 @@ export function ClassicTemplate({ data }: ClassicTemplateProps) {
         {personalInfo.title && (
           <p className="text-lg text-gray-600 mb-3">{personalInfo.title}</p>
         )}
-        <div className="flex flex-wrap justify-center gap-3 text-xs text-gray-700">
-          {personalInfo.email && <span>{personalInfo.email}</span>}
-          {personalInfo.phone && <span>•</span>}
-          {personalInfo.phone && <span>{personalInfo.phone}</span>}
-          {personalInfo.city && <span>•</span>}
-          {personalInfo.city && <span>{personalInfo.city}</span>}
-        </div>
-        {(personalInfo.linkedIn || personalInfo.github || personalInfo.website) && (
-          <div className="flex flex-wrap justify-center gap-4 text-sm text-gray-600 mt-2">
+        
+        {/* Contact Info - 2 Lines */}
+        <div className="text-xs text-gray-700 space-y-1">
+          {/* Line 1: Email | Phone | Location */}
+          <div className="flex justify-center items-center gap-4">
+            {personalInfo.email && <span>{personalInfo.email}</span>}
+            {personalInfo.phone && <span>{personalInfo.phone}</span>}
+            {(personalInfo.city || personalInfo.country) && (
+              <span>
+                {personalInfo.city}{personalInfo.city && personalInfo.country && '/'}{personalInfo.country}
+              </span>
+            )}
+          </div>
+          
+          {/* Line 2: LinkedIn | GitHub | Website */}
+          <div className="flex justify-center items-center gap-4 text-sm">
             {personalInfo.linkedIn && (
               <a 
                 href={personalInfo.linkedIn.startsWith('http') ? personalInfo.linkedIn : `https://linkedin.com/in/${personalInfo.linkedIn}`}
@@ -45,27 +52,26 @@ export function ClassicTemplate({ data }: ClassicTemplateProps) {
                 LinkedIn
               </a>
             )}
-            {personalInfo.github && (
-              <>
-                {personalInfo.linkedIn && <span>•</span>}
-                <a 
-                  href={personalInfo.github.startsWith('http') ? personalInfo.github : `https://github.com/${personalInfo.github}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-600 hover:underline"
-                >
-                  GitHub
-                </a>
-              </>
-            )}
+            <a 
+              href={personalInfo.github ? (personalInfo.github.startsWith('http') ? personalInfo.github : `https://github.com/${personalInfo.github}`) : '#'}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:underline"
+            >
+              GitHub
+            </a>
             {personalInfo.website && (
-              <>
-                {(personalInfo.linkedIn || personalInfo.github) && <span>•</span>}
-                <span>{personalInfo.website}</span>
-              </>
+              <a 
+                href={personalInfo.website}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600 hover:underline"
+              >
+                {personalInfo.website.replace('https://', '').replace('http://', '').replace('www.', '')}
+              </a>
             )}
           </div>
-        )}
+        </div>
       </header>
 
       {/* Professional Summary */}
@@ -109,131 +115,128 @@ export function ClassicTemplate({ data }: ClassicTemplateProps) {
         </section>
       )}
 
-      {/* Projects */}
-      {projects && projects.length > 0 && (
-        <section className="mb-4">
-          <h2 className="text-xl font-bold text-gray-900 mb-3 uppercase tracking-wide border-b border-gray-300 pb-1">
-            Projeler
-          </h2>
-          <div className="space-y-3">
-            {projects.map((project) => (
-              <div key={project.id} className="break-inside-avoid">
-                <h3 className="text-lg font-bold text-gray-900">{project.title}</h3>
-                {project.link && (
-                  <a 
-                    href={project.link} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="text-blue-600 text-sm hover:underline"
-                  >
-                    {project.link.includes('github') ? '→ GitHub' : '→ Project Link'}
-                  </a>
-                )}
-                <p className="text-gray-700 mt-1">{project.description}</p>
-                {(project.startDate || project.endDate) && (
-                  <p className="text-sm text-gray-600 mt-1">
-                    {project.startDate} {project.endDate && `- ${project.endDate}`}
-                  </p>
-                )}
-                {project.technologies && project.technologies.length > 0 && (
-                  <div className="flex flex-wrap gap-1.5 mt-2">
-                    {project.technologies.map((tech, idx) => (
-                      <span
-                        key={idx}
-                        className="px-2 py-0.5 bg-gray-100 text-gray-700 rounded text-xs"
+      {/* Skills & Projects - Side by Side */}
+      <div className="grid grid-cols-2 gap-6 mb-4">
+        {/* Skills */}
+        {skills.length > 0 && (
+          <section>
+            <h2 className="text-lg font-bold text-gray-900 mb-2 uppercase tracking-wide border-b border-gray-300 pb-1">
+              Yetenekler
+            </h2>
+            <div className="flex flex-wrap gap-2">
+              {skills.flatMap((skill) => 
+                skill.name.split('/').map((name, idx) => ({
+                  id: `${skill.id}-${idx}`,
+                  name: name.trim(),
+                  years: skill.years
+                }))
+              ).map((skill) => (
+                <span
+                  key={skill.id}
+                  className="px-2.5 py-0.5 bg-gray-100 text-gray-800 rounded text-xs font-medium"
+                >
+                  {skill.name}{skill.years ? `-${skill.years}y` : ''}
+                </span>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Projects */}
+        {projects && projects.length > 0 && (
+          <section>
+            <h2 className="text-lg font-bold text-gray-900 mb-2 uppercase tracking-wide border-b border-gray-300 pb-1">
+              Projeler
+            </h2>
+            <div className="space-y-2">
+              {projects.map((project) => (
+                <div key={project.id} className="break-inside-avoid">
+                  <div className="flex items-baseline gap-2">
+                    <h3 className="text-sm font-bold text-gray-900">{project.title}</h3>
+                    <div className="flex items-center gap-2 text-[10px]">
+                      <a 
+                        href={project.link || '#'} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:underline"
                       >
-                        {tech}
-                      </span>
-                    ))}
+                        Website
+                      </a>
+                      <a 
+                        href={project.github ? (project.github.startsWith('http') ? project.github : `https://github.com/${project.github}`) : '#'}
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:underline"
+                      >
+                        GitHub
+                      </a>
+                    </div>
                   </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* Education */}
-      {education.length > 0 && (
-        <section className="mb-4">
-          <h2 className="text-xl font-bold text-gray-900 mb-3 uppercase tracking-wide border-b border-gray-300 pb-1">
-            Eğitim
-          </h2>
-          <div className="space-y-2">
-            {education.map((edu) => (
-              <div key={edu.id} className="break-inside-avoid">
-                <div className="flex justify-between items-baseline mb-1">
-                  <h3 className="text-lg font-bold text-gray-900">{edu.degree}</h3>
-                  <span className="text-sm text-gray-600">
-                    {edu.startDate} - {edu.endDate || 'Günümüz'}
-                  </span>
                 </div>
-                <p className="text-gray-700 font-semibold">
-                  {edu.school} {edu.location && `• ${edu.location}`}
-                </p>
-                {edu.field && <p className="text-gray-600">{edu.field}</p>}
-                {edu.gpa && <p className="text-gray-600">GPA: {edu.gpa}</p>}
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
+              ))}
+            </div>
+          </section>
+        )}
+      </div>
 
-      {/* Skills */}
-      {skills.length > 0 && (
-        <section className="mb-4">
-          <h2 className="text-xl font-bold text-gray-900 mb-3 uppercase tracking-wide border-b border-gray-300 pb-1">
-            Yetenekler
-          </h2>
-          <div className="flex flex-wrap gap-2">
-            {skills.map((skill) => (
-              <span
-                key={skill.id}
-                className="px-3 py-1 bg-gray-100 text-gray-800 rounded text-sm font-medium"
-              >
-                {skill.name} {skill.years ? `(${skill.years} yıl)` : ''}
-              </span>
-            ))}
-          </div>
-        </section>
-      )}
+      {/* Education & Certificates | Languages - Side by Side (Bottom) */}
+      <div className="grid grid-cols-3 gap-6">
+        {/* Education */}
+        {education.length > 0 && (
+          <section>
+            <h2 className="text-lg font-bold text-gray-900 mb-3 uppercase tracking-wide border-b border-gray-300 pb-1">
+              Eğitim
+            </h2>
+            <div className="space-y-2">
+              {education.map((edu) => (
+                <div key={edu.id} className="break-inside-avoid">
+                  <h3 className="text-base font-bold text-gray-900">{edu.degree}</h3>
+                  <p className="text-gray-700 font-semibold text-sm">{edu.school}</p>
+                  <p className="text-gray-600 text-xs">
+                    {edu.startDate} - {edu.endDate || 'Günümüz'}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
 
-      {/* Languages */}
-      {languages.length > 0 && (
-        <section className="mb-4">
-          <h2 className="text-xl font-bold text-gray-900 mb-3 uppercase tracking-wide border-b border-gray-300 pb-1">
-            Diller
-          </h2>
-          <div className="flex flex-wrap gap-x-6 gap-y-2">
-            {languages.map((lang) => (
-              <div key={lang.id} className="flex items-center gap-2">
-                <span className="font-semibold text-gray-800">{lang.name}</span>
-                <span className="text-gray-600">—</span>
-                <span className="text-gray-600 capitalize">{lang.level}</span>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
+        {/* Certificates */}
+        {certificates.length > 0 && (
+          <section>
+            <h2 className="text-lg font-bold text-gray-900 mb-3 uppercase tracking-wide border-b border-gray-300 pb-1">
+              Sertifikalar
+            </h2>
+            <div className="space-y-1.5">
+              {certificates.map((cert) => (
+                <div key={cert.id}>
+                  <p className="font-semibold text-gray-800 text-xs">{cert.name}</p>
+                  <p className="text-gray-600 text-[10px]">
+                    {cert.issuer} • {cert.date}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
 
-      {/* Certificates */}
-      {certificates.length > 0 && (
-        <section>
-          <h2 className="text-xl font-bold text-gray-900 mb-3 uppercase tracking-wide border-b border-gray-300 pb-1">
-            Sertifikalar
-          </h2>
-          <div className="space-y-2">
-            {certificates.map((cert) => (
-              <div key={cert.id}>
-                <p className="font-semibold text-gray-800">{cert.name}</p>
-                <p className="text-gray-600 text-sm">
-                  {cert.issuer} {cert.date && `• ${cert.date}`}
-                </p>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
+        {/* Languages */}
+        {languages.length > 0 && (
+          <section>
+            <h2 className="text-lg font-bold text-gray-900 mb-2 uppercase tracking-wide border-b border-gray-300 pb-1">
+              Diller
+            </h2>
+            <div className="space-y-1.5">
+              {languages.map((lang) => (
+                <div key={lang.id} className="flex justify-between text-xs">
+                  <span className="font-semibold text-gray-800">{lang.name}</span>
+                  <span className="text-gray-600 capitalize">{lang.level}</span>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+      </div>
     </div>
   );
 }

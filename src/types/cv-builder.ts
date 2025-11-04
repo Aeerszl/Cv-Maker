@@ -53,7 +53,7 @@ export interface WorkExperience {
 export interface Education {
   id: string;
   school: string;
-  degree: string;
+  degree: 'high-school' | 'associate' | 'bachelor' | 'master' | 'phd' | 'other';
   field: string;
   location: string;
   startDate: string;
@@ -99,7 +99,8 @@ export interface Project {
   id: string;
   title: string;
   description: string;
-  link?: string;  // GitHub, demo, vb.
+  link?: string;  // Website, demo link
+  github?: string;  // GitHub repository link
   startDate?: string;
   endDate?: string;
   technologies?: string[];  // Kullanılan teknolojiler
@@ -116,7 +117,8 @@ export interface CVData {
   skills: Skill[];
   languages: Language[];
   certificates: Certificate[];
-  projects?: Project[];  // Opsiyonel
+  projects: Project[];  // Required, same as other arrays
+  cvLanguage?: 'tr' | 'en';  // CV dili (Türkçe/İngilizce)
   template: 
     | 'modern' 
     | 'classic' 
@@ -138,6 +140,7 @@ export type FormStep =
   | 'experience'
   | 'education'
   | 'skills'
+  | 'projects'
   | 'template'
   | 'preview';
 

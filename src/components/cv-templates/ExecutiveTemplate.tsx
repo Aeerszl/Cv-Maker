@@ -1,16 +1,14 @@
 /**
  * Executive CV Template
  * 
- * Professional executive-level CV with photo support (optional)
- * Compact 1-page design
+ * Professional executive-level CV
+ * Compact 1-page design, ATS-optimized
  * 
  * @module components/cv-templates/ExecutiveTemplate
  */
 
 import React from 'react';
-import { Mail, Phone, MapPin, Linkedin, Globe } from 'lucide-react';
 import type { CVData } from '@/types/cv-builder';
-import Image from 'next/image';
 
 interface ExecutiveTemplateProps {
   data: CVData;
@@ -22,48 +20,62 @@ export function ExecutiveTemplate({ data }: ExecutiveTemplateProps) {
   return (
     <div className="w-[210mm] min-h-[297mm] bg-white text-gray-900 shadow-lg mx-auto p-8">
       {/* Header */}
-      <div className="flex items-start gap-4 mb-4 pb-3 border-b-2 border-gray-800">
-        {personalInfo.photo && (
-          <div className="w-20 h-20 rounded-full overflow-hidden border-4 border-gray-800 shrink-0">
-            <Image src={personalInfo.photo} alt="Profile" width={80} height={80} className="object-cover" />
-          </div>
+      <div className="mb-4 pb-3 border-b-2 border-gray-800">
+        <h1 className="text-2xl font-bold text-gray-900 mb-1">
+          {personalInfo.firstName} {personalInfo.lastName}
+        </h1>
+        {personalInfo.title && (
+          <p className="text-base text-gray-600 mb-2">{personalInfo.title}</p>
         )}
-        <div className="flex-1">
-          <h1 className="text-2xl font-bold text-gray-900 mb-1">
-            {personalInfo.firstName} {personalInfo.lastName}
-          </h1>
-          {personalInfo.title && (
-            <p className="text-base text-gray-600 mb-2">{personalInfo.title}</p>
-          )}
-          <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-gray-600">
-            {personalInfo.email && (
-              <span className="flex items-center gap-1"><Mail className="w-3 h-3" />{personalInfo.email}</span>
+        
+        {/* Contact Info - 2 Columns */}
+        <div className="flex gap-8 text-xs text-gray-600">
+          {/* Left Column: Email, Phone, Location */}
+          <div className="space-y-0.5">
+            {personalInfo.email && <div>{personalInfo.email}</div>}
+            {personalInfo.phone && <div>{personalInfo.phone}</div>}
+            {(personalInfo.city || personalInfo.country) && (
+              <div>
+                {personalInfo.city}{personalInfo.city && personalInfo.country && '/'}{personalInfo.country}
+              </div>
             )}
-            {personalInfo.phone && (
-              <span className="flex items-center gap-1"><Phone className="w-3 h-3" />{personalInfo.phone}</span>
-            )}
-            {personalInfo.city && (
-              <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{personalInfo.city}</span>
-            )}
-            {personalInfo.linkedIn && (
-              <a 
-                href={personalInfo.linkedIn.startsWith('http') ? personalInfo.linkedIn : `https://linkedin.com/in/${personalInfo.linkedIn}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-1 text-blue-600 hover:underline"
-              >
-                <Linkedin className="w-3 h-3" />LinkedIn
-              </a>
-            )}
-            {personalInfo.github && (
-              <a 
-                href={personalInfo.github.startsWith('http') ? personalInfo.github : `https://github.com/${personalInfo.github}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-1 text-blue-600 hover:underline"
-              >
-                <Globe className="w-3 h-3" />GitHub
-              </a>
+          </div>
+          
+          {/* Right Column: LinkedIn, GitHub, Website */}
+          <div className="space-y-0.5">
+              {personalInfo.linkedIn && (
+                <div>
+                  <a 
+                    href={personalInfo.linkedIn.startsWith('http') ? personalInfo.linkedIn : `https://linkedin.com/in/${personalInfo.linkedIn}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:underline"
+                  >
+                    LinkedIn
+                  </a>
+                </div>
+              )}
+              <div>
+                <a 
+                  href={personalInfo.github ? (personalInfo.github.startsWith('http') ? personalInfo.github : `https://github.com/${personalInfo.github}`) : '#'}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 hover:underline"
+                >
+                  GitHub
+                </a>
+              </div>
+            {personalInfo.website && (
+              <div>
+                <a 
+                  href={personalInfo.website}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 hover:underline"
+                >
+                  {personalInfo.website.replace('https://', '').replace('http://', '').replace('www.', '')}
+                </a>
+              </div>
             )}
           </div>
         </div>
@@ -77,7 +89,7 @@ export function ExecutiveTemplate({ data }: ExecutiveTemplateProps) {
       )}
 
       <div className="grid grid-cols-3 gap-4">
-        {/* Left - Experience & Education */}
+        {/* Left - Experience & Projects */}
         <div className="col-span-2 space-y-2">
           {/* Experience */}
           {experience.length > 0 && (
@@ -111,53 +123,66 @@ export function ExecutiveTemplate({ data }: ExecutiveTemplateProps) {
               <div className="space-y-2">
                 {projects.map((project) => (
                   <div key={project.id} className="text-xs break-inside-avoid">
-                    <h3 className="font-bold text-gray-900">{project.title}</h3>
-                    {project.link && (
-                      <a 
-                        href={project.link} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="text-blue-600 text-[9px] hover:underline flex items-center gap-1"
-                      >
-                        <Globe className="w-2 h-2" />
-                        {project.link.includes('github') ? 'GitHub' : 'Link'}
-                      </a>
-                    )}
-                    <p className="text-gray-600 leading-tight text-[10px] mt-0.5">{project.description}</p>
-                    {project.technologies && project.technologies.length > 0 && (
-                      <div className="flex flex-wrap gap-1 mt-0.5">
-                        {project.technologies.map((tech, idx) => (
-                          <span
-                            key={idx}
-                            className="text-[8px] text-gray-600"
-                          >
-                            {tech}
-                          </span>
-                        ))}
+                    <div className="flex items-baseline gap-2">
+                      <h3 className="font-bold text-gray-900">{project.title}</h3>
+                      <div className="flex items-center gap-2 text-[9px]">
+                        <a 
+                          href={project.link || '#'} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-blue-600 hover:underline"
+                        >
+                          Website
+                        </a>
+                        <a 
+                          href={project.github ? (project.github.startsWith('http') ? project.github : `https://github.com/${project.github}`) : '#'}
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-blue-600 hover:underline"
+                        >
+                          GitHub
+                        </a>
                       </div>
-                    )}
+                    </div>
                   </div>
                 ))}
               </div>
             </div>
           )}
 
-          {/* Education */}
-          {education.length > 0 && (
+          {/* Education & Certifications */}
+          {(education.length > 0 || certificates.length > 0) && (
             <div>
               <h2 className="text-xs font-bold uppercase tracking-wide text-gray-800 mb-2 border-b border-gray-300 pb-1">
-                Education
+                Education & Certifications
               </h2>
-              <div className="space-y-1.5">
-                {education.map((edu) => (
-                  <div key={edu.id} className="text-xs break-inside-avoid">
-                    <div className="flex justify-between items-baseline">
-                      <h3 className="font-bold text-gray-900">{edu.degree}</h3>
-                      <span className="text-gray-500 text-[9px]">{edu.startDate} - {edu.current ? 'Present' : edu.endDate}</span>
-                    </div>
-                    <p className="text-gray-700 text-[10px]">{edu.school} • {edu.field}</p>
+              <div className="space-y-2">
+                {/* Education */}
+                {education.length > 0 && (
+                  <div className="space-y-1.5">
+                    {education.map((edu) => (
+                      <div key={edu.id} className="text-xs break-inside-avoid">
+                        <div className="flex justify-between items-baseline">
+                          <h3 className="font-bold text-gray-900">{edu.degree}</h3>
+                          <span className="text-gray-500 text-[9px]">{edu.startDate} - {edu.current ? 'Present' : edu.endDate}</span>
+                        </div>
+                        <p className="text-gray-700 text-[10px]">{edu.school} {edu.field && `• ${edu.field}`}</p>
+                      </div>
+                    ))}
                   </div>
-                ))}
+                )}
+
+                {/* Certifications */}
+                {certificates.length > 0 && (
+                  <div className="space-y-1.5 pt-2 border-t border-gray-200">
+                    {certificates.map((cert) => (
+                      <div key={cert.id} className="text-xs break-inside-avoid">
+                        <h3 className="font-bold text-gray-900">{cert.name}</h3>
+                        <p className="text-gray-700 text-[10px]">{cert.issuer} {cert.date && `• ${cert.date}`}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -171,13 +196,19 @@ export function ExecutiveTemplate({ data }: ExecutiveTemplateProps) {
               <h2 className="text-xs font-bold uppercase tracking-wide text-gray-800 mb-2 border-b border-gray-300 pb-1">
                 Skills
               </h2>
-              <div className="space-y-0.5">
-                {skills.map((skill) => (
-                  <div key={skill.id} className="text-[10px] flex justify-between items-center">
+              <div className="grid grid-cols-2 gap-x-3 gap-y-1">
+                {skills.flatMap((skill) => 
+                  skill.name.split('/').map((name, idx) => ({
+                    id: `${skill.id}-${idx}`,
+                    name: name.trim(),
+                    years: skill.years
+                  }))
+                ).map((skill) => (
+                  <div key={skill.id} className="text-[10px]">
                     <span className="text-gray-800">{skill.name}</span>
-                    <span className="text-gray-600 text-[9px] font-semibold">
-                      {skill.years ? `${skill.years} yıl` : '1 yıl'}
-                    </span>
+                    {skill.years && (
+                      <span className="text-gray-600 text-[9px] font-semibold"> - {skill.years}y</span>
+                    )}
                   </div>
                 ))}
               </div>
@@ -187,14 +218,14 @@ export function ExecutiveTemplate({ data }: ExecutiveTemplateProps) {
           {/* Languages */}
           {languages.length > 0 && (
             <div>
-              <h2 className="text-sm font-bold uppercase tracking-wide text-gray-800 mb-3 border-b border-gray-300">
+              <h2 className="text-xs font-bold uppercase tracking-wide text-gray-800 mb-2 border-b border-gray-300 pb-1">
                 Languages
               </h2>
-              <div className="space-y-1">
+              <div className="space-y-0.5">
                 {languages.map((lang) => (
-                  <div key={lang.id} className="text-sm flex justify-between">
+                  <div key={lang.id} className="text-[10px] flex justify-between">
                     <span className="text-gray-800">{lang.name}</span>
-                    <span className="text-gray-600 text-[10px]">{lang.level}</span>
+                    <span className="text-gray-600 text-[9px] capitalize">{lang.level}</span>
                   </div>
                 ))}
               </div>

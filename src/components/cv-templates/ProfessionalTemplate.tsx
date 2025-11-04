@@ -18,39 +18,59 @@ export function ProfessionalTemplate({ data }: ProfessionalTemplateProps) {
 
   return (
     <div className="w-[210mm] min-h-[297mm] bg-white text-gray-900 shadow-lg mx-auto p-0">
-      {/* Header with Green Accent */}
-      <div className="bg-white border-b-4 border-green-600 px-8 py-5">
+      {/* Header */}
+      <div className="bg-white border-b-2 border-gray-800 px-8 py-5">
         <h1 className="text-3xl font-bold text-gray-900 mb-1">
           {personalInfo.firstName} {personalInfo.lastName}
         </h1>
         {personalInfo.title && (
-          <p className="text-lg text-green-700 font-semibold mb-3">{personalInfo.title}</p>
+          <p className="text-lg text-gray-700 font-semibold mb-3">{personalInfo.title}</p>
         )}
-        <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-700">
-          {personalInfo.email && <span>📧 {personalInfo.email}</span>}
-          {personalInfo.phone && <span>📱 {personalInfo.phone}</span>}
-          {personalInfo.city && <span>📍 {personalInfo.city}</span>}
-          {personalInfo.linkedIn && (
+        
+        {/* Contact Info - 2 Lines */}
+        <div className="text-xs text-gray-700 space-y-1">
+          {/* Line 1: Email | Phone | Location */}
+          <div className="flex items-center gap-4">
+            {personalInfo.email && <span>{personalInfo.email}</span>}
+            {personalInfo.phone && <span>{personalInfo.phone}</span>}
+            {(personalInfo.city || personalInfo.country) && (
+              <span>
+                {personalInfo.city}{personalInfo.city && personalInfo.country && '/'}{personalInfo.country}
+              </span>
+            )}
+          </div>
+          
+          {/* Line 2: LinkedIn | GitHub | Website */}
+          <div className="flex items-center gap-4">
+            {personalInfo.linkedIn && (
+              <a 
+                href={personalInfo.linkedIn.startsWith('http') ? personalInfo.linkedIn : `https://linkedin.com/in/${personalInfo.linkedIn}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600 hover:underline"
+              >
+                LinkedIn
+              </a>
+            )}
             <a 
-              href={personalInfo.linkedIn.startsWith('http') ? personalInfo.linkedIn : `https://linkedin.com/in/${personalInfo.linkedIn}`}
+              href={personalInfo.github ? (personalInfo.github.startsWith('http') ? personalInfo.github : `https://github.com/${personalInfo.github}`) : '#'}
               target="_blank"
               rel="noopener noreferrer"
               className="text-blue-600 hover:underline"
             >
-              💼 LinkedIn
+              GitHub
             </a>
-          )}
-          {personalInfo.github && (
-            <a 
-              href={personalInfo.github.startsWith('http') ? personalInfo.github : `https://github.com/${personalInfo.github}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-600 hover:underline"
-            >
-              🔗 GitHub
-            </a>
-          )}
-          {personalInfo.website && <span>🌐 {personalInfo.website}</span>}
+            {personalInfo.website && (
+              <a 
+                href={personalInfo.website}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600 hover:underline"
+              >
+                {personalInfo.website.replace('https://', '').replace('http://', '').replace('www.', '')}
+              </a>
+            )}
+          </div>
         </div>
       </div>
 
@@ -59,7 +79,7 @@ export function ProfessionalTemplate({ data }: ProfessionalTemplateProps) {
         {summary && (
           <section className="mb-4">
             <div className="flex items-center gap-3 mb-3">
-              <div className="w-2 h-8 bg-green-600"></div>
+              <div className="w-2 h-8 bg-gray-800"></div>
               <h2 className="text-lg font-bold text-gray-900">EXECUTIVE SUMMARY</h2>
             </div>
             <p className="text-gray-700 leading-relaxed ml-5">{summary}</p>
@@ -70,7 +90,7 @@ export function ProfessionalTemplate({ data }: ProfessionalTemplateProps) {
         {experience.length > 0 && (
           <section className="mb-4">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-2 h-8 bg-green-600"></div>
+              <div className="w-2 h-8 bg-gray-800"></div>
               <h2 className="text-lg font-bold text-gray-900">PROFESSIONAL EXPERIENCE</h2>
             </div>
             <div className="ml-5 space-y-3">
@@ -79,7 +99,7 @@ export function ProfessionalTemplate({ data }: ProfessionalTemplateProps) {
                   <div className="flex justify-between items-start mb-2">
                     <div>
                       <h3 className="text-lg font-bold text-gray-900">{exp.position}</h3>
-                      <p className="text-green-700 font-semibold text-lg">{exp.company}</p>
+                      <p className="text-gray-700 font-semibold text-lg">{exp.company}</p>
                       {exp.location && <p className="text-gray-600">{exp.location}</p>}
                     </div>
                     <div className="text-right">
@@ -101,96 +121,110 @@ export function ProfessionalTemplate({ data }: ProfessionalTemplateProps) {
           </section>
         )}
 
-        {/* Projects */}
-        {projects && projects.length > 0 && (
-          <section className="mb-4">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-2 h-8 bg-green-600"></div>
-              <h2 className="text-lg font-bold text-gray-900">PROJECTS</h2>
-            </div>
-            <div className="ml-5 space-y-3">
-              {projects.map((project) => (
-                <div key={project.id} className="break-inside-avoid">
-                  <h3 className="text-lg font-bold text-gray-900">{project.title}</h3>
-                  {project.link && (
-                    <a 
-                      href={project.link} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="text-green-600 text-sm hover:underline"
-                    >
-                      {project.link.includes('github') ? '→ GitHub' : '→ Project Link'}
-                    </a>
-                  )}
-                  <p className="text-gray-700 mt-1">{project.description}</p>
-                  {(project.startDate || project.endDate) && (
-                    <p className="text-sm text-gray-600 mt-1">
-                      {project.startDate} {project.endDate && `- ${project.endDate}`}
-                    </p>
-                  )}
-                  {project.technologies && project.technologies.length > 0 && (
-                    <div className="flex flex-wrap gap-1.5 mt-2">
-                      {project.technologies.map((tech, idx) => (
-                        <span
-                          key={idx}
-                          className="px-2 py-0.5 bg-green-100 text-green-700 rounded text-xs"
-                        >
-                          {tech}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
+        {/* Skills & Projects - Side by Side */}
+        <div className="grid grid-cols-2 gap-6 mb-4">
+          {/* Skills */}
+          {skills.length > 0 && (
+            <section>
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-2 h-6 bg-gray-800"></div>
+                <h2 className="text-base font-bold text-gray-900">SKILLS</h2>
+              </div>
+              <div className="ml-5 flex flex-wrap gap-2">
+                {skills.flatMap((skill) => 
+                  skill.name.split('/').map((name, idx) => ({
+                    id: `${skill.id}-${idx}`,
+                    name: name.trim(),
+                    years: skill.years
+                  }))
+                ).map((skill) => (
+                  <span
+                    key={skill.id}
+                    className="px-2.5 py-1 bg-gray-100 text-gray-800 rounded text-xs font-medium"
+                  >
+                    {skill.name}{skill.years ? `-${skill.years}y` : ''}
+                  </span>
+                ))}
+              </div>
+            </section>
+          )}
 
-        {/* Education */}
-        {education.length > 0 && (
-          <section className="mb-4">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-2 h-8 bg-green-600"></div>
-              <h2 className="text-lg font-bold text-gray-900">EDUCATION</h2>
-            </div>
-            <div className="ml-5 space-y-4">
-              {education.map((edu) => (
-                <div key={edu.id} className="break-inside-avoid">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h3 className="text-lg font-bold text-gray-900">{edu.degree}</h3>
-                      <p className="text-green-700 font-semibold">{edu.school}</p>
-                      {edu.field && <p className="text-gray-600">{edu.field}</p>}
-                      {edu.gpa && <p className="text-gray-600">GPA: {edu.gpa}</p>}
+          {/* Projects */}
+          {projects && projects.length > 0 && (
+            <section>
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-2 h-6 bg-gray-800"></div>
+                <h2 className="text-base font-bold text-gray-900">PROJECTS</h2>
+              </div>
+              <div className="ml-5 space-y-2">
+                {projects.map((project) => (
+                  <div key={project.id} className="break-inside-avoid">
+                    <div className="flex items-baseline gap-2">
+                      <h3 className="text-sm font-bold text-gray-900">{project.title}</h3>
+                      <div className="flex items-center gap-2 text-[10px]">
+                        <a 
+                          href={project.link || '#'} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-blue-600 hover:underline"
+                        >
+                          Website
+                        </a>
+                        <a 
+                          href={project.github ? (project.github.startsWith('http') ? project.github : `https://github.com/${project.github}`) : '#'}
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-blue-600 hover:underline"
+                        >
+                          GitHub
+                        </a>
+                      </div>
                     </div>
-                    <p className="text-gray-700 font-medium">
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+        </div>
+
+        {/* Education & Certificates | Languages - Side by Side */}
+        <div className="grid grid-cols-3 gap-6">
+          {/* Education */}
+          {education.length > 0 && (
+            <section>
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-2 h-6 bg-gray-800"></div>
+                <h2 className="text-base font-bold text-gray-900">EDUCATION</h2>
+              </div>
+              <div className="ml-5 space-y-2">
+                {education.map((edu) => (
+                  <div key={edu.id} className="break-inside-avoid">
+                    <h3 className="text-sm font-bold text-gray-900">{edu.degree}</h3>
+                    <p className="text-gray-700 font-semibold text-xs">{edu.school}</p>
+                    <p className="text-gray-600 text-[10px]">
                       {edu.startDate} - {edu.endDate || 'Present'}
                     </p>
                   </div>
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
-
-        <div className="grid grid-cols-2 gap-8">
-          {/* Skills */}
-          {skills.length > 0 && (
-            <section className="mb-4">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-2 h-8 bg-green-600"></div>
-                <h2 className="text-lg font-bold text-gray-900">SKILLS</h2>
+                ))}
               </div>
-              <div className="ml-5 grid grid-cols-1 gap-2">
-                {skills.map((skill) => (
-                  <div key={skill.id} className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 bg-green-600 rounded-full"></div>
-                      <span className="text-gray-800 font-medium">{skill.name}</span>
+            </section>
+          )}
+
+          {/* Certificates */}
+          {certificates.length > 0 && (
+            <section>
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-2 h-6 bg-gray-800"></div>
+                <h2 className="text-base font-bold text-gray-900">CERTIFICATIONS</h2>
+              </div>
+              <div className="ml-5 space-y-1.5">
+                {certificates.map((cert) => (
+                  <div key={cert.id} className="flex items-start gap-2">
+                    <div className="w-1.5 h-1.5 bg-gray-800 rounded-full mt-1"></div>
+                    <div>
+                      <p className="font-semibold text-gray-900 text-xs">{cert.name}</p>
+                      <p className="text-gray-600 text-[10px]">{cert.issuer} • {cert.date}</p>
                     </div>
-                    {skill.years && (
-                      <span className="text-gray-600 text-sm">{skill.years} yıl</span>
-                    )}
                   </div>
                 ))}
               </div>
@@ -199,45 +233,23 @@ export function ProfessionalTemplate({ data }: ProfessionalTemplateProps) {
 
           {/* Languages */}
           {languages.length > 0 && (
-            <section className="mb-4">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-2 h-8 bg-green-600"></div>
-                <h2 className="text-lg font-bold text-gray-900">LANGUAGES</h2>
+            <section>
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-2 h-6 bg-gray-800"></div>
+                <h2 className="text-base font-bold text-gray-900">LANGUAGES</h2>
               </div>
-              <div className="ml-5 space-y-2">
+              <div className="ml-5 space-y-1.5">
                 {languages.map((lang) => (
                   <div key={lang.id} className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-green-600 rounded-full"></div>
-                    <span className="text-gray-800 font-medium">{lang.name}</span>
-                    <span className="text-gray-600">— {lang.level}</span>
+                    <div className="w-1.5 h-1.5 bg-gray-800 rounded-full"></div>
+                    <span className="text-gray-800 font-medium text-sm">{lang.name}</span>
+                    <span className="text-gray-600 text-xs capitalize">— {lang.level}</span>
                   </div>
                 ))}
               </div>
             </section>
           )}
         </div>
-
-        {/* Certificates */}
-        {certificates.length > 0 && (
-          <section>
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-2 h-8 bg-green-600"></div>
-              <h2 className="text-lg font-bold text-gray-900">CERTIFICATIONS</h2>
-            </div>
-            <div className="ml-5 space-y-3">
-              {certificates.map((cert) => (
-                <div key={cert.id} className="flex items-start gap-2">
-                  <div className="w-2 h-2 bg-green-600 rounded-full mt-1.5"></div>
-                  <div>
-                    <p className="font-bold text-gray-900">{cert.name}</p>
-                    <p className="text-gray-700">{cert.issuer}</p>
-                    {cert.date && <p className="text-gray-600 text-sm">{cert.date}</p>}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
       </div>
     </div>
   );

@@ -133,6 +133,29 @@ const sampleCVData: CVData = {
       date: '2021',
     },
   ],
+  projects: [
+    {
+      id: '1',
+      title: 'E-Ticaret Platformu',
+      description: 'Next.js ve Node.js kullanarak geliştirilen full-stack e-ticaret platformu. Stripe entegrasyonu, gerçek zamanlı envanter yönetimi ve kullanıcı analytics özellikleri içeriyor.',
+      link: 'https://github.com/ahmetyilmaz/ecommerce-platform',
+      technologies: ['Next.js', 'Node.js', 'MongoDB', 'Stripe', 'Redis'],
+    },
+    {
+      id: '2',
+      title: 'Real-Time Chat Uygulaması',
+      description: 'WebSocket kullanarak geliştirilen gerçek zamanlı mesajlaşma uygulaması. Grup sohbetleri, dosya paylaşımı ve end-to-end şifreleme desteği.',
+      link: 'https://github.com/ahmetyilmaz/chat-app',
+      technologies: ['React', 'Socket.io', 'Express', 'PostgreSQL'],
+    },
+    {
+      id: '3',
+      title: 'Task Management Dashboard',
+      description: 'Takım işbirliği için geliştirilmiş proje yönetim aracı. Drag-and-drop kanban board, zaman takibi ve raporlama özellikleri.',
+      link: 'https://github.com/ahmetyilmaz/task-manager',
+      technologies: ['React', 'TypeScript', 'Firebase', 'Tailwind CSS'],
+    },
+  ],
   template: 'modern',
 };
 
