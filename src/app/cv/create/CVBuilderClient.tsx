@@ -10,8 +10,6 @@
 
 import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import domtoimage from 'dom-to-image-more';
-import jsPDF from 'jspdf';
 import { Sidebar } from '@/components/dashboard/Sidebar';
 import { TemplateSelector } from '@/components/cv-templates/TemplateSelector';
 import { 
@@ -134,6 +132,7 @@ export default function CVBuilderClient({ userName, userEmail, initialData, isEd
           title: project.title || '',
           description: project.description || '',
           link: project.link || '',
+          github: project.github || '',
           technologies: project.technologies || [],
         })) || [],
         cvLanguage: initialData.cvLanguage || 'tr',
@@ -148,31 +147,66 @@ export default function CVBuilderClient({ userName, userEmail, initialData, isEd
   const cvPreviewRef = useRef<HTMLDivElement>(null);
 
   /**
-   * Handle PDF download using browser's print functionality
+   * Handle PDF download with clickable links and selectable text
    */
-  const handleDownloadPDF = () => {
+  const handleDownloadPDF = async () => {
     if (!cvPreviewRef.current) {
       alert('CV önizleme bulunamadı. Lütfen sayfayı yenileyin.');
       return;
     }
 
-    // Show instructions to user
-    const message = `PDF İndirme Talimatları:
+    try {
+      // Show loading indicator
+      const loadingToast = document.createElement('div');
+      loadingToast.style.cssText = 'position:fixed;top:20px;right:20px;background:#1f2937;color:white;padding:16px 24px;border-radius:8px;z-index:9999;box-shadow:0 4px 6px rgba(0,0,0,0.1);';
+      loadingToast.textContent = 'PDF oluşturuluyor...';
+      document.body.appendChild(loadingToast);
 
-1. Açılan pencerede hedef olarak "PDF'ye Kaydet" veya "Microsoft Print to PDF" seçin
-2. Ayarlar bölümünde:
-   - Sayfa: A4
-   - Kenar boşlukları: Varsayılan
-   - Arka plan grafikleri: AÇIK (önemli!)
-3. "Kaydet" butonuna basın
+      // Get HTML content from preview
+      const htmlContent = cvPreviewRef.current.innerHTML;
 
-Devam etmek için Tamam'a basın...`;
+      // Send to backend for PDF generation
+      const response = await fetch('/api/cv/generate-pdf', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          html: htmlContent,
+          filename: `${cvData.personalInfo.firstName}_${cvData.personalInfo.lastName}_CV.pdf`.replace(/\s+/g, '_'),
+        }),
+      });
 
-    if (confirm(message)) {
-      // Trigger browser print dialog
+      if (!response.ok) {
+        throw new Error('PDF oluşturulamadı');
+      }
+
+      // Download PDF
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${cvData.personalInfo.firstName}_${cvData.personalInfo.lastName}_CV.pdf`.replace(/\s+/g, '_');
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+
+      // Remove loading indicator
+      document.body.removeChild(loadingToast);
+
+      // Show success message
+      const successToast = document.createElement('div');
+      successToast.style.cssText = 'position:fixed;top:20px;right:20px;background:#10b981;color:white;padding:16px 24px;border-radius:8px;z-index:9999;box-shadow:0 4px 6px rgba(0,0,0,0.1);';
+      successToast.textContent = '✓ PDF başarıyla indirildi!';
+      document.body.appendChild(successToast);
       setTimeout(() => {
-        window.print();
-      }, 100);
+        document.body.removeChild(successToast);
+      }, 3000);
+
+    } catch (error) {
+      console.error('PDF generation error:', error);
+      alert('PDF oluşturulurken bir hata oluştu. Lütfen tekrar deneyin.');
     }
   };
 
@@ -1318,6 +1352,7 @@ Devam etmek için Tamam'a basın...`;
                           title: '',
                           description: '',
                           link: '',
+                          github: '',
                         };
                         setCVData({
                           ...cvData,
@@ -1367,21 +1402,40 @@ Devam etmek için Tamam'a basın...`;
                             />
                           </div>
                           
-                          <div>
-                            <label className="block text-sm font-medium text-foreground mb-2">
-                              {t('cvBuilder.projects.link')}
-                            </label>
-                            <input
-                              type="url"
-                              value={project.link || ''}
-                              onChange={(e) => {
-                                const updated = [...cvData.projects];
-                                updated[index].link = e.target.value;
-                                setCVData({ ...cvData, projects: updated });
-                              }}
-                              className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                              placeholder={t('cvBuilder.projects.linkPlaceholder')}
-                            />
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <label className="block text-sm font-medium text-foreground mb-2">
+                                {t('cvBuilder.projects.link')}
+                              </label>
+                              <input
+                                type="url"
+                                value={project.link || ''}
+                                onChange={(e) => {
+                                  const updated = [...cvData.projects];
+                                  updated[index].link = e.target.value;
+                                  setCVData({ ...cvData, projects: updated });
+                                }}
+                                className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                                placeholder={t('cvBuilder.projects.linkPlaceholder')}
+                              />
+                            </div>
+                            
+                            <div>
+                              <label className="block text-sm font-medium text-foreground mb-2">
+                                {t('cvBuilder.projects.github')}
+                              </label>
+                              <input
+                                type="url"
+                                value={project.github || ''}
+                                onChange={(e) => {
+                                  const updated = [...cvData.projects];
+                                  updated[index].github = e.target.value;
+                                  setCVData({ ...cvData, projects: updated });
+                                }}
+                                className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                                placeholder={t('cvBuilder.projects.githubPlaceholder')}
+                              />
+                            </div>
                           </div>
                         </div>
                         
@@ -1406,6 +1460,7 @@ Devam etmek için Tamam'a basın...`;
                           title: '',
                           description: '',
                           link: '',
+                          github: '',
                         };
                         setCVData({
                           ...cvData,

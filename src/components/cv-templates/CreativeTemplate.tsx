@@ -208,24 +208,33 @@ export function CreativeTemplate({ data }: CreativeTemplateProps) {
               {projects.map((project) => (
                 <div key={project.id} className="break-inside-avoid">
                   <h3 className="text-xs font-bold text-gray-900">{project.title}</h3>
-                  <div className="flex gap-2 mt-0.5 text-[9px]">
-                    <a 
-                      href={project.link || '#'} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="text-blue-600 hover:underline"
-                    >
-                      Website
-                    </a>
-                    <a 
-                      href={project.github || '#'} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="text-blue-600 hover:underline"
-                    >
-                      GitHub
-                    </a>
-                  </div>
+                  {project.description && (
+                    <p className="text-gray-700 text-[9px] leading-tight mt-0.5">{project.description}</p>
+                  )}
+                  {(project.link || project.github) && (
+                    <div className="flex gap-2 mt-0.5 text-[9px]">
+                      {project.link && (
+                        <a 
+                          href={project.link} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-blue-600 hover:underline"
+                        >
+                          Website
+                        </a>
+                      )}
+                      {project.github && (
+                        <a 
+                          href={project.github} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-blue-600 hover:underline"
+                        >
+                          GitHub
+                        </a>
+                      )}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

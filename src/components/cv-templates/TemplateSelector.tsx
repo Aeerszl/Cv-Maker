@@ -73,7 +73,7 @@ const sampleCVData: CVData = {
     {
       id: '1',
       school: 'İstanbul Teknik Üniversitesi',
-      degree: 'Yüksek Lisans',
+      degree: 'master',
       field: 'Bilgisayar Mühendisliği',
       location: 'İstanbul, Türkiye',
       startDate: '09/2015',
@@ -84,7 +84,7 @@ const sampleCVData: CVData = {
     {
       id: '2',
       school: 'Boğaziçi Üniversitesi',
-      degree: 'Lisans',
+      degree: 'bachelor',
       field: 'Bilgisayar Mühendisliği',
       location: 'İstanbul, Türkiye',
       startDate: '09/2011',
@@ -366,10 +366,10 @@ export function TemplateSelector({ selectedTemplate, onSelectTemplate }: Templat
       <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
         <h4 className="font-semibold text-green-900 dark:text-green-100 mb-2 flex items-center gap-2">
           <CheckCircle2 className="w-4 h-4" />
-          Tüm Templateler %90+ ATS Uyumlu
+          {t('templateSelector.atsInfo.title')}
         </h4>
         <p className="text-sm text-green-800 dark:text-green-200">
-          9 template de ATS sistemleri tarafından kolayca okunabilir formatta optimize edilmiştir. Grid layoutlar modern ATS sistemleri tarafından %85-95 başarıyla işlenir.
+          {t('templateSelector.atsInfo.description')}
         </p>
       </div>
 

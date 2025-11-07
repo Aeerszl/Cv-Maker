@@ -153,24 +153,30 @@ export function MinimalTemplate({ data }: MinimalTemplateProps) {
               <div key={project.id} className="break-inside-avoid">
                 <div className="flex items-baseline gap-3">
                   <h3 className="text-sm font-semibold text-gray-900">{project.title}</h3>
-                  <div className="flex items-center gap-3 text-[10px]">
-                    <a 
-                      href={project.link || '#'} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="text-gray-600 hover:text-gray-900 hover:underline"
-                    >
-                      Website
-                    </a>
-                    <a 
-                      href={project.github ? (project.github.startsWith('http') ? project.github : `https://github.com/${project.github}`) : '#'}
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="text-gray-600 hover:text-gray-900 hover:underline"
-                    >
-                      GitHub
-                    </a>
-                  </div>
+                  {(project.link || project.github) && (
+                    <div className="flex items-center gap-3 text-[10px]">
+                      {project.link && (
+                        <a 
+                          href={project.link} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-gray-600 hover:text-gray-900 hover:underline"
+                        >
+                          Website
+                        </a>
+                      )}
+                      {project.github && (
+                        <a 
+                          href={project.github.startsWith('http') ? project.github : `https://github.com/${project.github}`}
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-gray-600 hover:text-gray-900 hover:underline"
+                        >
+                          GitHub
+                        </a>
+                      )}
+                    </div>
+                  )}
                 </div>
                 <p className="text-gray-700 font-light text-xs leading-tight mt-1">{project.description}</p>
               </div>

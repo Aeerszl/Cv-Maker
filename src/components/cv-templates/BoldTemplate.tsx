@@ -111,24 +111,33 @@ export function BoldTemplate({ data }: BoldTemplateProps) {
                   {projects.map((project) => (
                     <div key={project.id} className="text-xs border-l-2 border-gray-800 pl-3 break-inside-avoid">
                       <h3 className="font-bold text-gray-900">{project.title}</h3>
-                      <div className="flex gap-3 text-[10px] mt-0.5">
-                        <a 
-                          href={project.link || '#'} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="text-blue-600 hover:underline"
-                        >
-                          Website
-                        </a>
-                        <a 
-                          href={project.github || '#'} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="text-blue-600 hover:underline"
-                        >
-                          GitHub
-                        </a>
-                      </div>
+                      {project.description && (
+                        <p className="text-gray-700 text-[10px] leading-tight mt-0.5">{project.description}</p>
+                      )}
+                      {(project.link || project.github) && (
+                        <div className="flex gap-3 text-[10px] mt-0.5">
+                          {project.link && (
+                            <a 
+                              href={project.link} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="text-blue-600 hover:underline"
+                            >
+                              Website
+                            </a>
+                          )}
+                          {project.github && (
+                            <a 
+                              href={project.github.startsWith('http') ? project.github : `https://github.com/${project.github}`}
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="text-blue-600 hover:underline"
+                            >
+                              GitHub
+                            </a>
+                          )}
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>

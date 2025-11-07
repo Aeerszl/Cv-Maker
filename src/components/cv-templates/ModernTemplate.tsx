@@ -149,23 +149,30 @@ export function ModernTemplate({ data }: ModernTemplateProps) {
                 {projects.map((project) => (
                   <div key={project.id} className="break-inside-avoid">
                     <h3 className="text-sm font-bold text-gray-900">{project.title}</h3>
-                    <div className="flex gap-3 text-xs">
-                      <a 
-                        href={project.link || '#'} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="text-blue-600 hover:underline"
-                      >
-                        Website
-                      </a>
-                      <a 
-                        href={project.github || '#'} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="text-blue-600 hover:underline"
-                      >
-                        GitHub
-                      </a>
+                    {project.description && (
+                      <p className="text-gray-700 text-xs leading-tight mt-1">{project.description}</p>
+                    )}
+                    <div className="flex gap-3 text-xs mt-1">
+                      {project.link && (
+                        <a 
+                          href={project.link} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-blue-600 hover:underline"
+                        >
+                          Website
+                        </a>
+                      )}
+                      {project.github && (
+                        <a 
+                          href={project.github} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-blue-600 hover:underline"
+                        >
+                          GitHub
+                        </a>
+                      )}
                     </div>
                   </div>
                 ))}

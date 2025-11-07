@@ -125,25 +125,34 @@ export function ExecutiveTemplate({ data }: ExecutiveTemplateProps) {
                   <div key={project.id} className="text-xs break-inside-avoid">
                     <div className="flex items-baseline gap-2">
                       <h3 className="font-bold text-gray-900">{project.title}</h3>
-                      <div className="flex items-center gap-2 text-[9px]">
-                        <a 
-                          href={project.link || '#'} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="text-blue-600 hover:underline"
-                        >
-                          Website
-                        </a>
-                        <a 
-                          href={project.github ? (project.github.startsWith('http') ? project.github : `https://github.com/${project.github}`) : '#'}
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="text-blue-600 hover:underline"
-                        >
-                          GitHub
-                        </a>
-                      </div>
+                      {(project.link || project.github) && (
+                        <div className="flex items-center gap-2 text-[9px]">
+                          {project.link && (
+                            <a 
+                              href={project.link} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="text-blue-600 hover:underline"
+                            >
+                              Website
+                            </a>
+                          )}
+                          {project.github && (
+                            <a 
+                              href={project.github.startsWith('http') ? project.github : `https://github.com/${project.github}`}
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="text-blue-600 hover:underline"
+                            >
+                              GitHub
+                            </a>
+                          )}
+                        </div>
+                      )}
                     </div>
+                    {project.description && (
+                      <p className="text-gray-600 text-[10px] leading-tight mt-1">{project.description}</p>
+                    )}
                   </div>
                 ))}
               </div>

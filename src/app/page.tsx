@@ -13,7 +13,7 @@
 
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import Link from 'next/link';
 import { ArrowRight, Zap, Download, CheckCircle2, Sparkles, Star, TrendingUp, BookOpen, Palette, Briefcase, Circle } from 'lucide-react';
 import { Header } from '@/components/Header';
@@ -33,6 +33,85 @@ export default function Home() {
   const blob1Ref = useRef<HTMLDivElement>(null);
   const blob2Ref = useRef<HTMLDivElement>(null);
   const blob3Ref = useRef<HTMLDivElement>(null);
+
+  // Define templates with translations - memoized to update when language changes
+  const templates = useMemo(() => [
+    {
+      id: 'modern' as const,
+      name: 'Modern',
+      description: t('template.modern.description'),
+      color: 'from-blue-500 to-blue-600',
+      borderColor: 'border-blue-500',
+      icon: Zap,
+      features: [
+        t('template.modern.features.1'),
+        t('template.modern.features.2'),
+        t('template.modern.features.3'),
+        t('template.modern.features.4'),
+      ],
+      preview: t('template.modern.preview'),
+    },
+    {
+      id: 'classic' as const,
+      name: 'Classic',
+      description: t('template.classic.description'),
+      color: 'from-gray-600 to-gray-700',
+      borderColor: 'border-gray-600',
+      icon: BookOpen,
+      features: [
+        t('template.classic.features.1'),
+        t('template.classic.features.2'),
+        t('template.classic.features.3'),
+        t('template.classic.features.4'),
+      ],
+      preview: t('template.classic.preview'),
+    },
+    {
+      id: 'creative' as const,
+      name: 'Creative',
+      description: t('template.creative.description'),
+      color: 'from-purple-500 to-purple-600',
+      borderColor: 'border-purple-500',
+      icon: Palette,
+      features: [
+        t('template.creative.features.1'),
+        t('template.creative.features.2'),
+        t('template.creative.features.3'),
+        t('template.creative.features.4'),
+      ],
+      preview: t('template.creative.preview'),
+    },
+    {
+      id: 'professional' as const,
+      name: 'Professional',
+      description: t('template.professional.description'),
+      color: 'from-green-500 to-green-600',
+      borderColor: 'border-green-500',
+      icon: Briefcase,
+      features: [
+        t('template.professional.features.1'),
+        t('template.professional.features.2'),
+        t('template.professional.features.3'),
+        t('template.professional.features.4'),
+      ],
+      preview: t('template.professional.preview'),
+    },
+    {
+      id: 'minimal' as const,
+      name: 'Minimal',
+      description: t('template.minimal.description'),
+      color: 'from-orange-500 to-orange-600',
+      borderColor: 'border-orange-500',
+      icon: Circle,
+      features: [
+        t('template.minimal.features.1'),
+        t('template.minimal.features.2'),
+        t('template.minimal.features.3'),
+        t('template.minimal.features.4'),
+      ],
+      preview: t('template.minimal.preview'),
+    },
+  ], [t]);
 
 /**
  * Sample CV Data for Preview
@@ -78,7 +157,7 @@ const sampleCVData: CVData = {
     {
       id: '1',
       school: 'İstanbul Teknik Üniversitesi',
-      degree: 'Yüksek Lisans',
+      degree: 'master',
       field: 'Bilgisayar Mühendisliği',
       location: 'İstanbul, Türkiye',
       startDate: '09/2015',
@@ -89,7 +168,7 @@ const sampleCVData: CVData = {
     {
       id: '2',
       school: 'Boğaziçi Üniversitesi',
-      degree: 'Lisans',
+      degree: 'bachelor',
       field: 'Bilgisayar Mühendisliği',
       location: 'İstanbul, Türkiye',
       startDate: '09/2011',
@@ -158,59 +237,6 @@ const sampleCVData: CVData = {
   ],
   template: 'modern',
 };
-
-const templates = [
-  {
-    id: 'modern' as const,
-    name: 'Modern',
-    description: 'İki sütun düzenli, temiz ve çağdaş tasarım',
-    color: 'from-blue-500 to-blue-600',
-    borderColor: 'border-blue-500',
-    icon: Zap,
-    features: ['İki sütun düzen', 'Renk vurguları', 'İkon destekli', 'ATS uyumlu'],
-    preview: '📄 Modern, profesyonel görünüm',
-  },
-  {
-    id: 'classic' as const,
-    name: 'Classic',
-    description: 'Geleneksel ve profesyonel tek sütun düzeni',
-    color: 'from-gray-600 to-gray-700',
-    borderColor: 'border-gray-600',
-    icon: BookOpen,
-    features: ['Tek sütun', 'Sade tasarım', 'Kolay okunur', 'Evrensel'],
-    preview: '📋 Klasik, güvenilir tasarım',
-  },
-  {
-    id: 'creative' as const,
-    name: 'Creative',
-    description: 'Yaratıcı pozisyonlar için özgün tasarım',
-    color: 'from-purple-500 to-purple-600',
-    borderColor: 'border-purple-500',
-    icon: Palette,
-    features: ['Yan panel', 'Grafik elemanlar', 'Dikkat çekici', 'Renkli'],
-    preview: '🎨 Yaratıcı, farklı görünüm',
-  },
-  {
-    id: 'professional' as const,
-    name: 'Professional',
-    description: 'Kurumsal pozisyonlar için ciddi tasarım',
-    color: 'from-green-500 to-green-600',
-    borderColor: 'border-green-500',
-    icon: Briefcase,
-    features: ['Klasik düzen', 'Net bölümler', 'ATS optimize', 'Kurumsal'],
-    preview: '💼 Kurumsal, güçlü görünüm',
-  },
-  {
-    id: 'minimal' as const,
-    name: 'Minimal',
-    description: 'Sade ve şık minimalist tasarım',
-    color: 'from-orange-500 to-orange-600',
-    borderColor: 'border-orange-500',
-    icon: Circle,
-    features: ['Minimalist', 'Bol beyaz alan', 'Okunabilir', 'Zarif'],
-    preview: '✨ Minimal, zarif görünüm',
-  },
-];
 
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY);
@@ -615,13 +641,13 @@ const templates = [
                 </p>
                 <div className="flex flex-wrap justify-center gap-2">
                   <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 rounded-full text-sm font-medium">
-                    Anahtar Kelime Optimizasyonu
+                    {t('atsInfo.badge1')}
                   </span>
                   <span className="px-3 py-1 bg-purple-100 dark:bg-purple-900/50 text-purple-700 dark:text-purple-300 rounded-full text-sm font-medium">
-                    Standart Format
+                    {t('atsInfo.badge2')}
                   </span>
                   <span className="px-3 py-1 bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-300 rounded-full text-sm font-medium">
-                    Hızlı Tarama
+                    {t('atsInfo.badge3')}
                   </span>
                 </div>
               </div>

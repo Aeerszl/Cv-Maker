@@ -13,60 +13,68 @@
  * @module app/dashboard/page
  */
 
-import { redirect } from 'next/navigation';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+'use client';
+
+import { useEffect, useState } from 'react';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 import { Sidebar } from '@/components/dashboard/Sidebar';
 import { DashboardContent } from '@/components/dashboard/DashboardContent';
+import { useLanguage } from '@/contexts/LanguageContext';
 import type { CVCard as CVCardType } from '@/types/dashboard';
-
-/**
- * Get user's CVs from database
- */
-async function getUserCVs(): Promise<CVCardType[]> {
-  // For now, return mock data
-  // TODO: Implement proper server-side data fetching with authentication
-  return [
-    {
-      id: '1',
-      title: 'Yazılım Geliştirici CV',
-      template: 'modern' as const,
-      lastModified: new Date(Date.now() - 1000 * 60 * 60 * 2), // 2 hours ago
-      createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 5), // 5 days ago
-      isComplete: true,
-    },
-    {
-      id: '2',
-      title: 'Frontend Developer Resume',
-      template: 'professional' as const,
-      lastModified: new Date(Date.now() - 1000 * 60 * 60 * 24), // 1 day ago
-      createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 3), // 3 days ago
-      isComplete: false,
-    },
-    {
-      id: '3',
-      title: 'Full Stack Developer CV',
-      template: 'creative' as const,
-      lastModified: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7), // 1 week ago
-      createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 10), // 10 days ago
-      isComplete: true,
-    },
-  ];
-}
 
 /**
  * Dashboard Page Component
  */
-export default async function DashboardPage() {
+export default function DashboardPage() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
+  const { t } = useLanguage();
+  const [cvs, setCvs] = useState<CVCardType[]>([]);
+  const [loading, setLoading] = useState(true);
+
   // Check authentication
-  const session = await getServerSession(authOptions);
-  
-  if (!session?.user) {
-    redirect('/auth/signin');
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      router.push('/auth/signin');
+    }
+  }, [status, router]);
+
+  // Fetch CVs
+  useEffect(() => {
+    const fetchCVs = async () => {
+      try {
+        const response = await fetch('/api/cv');
+        if (response.ok) {
+          const data = await response.json();
+          setCvs(data.cvs || []);
+        }
+      } catch (error) {
+        console.error('Failed to fetch CVs:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (status === 'authenticated') {
+      fetchCVs();
+    }
+  }, [status]);
+
+  if (status === 'loading' || loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
   }
 
-  // Get user's CVs
-  const cvs = await getUserCVs();
+  if (!session?.user) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -82,10 +90,10 @@ export default async function DashboardPage() {
           {/* Header */}
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-foreground mb-2">
-              Ana Sayfa
+              {t('dashboard.title')}
             </h1>
             <p className="text-muted-foreground">
-              CV&apos;lerinizi yönetin ve düzenleyin
+              {t('dashboard.subtitle')}
             </p>
           </div>
 
