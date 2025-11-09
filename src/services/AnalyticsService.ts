@@ -29,8 +29,7 @@ export class AnalyticsService {
         userAgent,
         referrer,
       });
-    } catch (error) {
-      console.error('❌ Track page view error:', error);
+    } catch {
       // Don't throw - analytics shouldn't break the app
     }
   }
@@ -50,8 +49,8 @@ export class AnalyticsService {
         page,
         ip,
       });
-    } catch (error) {
-      console.error('❌ Track link click error:', error);
+    } catch {
+      // Silent fail - analytics shouldn't break the app
     }
   }
 
@@ -71,8 +70,8 @@ export class AnalyticsService {
         },
         { upsert: true }
       );
-    } catch (error) {
-      console.error('❌ Track email error:', error);
+    } catch {
+      // Silent fail - email tracking shouldn't break the app
     }
   }
 
@@ -147,9 +146,14 @@ export class AnalyticsService {
           lastSent: emailUsage?.lastEmailSentAt,
         },
       };
-    } catch (error) {
-      console.error('❌ Get dashboard stats error:', error);
-      throw error;
+    } catch {
+      // Return empty stats on error
+      return {
+        totalUsers: 0,
+        totalCVs: 0,
+        totalPageViews: 0,
+        emailUsage: { sent: 0, limit: 3000, percentage: 0 },
+      };
     }
   }
 
@@ -179,9 +183,8 @@ export class AnalyticsService {
         total: pageViews.length,
         viewsByDate,
       };
-    } catch (error) {
-      console.error('❌ Get page analytics error:', error);
-      throw error;
+    } catch {
+      return { total: 0, viewsByDate: {} };
     }
   }
 
@@ -208,9 +211,8 @@ export class AnalyticsService {
         clicks: link.count,
         lastClicked: link.lastClicked,
       }));
-    } catch (error) {
-      console.error('❌ Get link click stats error:', error);
-      throw error;
+    } catch {
+      return [];
     }
   }
 }

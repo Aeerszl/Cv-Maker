@@ -32,6 +32,7 @@ export interface ApiResponse<T = unknown> {
   data?: T;
   error?: string;
   message?: string;
+  devCode?: string; // Development mode verification code
 }
 
 /**
@@ -103,9 +104,9 @@ export class AuthService {
         success: true,
         data: result.user,
         message: result.message || 'Kayıt başarılı!',
+        devCode: result.devCode, // Pass through dev code if present
       };
-    } catch (error) {
-      console.error('Register error:', error);
+    } catch {
       return {
         success: false,
         error: 'Bağlantı hatası. Lütfen tekrar deneyin.',

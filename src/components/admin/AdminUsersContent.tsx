@@ -44,8 +44,8 @@ export default function AdminUsersContent() {
       if (data.success) {
         setUsers(data.users);
       }
-    } catch (error) {
-      console.error('Failed to fetch users:', error);
+    } catch {
+      // Silently fail - user will see empty list
     } finally {
       setLoading(false);
     }
@@ -190,7 +190,7 @@ export default function AdminUsersContent() {
               <div className="flex gap-2">
                 <button
                   className="px-3 py-1.5 text-sm bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors"
-                  onClick={() => alert('Detaylar yakında eklenecek')}
+                  onClick={() => {/* TODO: Implement user details modal */}}
                 >
                   Detaylar
                 </button>

@@ -5,6 +5,7 @@ import mongoose from 'mongoose';
 import connectDB from '@/lib/mongodb';
 import User from '@/models/User';
 import UserActivity from '@/models/UserActivity';
+import { logger } from '@/lib/logger';
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -46,10 +47,12 @@ export const authOptions: NextAuthOptions = {
         }
 
         // Login aktivitesini kaydet
+        // Note: IP address not available in authorize callback
+        // IP tracking is handled via middleware for page views
         await UserActivity.create({
           userId: user._id,
           activityType: 'login',
-          ipAddress: '', // TODO: IP adresini al
+          ipAddress: 'N/A', // IP tracked separately via middleware
         });
 
         // lastLogin güncelle
@@ -75,17 +78,43 @@ export const authOptions: NextAuthOptions = {
     error: '/auth/error',
   },
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session }) {
       if (user) {
         token.id = user.id;
         token.role = user.role;
+        token.email = user.email;
+        token.name = user.name;
       }
+      
+      // Profile güncellemesi sonrası veya session refresh
+      if (trigger === 'update' && session) {
+        token.name = session.name;
+        token.email = session.email;
+      }
+      
+      // Her session check'inde DB'den güncel bilgiyi çek
+      if (token.email && !user) {
+        try {
+          await connectDB();
+          const dbUser = await User.findOne({ email: token.email }).select('fullName email role');
+          if (dbUser) {
+            token.name = dbUser.fullName;
+            token.email = dbUser.email;
+            token.role = dbUser.role;
+          }
+        } catch (error) {
+          logger.error('Error fetching user in JWT callback', error);
+        }
+      }
+      
       return token;
     },
     async session({ session, token }) {
       if (session.user) {
         session.user.id = token.id as string;
         session.user.role = token.role;
+        session.user.name = token.name as string;
+        session.user.email = token.email as string;
       }
       return session;
     },

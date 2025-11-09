@@ -4,6 +4,10 @@ import connectDB from '@/lib/mongodb';
 import CV from '@/models/CV';
 import UserActivity from '@/models/UserActivity';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { logger } from '@/lib/logger';
+import { rateLimit, RATE_LIMITS } from '@/lib/rateLimit';
+import { sanitizeObject } from '@/lib/sanitize';
+import { handleError, validationError } from '@/lib/errorHandler';
 
 // GET /api/cv - Kullanıcının CV'lerini listele
 export async function GET() {
@@ -25,16 +29,16 @@ export async function GET() {
 
     return NextResponse.json({ cvs });
   } catch (error) {
-    console.error('CV listeleme hatası:', error);
-    return NextResponse.json(
-      { error: 'CV\'ler yüklenirken bir hata oluştu' },
-      { status: 500 }
-    );
+    return handleError(error, 'CV list');
   }
 }
 
 // POST /api/cv - Yeni CV oluştur
 export async function POST(req: NextRequest) {
+  // ✅ RATE LIMIT: CV spam oluşturmayı önle
+  const rateLimitResult = rateLimit(req, RATE_LIMITS.CV_OPERATIONS);
+  if (rateLimitResult) return rateLimitResult;
+  
   try {
     const session = await getServerSession(authOptions);
 
@@ -46,36 +50,37 @@ export async function POST(req: NextRequest) {
     }
 
     const cvData = await req.json();
-    console.log('Received CV data:', JSON.stringify(cvData, null, 2));
+
+    // ✅ SANITIZE: XSS ve NoSQL injection koruması
+    const sanitizedData = sanitizeObject(cvData);
 
     // Validate required fields
-    if (!cvData.title || !cvData.personalInfo?.fullName) {
-      console.log('Validation failed - missing title or fullName:', { title: cvData.title, fullName: cvData.personalInfo?.fullName });
+    if (!sanitizedData.title || !sanitizedData.personalInfo?.fullName) {
       return NextResponse.json(
-        { error: 'CV başlığı ve kişisel bilgiler gereklidir' },
+        validationError('CV başlığı ve kişisel bilgiler gereklidir'),
         { status: 400 }
       );
     }
 
     await connectDB();
 
-    // Yeni CV oluştur - tüm verileri kabul et
+    // Yeni CV oluştur - sanitize edilmiş verilerle
     const cv = await CV.create({
       userId: session.user.id,
-      title: cvData.title,
-      template: cvData.template || 'modern',
-      status: cvData.status || 'draft',
-      personalInfo: cvData.personalInfo,
-      summary: cvData.summary,
-      workExperience: cvData.workExperience || [],
-      education: cvData.education || [],
-      skills: cvData.skills || [],
-      languages: cvData.languages || [],
-      certifications: cvData.certifications || [],
-      projects: cvData.projects || [],
+      title: sanitizedData.title,
+      template: sanitizedData.template || 'modern',
+      status: sanitizedData.status || 'draft',
+      personalInfo: sanitizedData.personalInfo,
+      summary: sanitizedData.summary,
+      workExperience: sanitizedData.workExperience || [],
+      education: sanitizedData.education || [],
+      skills: sanitizedData.skills || [],
+      languages: sanitizedData.languages || [],
+      certifications: sanitizedData.certifications || [],
+      projects: sanitizedData.projects || [],
     });
 
-    console.log('CV created successfully:', cv._id);
+    logger.info('CV created', { cvId: cv._id, title: cv.title });
 
     // Activity log
     await UserActivity.create({
@@ -98,10 +103,6 @@ export async function POST(req: NextRequest) {
       { status: 201 }
     );
   } catch (error) {
-    console.error('CV oluşturma hatası:', error);
-    return NextResponse.json(
-      { error: 'CV oluşturulurken bir hata oluştu' },
-      { status: 500 }
-    );
+    return handleError(error, 'CV create');
   }
 }

@@ -14,8 +14,14 @@ import User from '@/models/User';
 import PendingUser from '@/models/PendingUser';
 import VerificationCode from '@/models/VerificationCode';
 import { generateVerificationCode, sendVerificationEmail } from '@/lib/email';
+import { rateLimit, RATE_LIMITS } from '@/lib/rateLimit';
+import { handleError } from '@/lib/errorHandler';
 
 export async function POST(request: NextRequest) {
+  // ✅ RATE LIMIT: Email spam önleme
+  const rateLimitResult = rateLimit(request, RATE_LIMITS.EMAIL_SEND);
+  if (rateLimitResult) return rateLimitResult;
+  
   try {
     const { email, language = 'tr' } = await request.json();
 
@@ -87,10 +93,6 @@ export async function POST(request: NextRequest) {
       { status: 200 }
     );
   } catch (error) {
-    console.error('❌ Send verification error:', error);
-    return NextResponse.json(
-      { error: 'Bir hata oluştu / An error occurred' },
-      { status: 500 }
-    );
+    return handleError(error, 'Send verification code');
   }
 }

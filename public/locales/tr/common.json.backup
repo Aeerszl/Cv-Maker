@@ -1,0 +1,138 @@
+{
+  "nav": {
+    "features": "Neden Biz",
+    "templates": "Şablonlar",
+    "about": "Hakkımızda",
+    "signin": "Giriş Yap",
+    "signup": "Ücretsiz Başla"
+  },
+    "title": "CV Şablonu Seçin",
+    "subtitle": "5 farklı ATS uyumlu profesyonel şablon arasından size en uygun olanı seçin. Tüm şablonlar başvuru takip sistemleri tarafından kolayca okunabilir.",
+    "preview": "Önizle",
+    "selectTemplate": "Bu Şablonu Seç",
+    "modalTitle": "Şablonu - Örnek CV",
+    "modalSubtitle": "Bu şablon ile CV'niz nasıl görünecek",
+    "close": "Kapat"
+  },
+  "templates": {
+    "modern": {
+      "name": "Modern",
+      "description": "İki sütun düzenli, temiz ve çağdaş tasarım",
+      "preview": "📄 Modern, profesyonel görünüm",
+      "features": ["İki sütun düzen", "Renk vurguları", "İkon destekli", "ATS uyumlu"]
+    },
+    "classic": {
+      "name": "Classic",
+      "description": "Geleneksel ve profesyonel tek sütun düzeni",
+      "preview": "📋 Klasik, güvenilir tasarım",
+      "features": ["Tek sütun", "Sade tasarım", "Kolay okunur", "Evrensel"]
+    },
+    "creative": {
+      "name": "Creative",
+      "description": "Yaratıcı pozisyonlar için özgün tasarım",
+      "preview": "🎨 Yaratıcı, farklı görünüm",
+      "features": ["Yan panel", "Grafik elemanlar", "Dikkat çekici", "Renkli"]
+    },
+    "professional": {
+      "name": "Professional",
+      "description": "Kurumsal pozisyonlar için ciddi tasarım",
+      "preview": "💼 Kurumsal, güçlü görünüm",
+      "features": ["Klasik düzen", "Net bölümler", "ATS optimize", "Kurumsal"]
+    },
+    "minimal": {
+      "name": "Minimal",
+      "description": "Sade ve şık minimalist tasarım",
+      "preview": "✨ Minimal, zarif görünüm",
+      "features": ["Minimalist", "Bol beyaz alan", "Okunabilir", "Zarif"]
+    }
+  },
+  "atsInfo": {
+    "title": "ATS Uyumluluk Nedir?",
+    "description": "ATS (Applicant Tracking System - Başvuru Takip Sistemi), şirketlerin CV'leri otomatik olarak taramasına olanak tanır. Tüm şablonlarımız bu sistemler tarafından kolayca okunabilecek şekilde tasarlanmıştır, böylece başvurunuzun insan kaynakları departmanına ulaşma şansı artar."
+  },
+  "about": {
+    "hero": {
+      "badge": "Hakkımızda",
+      "title": "Profesyonel CV'ler İçin Güvenilir Çözüm",
+      "description": "CvMaker.Aliee ile ATS uyumlu, modern ve etkileyici CV'ler oluşturun. Ücretsiz, hızlı ve profesyonel sonuçlar elde edin."
+    },
+    "stats": {
+      "templates": "Şablon",
+      "ats": "ATS Uyumlu",
+      "support": "Destek",
+      "price": "Ücret"
+    },
+    "features": {
+      "title": "Neden CvMaker.Aliee?",
+      "subtitle": "Modern teknolojiler ve kullanıcı dostu tasarım ile CV oluşturma deneyimini yeniden tanımlıyoruz.",
+      "templates": {
+        "title": "5 Profesyonel Şablon",
+        "description": "Modern, Klasik, Yaratıcı, Profesyonel ve Minimal tasarımlar arasından seçim yapın."
+      },
+      "ats": {
+        "title": "Tam ATS Uyumluluk",
+        "description": "Tüm şablonlarımız ATS sistemleri tarafından kolayca okunabilir, başvurularınızın değerlendirilme şansını artırır."
+      },
+      "fast": {
+        "title": "Hızlı ve Kolay",
+        "description": "Sadece birkaç dakika içinde profesyonel bir CV oluşturun ve PDF olarak indirin."
+      },
+      "free": {
+        "title": "Tamamen Ücretsiz",
+        "description": "Premium özellikler dahil olmak üzere tüm hizmetlerimiz ücretsiz. Hiçbir gizli ücret yok."
+      }
+    },
+    "ats": {
+      "benefits": {
+        "title": "ATS Avantajları",
+        "keyword": "Anahtar kelime optimizasyonu",
+        "format": "Standart format desteği",
+        "speed": "Otomatik tarama hızı"
+      },
+      "templates": {
+        "title": "ATS Uyumlu Şablonlar",
+        "description": "Tüm şablonlarımız ATS sistemleri için optimize edilmiştir:"
+      }
+    },
+    "cta": {
+      "title": "CV'nizi Şimdi Oluşturun",
+      "description": "Profesyonel bir CV ile kariyer fırsatlarınızı değerlendirin. Ücretsiz başlayın!",
+      "button": "Ücretsiz Başla",
+      "templates": "Şablonları İncele"
+    },
+    "page": {
+      "hero": {
+        "title": "Proje Hakkında",
+        "description": "İş başvuru sürecini kolaylaştırmak amacıyla bu CV oluşturma platformunu geliştirdim. Platform, kullanıcıların kişisel bilgilerini, deneyimlerini ve yeteneklerini girerek ATS (Applicant Tracking System) uyumlu 5 farklı profesyonel CV şablonu arasından seçim yapmasına olanak tanıyor. Tüm hizmetler tamamen ücretsiz ve kullanımı son derece basit."
+      },
+      "why": {
+        "title": "Neden Bu Projeyi Yaptım?",
+        "description": "Kariyer yolculuğunda CV hazırlamanın ne kadar önemli olduğunu biliyorum. Ancak çoğu insan Word'de saatlerce uğraşır, format sorunları yaşar veya profesyonel görünüm elde etmek için tasarım bilgisi gerektirir. Bu sorunu çözmek için bu platformu geliştirdim. Amacım, herkesin 5 dakika içinde ücretsiz ve profesyonel bir CV oluşturabilmesi."
+      },
+      "ats": {
+        "title": "ATS Format Nedir?",
+        "description": "ATS (Applicant Tracking System), şirketlerin CV'leri otomatik olarak taramasına olanak tanıyan yazılımlardır. Başvuruların %75'i ATS sistemlerinden geçer ve uygun formatta olmayan CV'ler elenir.",
+        "correct": "Doğru Format",
+        "wrong": "Yanlış Format",
+        "correctItems": {
+          "0": "Standart yazı tipleri (Arial, Calibri)",
+          "1": "Anahtar kelime optimizasyonu",
+          "2": "Temiz, düzenli yapı"
+        },
+        "wrongItems": {
+          "0": "Fancy yazı tipleri",
+          "1": "Tablolar, resimler",
+          "2": "Karmaşık düzenlemeler"
+        }
+      },
+      "aboutMe": {
+        "title": "Hakkımda",
+        "description": "Merhaba! Ben Aliee, bu uygulamayı geliştiren yazılım geliştiriciyim. Modern teknolojilerle kullanıcı dostu çözümler üretmeyi seviyorum. CV Maker, kişisel projelerimden biri olarak hayat buldu ve artık binlerce kişinin kariyer yolculuğuna yardımcı oluyor.",
+        "visitWebsite": "Web Sitemi Ziyaret Et"
+      },
+      "footer": {
+        "message": "Umarım bu uygulama işinize yarar!",
+        "signature": "— CvMaker.Aliee"
+      }
+    }
+  }

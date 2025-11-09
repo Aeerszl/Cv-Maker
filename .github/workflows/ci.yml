@@ -1,0 +1,202 @@
+# CI/CD Pipeline for CV Maker
+# 
+# Bu workflow her PR ve push'ta otomatik olarak çalışır
+# Kod kalitesini garanti eder ve hatalı kodun main branch'e girmesini engeller
+
+name: CI/CD Pipeline
+
+# Workflow ne zaman çalışacak?
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+# Environment variables (tüm job'lar için)
+env:
+  NODE_VERSION: '20.x'
+
+jobs:
+  # ============================================
+  # JOB 1: TEST
+  # Tüm testleri çalıştır
+  # ============================================
+  test:
+    name: 🧪 Run Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+      # 1. Kod deposunu indir
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      # 2. Node.js kur
+      - name: 🟢 Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      # 3. Dependencies yükle
+      - name: 📦 Install dependencies
+        run: npm ci
+
+      # 4. Testleri çalıştır
+      - name: 🧪 Run tests
+        run: npm test
+
+      # 5. Test coverage raporu oluştur (opsiyonel)
+      - name: 📊 Generate coverage report
+        run: npm test -- --coverage
+        continue-on-error: true
+
+  # ============================================
+  # JOB 2: BUILD
+  # Production build kontrolü
+  # ============================================
+  build:
+    name: 🏗️ Build Check
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 📦 Install dependencies
+        run: npm ci
+
+      # Next.js build (production)
+      - name: 🏗️ Build application
+        run: npm run build
+        env:
+          # Build için gerekli minimal env variables
+          MONGODB_URI: mongodb://localhost:27017/test
+          NEXTAUTH_SECRET: test-secret-for-ci
+          NEXTAUTH_URL: http://localhost:3000
+
+  # ============================================
+  # JOB 3: TYPE CHECK
+  # TypeScript type kontrolü
+  # ============================================
+  type-check:
+    name: 📝 TypeScript Check
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 📦 Install dependencies
+        run: npm ci
+
+      # TypeScript compilation check (build olmadan)
+      - name: 📝 Check TypeScript types
+        run: npx tsc --noEmit
+
+  # ============================================
+  # JOB 4: LINT
+  # ESLint kontrolü
+  # ============================================
+  lint:
+    name: 🔍 Lint Check
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 📦 Install dependencies
+        run: npm ci
+
+      - name: 🔍 Run ESLint
+        run: npm run lint
+
+  # ============================================
+  # JOB 5: SECURITY AUDIT
+  # npm audit ile güvenlik kontrolü
+  # ============================================
+  security:
+    name: 🔒 Security Audit
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 🔒 Run security audit
+        run: npm audit --audit-level=moderate
+        continue-on-error: true
+
+# ============================================
+# WORKFLOW AÇIKLAMALARI
+# ============================================
+#
+# Bu CI/CD pipeline 5 farklı job çalıştırır:
+#
+# 1. TEST (🧪):
+#    - Jest testlerini çalıştırır
+#    - 24 test başarılı olmalı
+#    - Coverage raporu oluşturur
+#
+# 2. BUILD (🏗️):
+#    - Production build yapar
+#    - Next.js compile kontrolü
+#    - Build hatası varsa fail olur
+#
+# 3. TYPE CHECK (📝):
+#    - TypeScript type kontrolü
+#    - tsc --noEmit ile derleme hatası var mı bakar
+#
+# 4. LINT (🔍):
+#    - ESLint kurallarını kontrol eder
+#    - Kod standardına uygun mu?
+#
+# 5. SECURITY (🔒):
+#    - npm audit ile güvenlik açığı tarar
+#    - Moderate ve üstü açıkları bildirir
+#
+# ============================================
+# KULLANIM
+# ============================================
+#
+# Bu dosya .github/workflows/ci.yml konumunda olmalı
+#
+# Otomatik çalışır:
+# - Her push'ta (main/develop branch)
+# - Her PR açıldığında
+# - PR güncellendiğinde
+#
+# GitHub'da görüntüleme:
+# Repository → Actions sekmesi
+#
+# ============================================
+# STATUS BADGE (README için)
+# ============================================
+#
+# README.md'ye ekle:
+# ![CI/CD](https://github.com/Aeerszl/Cv-Maker/workflows/CI%2FCD%20Pipeline/badge.svg)
+#

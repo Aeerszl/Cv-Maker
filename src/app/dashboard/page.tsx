@@ -49,8 +49,8 @@ export default function DashboardPage() {
           const data = await response.json();
           setCvs(data.cvs || []);
         }
-      } catch (error) {
-        console.error('Failed to fetch CVs:', error);
+      } catch {
+        // Silently fail - user will see empty state
       } finally {
         setLoading(false);
       }

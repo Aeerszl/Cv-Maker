@@ -38,8 +38,7 @@ export async function verifyAdmin(req: NextRequest) {
       authorized: true,
       user: session.user,
     };
-  } catch (error) {
-    console.error('Admin auth error:', error);
+  } catch {
     return {
       authorized: false,
       error: 'Internal server error',

@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { logger } from './logger';
 
 const MONGODB_URI = process.env.MONGODB_URI!;
 
@@ -39,7 +40,7 @@ async function connectDB() {
     };
 
     cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
-      console.log('✅ MongoDB connected successfully');
+      logger.info('MongoDB connected successfully');
       return mongoose;
     });
   }
@@ -48,7 +49,7 @@ async function connectDB() {
     cached.conn = await cached.promise;
   } catch (e) {
     cached.promise = null;
-    console.error('❌ MongoDB connection error:', e);
+    logger.error('MongoDB connection error', e);
     throw e;
   }
 

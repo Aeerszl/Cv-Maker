@@ -35,6 +35,9 @@ interface LinkClick {
   linkName: string;
   url: string;
   clicks: number;
+  name?: string;
+  value?: number;
+  [key: string]: string | number | undefined; // Index signature for chart compatibility
 }
 
 export default function AdminAnalyticsContent() {
@@ -63,10 +66,16 @@ export default function AdminAnalyticsContent() {
       }
       
       if (linkData.success) {
-        setLinkClicks(linkData.topLinks || []);
+        // Transform data to be chart-compatible
+        const transformedLinks = (linkData.topLinks || []).map((link: LinkClick) => ({
+          ...link,
+          name: link.linkName,
+          value: link.clicks,
+        }));
+        setLinkClicks(transformedLinks);
       }
-    } catch (error) {
-      console.error('Failed to fetch analytics:', error);
+    } catch {
+      // Silently fail - user will see empty charts
     } finally {
       setLoading(false);
     }

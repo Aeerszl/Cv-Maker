@@ -5,34 +5,32 @@ import User from '@/models/User';
 import PendingUser from '@/models/PendingUser';
 import VerificationCode from '@/models/VerificationCode';
 import { generateVerificationCode, sendVerificationEmail } from '@/lib/email';
+import { rateLimit, RATE_LIMITS } from '@/lib/rateLimit';
+import { handleError, validationError, conflictError } from '@/lib/errorHandler';
+import { logger } from '@/lib/logger';
 
 export async function POST(req: NextRequest) {
+  // ✅ RATE LIMIT: Brute force ve spam önleme
+  const rateLimitResult = rateLimit(req, RATE_LIMITS.AUTH_STRICT);
+  if (rateLimitResult) return rateLimitResult;
+  
   try {
     const body = await req.json();
     const { fullName, email, password, phone, language = 'tr' } = body;
 
     // Validasyon
     if (!fullName || !email || !password) {
-      return NextResponse.json(
-        { error: 'Ad, email ve şifre zorunludur' },
-        { status: 400 }
-      );
+      throw validationError('Ad, email ve şifre zorunludur');
     }
 
     if (password.length < 6) {
-      return NextResponse.json(
-        { error: 'Şifre en az 6 karakter olmalıdır' },
-        { status: 400 }
-      );
+      throw validationError('Şifre en az 6 karakter olmalıdır');
     }
 
     // Email formatı kontrolü
     const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
     if (!emailRegex.test(email)) {
-      return NextResponse.json(
-        { error: 'Geçerli bir email adresi giriniz' },
-        { status: 400 }
-      );
+      throw validationError('Geçerli bir email adresi giriniz');
     }
 
     await connectDB();
@@ -40,10 +38,7 @@ export async function POST(req: NextRequest) {
     // Kullanıcı zaten doğrulanmış mı kontrol et
     const existingUser = await User.findOne({ email: email.toLowerCase() });
     if (existingUser) {
-      return NextResponse.json(
-        { error: 'Bu email adresi zaten kayıtlı ve doğrulanmış' },
-        { status: 400 }
-      );
+      throw conflictError('Bu email adresi zaten kayıtlı ve doğrulanmış');
     }
 
     // Şifreyi hashle
@@ -59,7 +54,7 @@ export async function POST(req: NextRequest) {
       existingPendingUser.phone = phone || '';
       existingPendingUser.expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 saat daha
       await existingPendingUser.save();
-      console.log('✅ Pending user updated:', email);
+      logger.info('Pending user updated', { email });
     } else {
       // Yeni pending user oluştur (email doğrulanana kadar geçici)
       await PendingUser.create({
@@ -68,7 +63,7 @@ export async function POST(req: NextRequest) {
         passwordHash: hashedPassword,
         phone: phone || '',
       });
-      console.log('✅ Pending user created:', email);
+      logger.info('Pending user created', { email });
     }
 
     // Doğrulama kodu oluştur ve gönder
@@ -91,9 +86,9 @@ export async function POST(req: NextRequest) {
         devCode = verificationCode;
       }
       
-      console.log('✅ Verification code prepared for:', email.toLowerCase());
+      logger.info('Verification code prepared', { email: email.toLowerCase() });
     } catch (emailError) {
-      console.error('❌ Email sending failed:', emailError);
+      logger.error('Email sending failed', emailError);
       // Email gönderilemese bile kayıt başarılı
       // Kullanıcı daha sonra yeniden kod isteyebilir
     }
@@ -113,13 +108,7 @@ export async function POST(req: NextRequest) {
       { status: 201 }
     );
   } catch (error) {
-    console.error('Register error:', error);
-    return NextResponse.json(
-      {
-        error: 'Kayıt sırasında bir hata oluştu',
-        details: error instanceof Error ? error.message : 'Unknown error'
-      },
-      { status: 500 }
-    );
+    // ✅ SECURE ERROR HANDLING: Detail sızdırma yok!
+    return handleError(error, 'Registration failed');
   }
 }

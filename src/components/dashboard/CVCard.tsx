@@ -28,6 +28,7 @@ import {
   Clock
 } from 'lucide-react';
 import type { CVCardProps } from '@/types/dashboard';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 /**
  * Template color mapping for visual distinction
@@ -59,6 +60,7 @@ export function CVCard({
 }: CVCardProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const { t } = useLanguage();
 
   /**
    * Format date to Turkish locale
@@ -68,9 +70,9 @@ export function CVCard({
     const diff = now.getTime() - date.getTime();
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
 
-    if (days === 0) return 'Bugün';
-    if (days === 1) return 'Dün';
-    if (days < 7) return `${days} gün önce`;
+    if (days === 0) return t('cvCard.today');
+    if (days === 1) return t('cvCard.yesterday');
+    if (days < 7) return t('cvCard.daysAgo').replace('{days}', String(days));
     
     return date.toLocaleDateString('tr-TR', { 
       day: 'numeric', 
@@ -83,7 +85,7 @@ export function CVCard({
    * Handle delete with confirmation
    */
   const handleDelete = async () => {
-    if (!confirm(`"${title}" adlı CV'yi silmek istediğinizden emin misiniz?`)) {
+    if (!confirm(t('cvCard.deleteConfirm').replace('{title}', title))) {
       return;
     }
 
@@ -141,7 +143,7 @@ export function CVCard({
             className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors"
           >
             <Edit className="w-4 h-4" />
-            <span>Düzenle</span>
+            <span>{t('cvCard.edit')}</span>
           </Link>
 
           {/* More Actions Menu */}
@@ -170,7 +172,7 @@ export function CVCard({
                     className="flex items-center gap-3 w-full px-4 py-2 text-sm text-foreground hover:bg-accent transition-colors"
                   >
                     <Download className="w-4 h-4" />
-                    <span>PDF İndir</span>
+                    <span>{t('cvCard.download')}</span>
                   </button>
                   <button
                     onClick={() => {
@@ -180,7 +182,7 @@ export function CVCard({
                     className="flex items-center gap-3 w-full px-4 py-2 text-sm text-foreground hover:bg-accent transition-colors"
                   >
                     <Copy className="w-4 h-4" />
-                    <span>Kopyala</span>
+                    <span>{t('cvCard.duplicate')}</span>
                   </button>
                   <div className="h-px bg-border my-1" />
                   <button
@@ -189,7 +191,7 @@ export function CVCard({
                     className="flex items-center gap-3 w-full px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors disabled:opacity-50"
                   >
                     <Trash2 className="w-4 h-4" />
-                    <span>{isDeleting ? 'Siliniyor...' : 'Sil'}</span>
+                    <span>{isDeleting ? t('cvCard.deleting') : t('cvCard.delete')}</span>
                   </button>
                 </div>
               </>

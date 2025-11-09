@@ -72,11 +72,11 @@ async function trackPageView(request: NextRequest): Promise<void> {
         userAgent,
         referrer,
       }),
-    }).catch((error) => {
-      console.error('Failed to track page view:', error);
+    }).catch(() => {
+      // Silent fail - tracking shouldn't break page load
     });
-  } catch (error) {
-    console.error('Error in trackPageView:', error);
+  } catch {
+    // Silent fail - tracking shouldn't break page load
   }
 }
 

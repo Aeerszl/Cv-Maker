@@ -12,6 +12,8 @@ import puppeteer from 'puppeteer';
 import connectDB from '@/lib/mongodb';
 import CV from '@/models/CV';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { rateLimit, RATE_LIMITS } from '@/lib/rateLimit';
+import { handleError } from '@/lib/errorHandler';
 
 interface RouteParams {
   params: Promise<{
@@ -20,6 +22,10 @@ interface RouteParams {
 }
 
 export async function GET(req: NextRequest, { params }: RouteParams) {
+  // ✅ RATE LIMIT: PDF download spam önleme
+  const rateLimitResult = rateLimit(req, RATE_LIMITS.CV_OPERATIONS);
+  if (rateLimitResult) return rateLimitResult;
+  
   try {
     const session = await getServerSession(authOptions);
 
@@ -82,11 +88,7 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
     });
 
   } catch (error) {
-    console.error('PDF generation error:', error);
-    return NextResponse.json(
-      { error: 'PDF oluşturulurken bir hata oluştu' },
-      { status: 500 }
-    );
+    return handleError(error, 'PDF generation');
   }
 }
 

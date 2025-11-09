@@ -9,6 +9,7 @@
 
 import { Resend } from 'resend';
 import { AnalyticsService } from '@/services/AnalyticsService';
+import { logger } from '@/lib/logger';
 
 // Initialize Resend with API key from environment
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -213,7 +214,7 @@ export async function sendVerificationEmail(
     });
 
     if (error) {
-      console.error('❌ Email sending error:', error);
+      logger.error('Email sending error', { error: String(error), recipient: email });
       
       // Development mode: Log email instead of throwing error
       if (process.env.NODE_ENV === 'development') {
@@ -224,8 +225,8 @@ export async function sendVerificationEmail(
         // Track email attempt even in dev mode (for testing analytics)
         try {
           await AnalyticsService.trackEmailSent();
-        } catch (trackError) {
-          console.error('Failed to track email in dev mode:', trackError);
+        } catch {
+          // Silent fail - tracking is secondary
         }
         
         // Return false to indicate email wasn't sent
@@ -235,15 +236,13 @@ export async function sendVerificationEmail(
       throw new Error('Email gönderilemedi / Failed to send email');
     }
 
-    console.log('✅ Email sent successfully:', data);
+    logger.info('Email sent successfully', { recipient: email });
     
     // Track successful email send for API usage monitoring
     try {
       await AnalyticsService.trackEmailSent();
-      console.log('📊 Email usage tracked successfully');
-    } catch (trackError) {
-      console.error('⚠️ Failed to track email usage:', trackError);
-      // Don't throw - email was sent successfully, tracking is secondary
+    } catch {
+      // Silent fail - tracking is secondary
     }
     
     return true;

@@ -4,6 +4,9 @@ import connectDB from '@/lib/mongodb';
 import CV from '@/models/CV';
 import UserActivity from '@/models/UserActivity';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { rateLimit, RATE_LIMITS } from '@/lib/rateLimit';
+import { sanitizeObject } from '@/lib/sanitize';
+import { handleError, notFoundError } from '@/lib/errorHandler';
 
 interface RouteParams {
   params: Promise<{
@@ -53,16 +56,16 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
 
     return NextResponse.json({ cv });
   } catch (error) {
-    console.error('CV getirme hatası:', error);
-    return NextResponse.json(
-      { error: 'CV yüklenirken bir hata oluştu' },
-      { status: 500 }
-    );
+    return handleError(error, 'CV get');
   }
 }
 
 // PUT /api/cv/[id] - CV'yi güncelle
 export async function PUT(req: NextRequest, { params }: RouteParams) {
+  // ✅ RATE LIMIT: CV spam güncellemeyi önle
+  const rateLimitResult = rateLimit(req, RATE_LIMITS.CV_OPERATIONS);
+  if (rateLimitResult) return rateLimitResult;
+  
   try {
     const session = await getServerSession(authOptions);
 
@@ -75,17 +78,20 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
 
     const updateData = await req.json();
 
+    // ✅ SANITIZE: XSS ve NoSQL injection koruması
+    const sanitizedData = sanitizeObject(updateData);
+
     await connectDB();
 
     const { id } = await params;
-    // CV'yi güncelle
+    // CV'yi güncelle - sanitize edilmiş verilerle
     const cv = await CV.findOneAndUpdate(
       {
         _id: id,
         userId: session.user.id, // Sadece kendi CV'sini güncelleyebilir
       },
       {
-        ...updateData,
+        ...sanitizedData,
         lastModified: new Date(),
       },
       { new: true }
@@ -93,7 +99,7 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
 
     if (!cv) {
       return NextResponse.json(
-        { error: 'CV bulunamadı' },
+        notFoundError('CV bulunamadı'),
         { status: 404 }
       );
     }
@@ -110,16 +116,16 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
       cv,
     });
   } catch (error) {
-    console.error('CV güncelleme hatası:', error);
-    return NextResponse.json(
-      { error: 'CV güncellenirken bir hata oluştu' },
-      { status: 500 }
-    );
+    return handleError(error, 'CV update');
   }
 }
 
 // DELETE /api/cv/[id] - CV'yi sil
 export async function DELETE(req: NextRequest, { params }: RouteParams) {
+  // ✅ RATE LIMIT: CV spam silmeyi önle
+  const rateLimitResult = rateLimit(req, RATE_LIMITS.CV_OPERATIONS);
+  if (rateLimitResult) return rateLimitResult;
+  
   try {
     const session = await getServerSession(authOptions);
 
@@ -156,10 +162,6 @@ export async function DELETE(req: NextRequest, { params }: RouteParams) {
       message: 'CV başarıyla silindi',
     });
   } catch (error) {
-    console.error('CV silme hatası:', error);
-    return NextResponse.json(
-      { error: 'CV silinirken bir hata oluştu' },
-      { status: 500 }
-    );
+    return handleError(error, 'CV delete');
   }
 }

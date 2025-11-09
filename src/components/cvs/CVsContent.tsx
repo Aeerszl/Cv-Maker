@@ -13,6 +13,8 @@ import { CVCard } from '@/components/dashboard/CVCard';
 import { Plus } from 'lucide-react';
 import Link from 'next/link';
 import type { CVCard as CVCardType } from '@/types/dashboard';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { useToast } from '@/contexts/ToastContext';
 
 interface CVsContentProps {
   initialCVs: CVCardType[];
@@ -20,6 +22,8 @@ interface CVsContentProps {
 
 export function CVsContent({ initialCVs }: CVsContentProps) {
   const [cvs, setCvs] = useState(initialCVs);
+  const { t } = useLanguage();
+  const toast = useToast();
 
   // Fetch CVs from API
   useEffect(() => {
@@ -38,12 +42,9 @@ export function CVsContent({ initialCVs }: CVsContentProps) {
             isComplete: cv.status === 'completed',
           }));
           setCvs(transformedCVs);
-        } else {
-          console.error('API Error:', response.status, response.statusText);
         }
-      } catch (error) {
-        console.error('Error fetching CVs:', error);
-        // Keep initial CVs on error
+      } catch {
+        // Keep initial CVs on error - silently fail
       }
     };
 
@@ -62,7 +63,7 @@ export function CVsContent({ initialCVs }: CVsContentProps) {
    * Handle CV delete
    */
   const handleDelete = async (id: string) => {
-    if (!confirm('Bu CV\'yi silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.')) {
+    if (!confirm(t('cvs.delete.confirm'))) {
       return;
     }
 
@@ -73,15 +74,14 @@ export function CVsContent({ initialCVs }: CVsContentProps) {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'CV silinemedi');
+        throw new Error(errorData.error || t('cvs.delete.failed'));
       }
 
       // Remove from local state
       setCvs(cvs.filter(cv => cv.id !== id));
-      alert('CV başarıyla silindi');
-    } catch (error) {
-      console.error('Delete error:', error);
-      alert('CV silinirken bir hata oluştu');
+      toast.success(t('cvs.delete.success'));
+    } catch {
+      toast.error(t('cvs.delete.error'));
     }
   };
 
@@ -93,7 +93,7 @@ export function CVsContent({ initialCVs }: CVsContentProps) {
       // First get the original CV
       const response = await fetch(`/api/cv/${id}`);
       if (!response.ok) {
-        throw new Error('CV bulunamadı');
+        throw new Error(t('cvs.notFound'));
       }
 
       const data = await response.json();
@@ -144,10 +144,9 @@ export function CVsContent({ initialCVs }: CVsContentProps) {
         setCvs(transformedCVs);
       }
 
-      alert('CV başarıyla kopyalandı');
-    } catch (error) {
-      console.error('Duplicate error:', error);
-      alert('CV kopyalanırken bir hata oluştu');
+      toast.success(t('cvs.duplicate.success'));
+    } catch {
+      toast.error(t('cvs.duplicate.error'));
     }
   };
 
@@ -164,10 +163,9 @@ export function CVsContent({ initialCVs }: CVsContentProps) {
       link.click();
       document.body.removeChild(link);
 
-      alert('PDF indirme işlemi başlatıldı!');
-    } catch (error) {
-      console.error('Download error:', error);
-      alert('PDF indirilirken bir hata oluştu');
+      toast.info(t('cvs.download.started'));
+    } catch {
+      toast.error(t('cvs.download.error'));
     }
   };
 
@@ -178,10 +176,10 @@ export function CVsContent({ initialCVs }: CVsContentProps) {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-foreground mb-2">
-              CV&apos;lerim
+              {t('cvs.title')}
             </h1>
             <p className="text-muted-foreground">
-              Tüm CV&apos;lerinizi görüntüleyin, düzenleyin ve indirin
+              {t('cvs.subtitle')}
             </p>
           </div>
           <Link
@@ -189,7 +187,7 @@ export function CVsContent({ initialCVs }: CVsContentProps) {
             className="flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors shadow-md hover:shadow-lg"
           >
             <Plus className="w-5 h-5" />
-            <span>Yeni CV Oluştur</span>
+            <span>{t('cvs.createNew')}</span>
           </Link>
         </div>
       </div>
@@ -197,23 +195,23 @@ export function CVsContent({ initialCVs }: CVsContentProps) {
       {/* Statistics */}
       <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-8">
         <div className="bg-white dark:bg-gray-900 rounded-lg border border-border p-4">
-          <p className="text-sm text-muted-foreground mb-1">Toplam CV</p>
+          <p className="text-sm text-muted-foreground mb-1">{t('cvs.stats.total')}</p>
           <p className="text-2xl font-bold text-foreground">{cvs.length}</p>
         </div>
         <div className="bg-white dark:bg-gray-900 rounded-lg border border-border p-4">
-          <p className="text-sm text-muted-foreground mb-1">Tamamlanan</p>
+          <p className="text-sm text-muted-foreground mb-1">{t('cvs.stats.completed')}</p>
           <p className="text-2xl font-bold text-green-600 dark:text-green-400">
             {cvs.filter(cv => cv.isComplete).length}
           </p>
         </div>
         <div className="bg-white dark:bg-gray-900 rounded-lg border border-border p-4">
-          <p className="text-sm text-muted-foreground mb-1">Taslak</p>
+          <p className="text-sm text-muted-foreground mb-1">{t('cvs.stats.draft')}</p>
           <p className="text-2xl font-bold text-orange-600 dark:text-orange-400">
             {cvs.filter(cv => !cv.isComplete).length}
           </p>
         </div>
         <div className="bg-white dark:bg-gray-900 rounded-lg border border-border p-4">
-          <p className="text-sm text-muted-foreground mb-1">Bu Ay</p>
+          <p className="text-sm text-muted-foreground mb-1">{t('cvs.stats.thisMonth')}</p>
           <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
             {cvs.filter(cv => {
               const now = new Date();
@@ -244,17 +242,17 @@ export function CVsContent({ initialCVs }: CVsContentProps) {
             <Plus className="w-10 h-10 text-white" />
           </div>
           <h3 className="text-xl font-bold text-foreground mb-2">
-            Henüz CV oluşturmadınız
+            {t('cvs.emptyState.title')}
           </h3>
           <p className="text-muted-foreground mb-8 max-w-md mx-auto">
-            Profesyonel CV şablonlarımızdan birini seçerek ilk CV&apos;nizi oluşturun
+            {t('cvs.emptyState.description')}
           </p>
           <Link
             href="/cv/create"
             className="inline-flex items-center gap-2 px-8 py-4 bg-linear-to-r from-blue-600 to-purple-600 text-white rounded-xl font-semibold hover:shadow-xl hover:scale-105 transition-all duration-300"
           >
             <Plus className="w-6 h-6" />
-            <span>İlk CV&apos;mi Oluştur</span>
+            <span>{t('cvs.emptyState.button')}</span>
           </Link>
         </div>
       )}

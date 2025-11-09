@@ -14,8 +14,15 @@ import User from '@/models/User';
 import PendingUser from '@/models/PendingUser';
 import VerificationCode from '@/models/VerificationCode';
 import { sendWelcomeEmail } from '@/lib/email';
+import { rateLimit, RATE_LIMITS } from '@/lib/rateLimit';
+import { handleError } from '@/lib/errorHandler';
+import { logger } from '@/lib/logger';
 
 export async function POST(request: NextRequest) {
+  // ✅ RATE LIMIT: Brute force code denemelerini önle
+  const rateLimitResult = rateLimit(request, RATE_LIMITS.AUTH_STRICT);
+  if (rateLimitResult) return rateLimitResult;
+  
   try {
     const { email, code, language = 'tr' } = await request.json();
 
@@ -92,13 +99,13 @@ export async function POST(request: NextRequest) {
 
     // Delete pending user
     await PendingUser.deleteOne({ _id: pendingUser._id });
-    console.log('✅ User created and pending user deleted:', newUser.email);
+    logger.info('User created and pending user deleted', { email: newUser.email });
 
     // Send welcome email
     try {
       await sendWelcomeEmail(newUser.email, newUser.fullName, language);
     } catch (emailError) {
-      console.error('❌ Welcome email error (non-critical):', emailError);
+      logger.warn('Welcome email error (non-critical)', { error: String(emailError) });
       // Don't fail the verification if welcome email fails
     }
 
@@ -116,10 +123,6 @@ export async function POST(request: NextRequest) {
       { status: 200 }
     );
   } catch (error) {
-    console.error('❌ Verify email error:', error);
-    return NextResponse.json(
-      { error: 'Bir hata oluştu / An error occurred' },
-      { status: 500 }
-    );
+    return handleError(error, 'Email verification');
   }
 }

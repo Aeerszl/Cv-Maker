@@ -6,134 +6,85 @@
     "signin": "Sign In",
     "signup": "Get Started Free"
   },
-  "templateSelector": {
-    "title": "Choose CV Template",
-    "subtitle": "Choose the most suitable one from 5 different ATS-friendly professional templates. All templates can be easily read by application tracking systems.",
-    "preview": "Preview",
-    "selectTemplate": "Select This Template",
-    "modalTitle": "Template - Sample CV",
-    "modalSubtitle": "How your CV will look with this template",
-    "close": "Close"
-  },
-  "templates": {
-    "modern": {
-      "name": "Modern",
-      "description": "Two-column layout, clean and contemporary design",
-      "preview": "📄 Modern, professional look",
-      "features": ["Two-column layout", "Color highlights", "Icon support", "ATS compatible"]
+  "profile": {
+    "title": "Profile Settings",
+    "saveChanges": "Save Changes",
+    "saving": "Saving...",
+    "changing": "Changing...",
+    "deleting": "Deleting...",
+    "updateSuccess": "Profile updated successfully",
+    "updateError": "An error occurred while updating profile",
+    "passwordMismatch": "New passwords do not match",
+    "passwordTooShort": "Password must be at least 6 characters",
+    "passwordChanged": "Password changed successfully",
+    "passwordChangeError": "An error occurred while changing password",
+    "accountDeleted": "Your account has been deleted successfully",
+    "deleteError": "An error occurred while deleting account",
+    "deleteConfirmationError": "Please confirm by typing 'DELETE'",
+    "tabs": {
+      "personal": "Personal Info",
+      "security": "Security",
+      "stats": "Statistics",
+      "sessions": "Sessions"
     },
-    "classic": {
-      "name": "Classic",
-      "description": "Traditional and professional single-column layout",
-      "preview": "📋 Classic, reliable design",
-      "features": ["Single column", "Simple design", "Easy to read", "Universal"]
+    "personalInfo": {
+      "title": "Personal Information",
+      "fullName": "Full Name",
+      "fullNamePlaceholder": "Enter your full name",
+      "email": "Email",
+      "emailPlaceholder": "Enter your email"
     },
-    "creative": {
-      "name": "Creative",
-      "description": "Unique design for creative positions",
-      "preview": "🎨 Creative, different look",
-      "features": ["Side panel", "Graphic elements", "Eye-catching", "Colorful"]
-    },
-    "professional": {
-      "name": "Professional",
-      "description": "Serious design for corporate positions",
-      "preview": "💼 Corporate, strong look",
-      "features": ["Classic layout", "Clear sections", "ATS optimized", "Corporate"]
-    },
-    "minimal": {
-      "name": "Minimal",
-      "description": "Simple and elegant minimalist design",
-      "preview": "✨ Minimal, elegant look",
-      "features": ["Minimalist", "Plenty of white space", "Readable", "Elegant"]
-    }
-  },
-  "atsInfo": {
-    "title": "What is ATS Compatibility?",
-    "description": "ATS (Applicant Tracking System) allows companies to automatically scan CVs. All our templates are designed to be easily readable by these systems, thus increasing the chance of your application reaching human resources."
-  },
-  "about": {
-    "hero": {
-      "badge": "About Us",
-      "title": "Reliable Solution for Professional CVs",
-      "description": "Create ATS-compatible, modern and impressive CVs with CvMaker.Aliee. Get free, fast and professional results."
+    "security": {
+      "title": "Change Password",
+      "currentPassword": "Current Password",
+      "newPassword": "New Password",
+      "confirmPassword": "Confirm New Password",
+      "changePassword": "Change Password",
+      "showPasswords": "Show Passwords",
+      "hidePasswords": "Hide Passwords"
     },
     "stats": {
-      "templates": "Templates",
-      "ats": "ATS Compatible",
-      "support": "Support",
-      "price": "Price"
+      "title": "Account Statistics",
+      "totalCVs": "Total CVs",
+      "mostUsedTemplate": "Most Used Template",
+      "memberSince": "Member Since",
+      "lastActivity": "Last Activity",
+      "none": "None",
+      "never": "Never",
+      "loading": "Loading..."
     },
-    "features": {
-      "title": "Why CvMaker.Aliee?",
-      "subtitle": "We redefine the CV creation experience with modern technologies and user-friendly design.",
-      "templates": {
-        "title": "5 Professional Templates",
-        "description": "Choose from Modern, Classic, Creative, Professional and Minimal designs."
-      },
-      "ats": {
-        "title": "Full ATS Compatibility",
-        "description": "All our templates are easily readable by ATS systems, increasing the chance of your applications being evaluated."
-      },
-      "fast": {
-        "title": "Fast and Easy",
-        "description": "Create a professional CV in just a few minutes and download it as PDF."
-      },
-      "free": {
-        "title": "Completely Free",
-        "description": "All our services including premium features are free. No hidden fees."
+    "activity": {
+      "title": "Recent Activities",
+      "noActivity": "No activity yet",
+      "types": {
+        "login": "Logged In",
+        "logout": "Logged Out",
+        "cv_create": "CV Created",
+        "cv_edit": "CV Edited",
+        "cv_delete": "CV Deleted",
+        "cv_view": "CV Viewed",
+        "profile_update": "Profile Updated",
+        "user_register": "User Registered"
       }
     },
-    "ats": {
-      "benefits": {
-        "title": "ATS Benefits",
-        "keyword": "Keyword optimization",
-        "format": "Standard format support",
-        "speed": "Automatic scanning speed"
-      },
-      "templates": {
-        "title": "ATS Compatible Templates",
-        "description": "All our templates are optimized for ATS systems:"
-      }
+    "sessions": {
+      "title": "Active Sessions",
+      "description": "You can view devices connected to your account here",
+      "current": "Current Session",
+      "noSessions": "No sessions found"
     },
-    "cta": {
-      "title": "Create Your CV Now",
-      "description": "Evaluate your career opportunities with a professional CV. Start free!",
-      "button": "Get Started Free",
-      "templates": "View Templates"
+    "dangerZone": {
+      "title": "Danger Zone",
+      "description": "These actions cannot be undone. Please be careful.",
+      "deleteAccount": "Delete Account",
+      "logout": "Log Out"
     },
-    "page": {
-      "hero": {
-        "title": "About the Project",
-        "description": "I developed this CV creation platform to simplify the job application process. The platform allows users to enter their personal information, experiences, and skills to choose from 5 different professional CV templates that are compatible with ATS (Applicant Tracking System). All services are completely free and extremely easy to use."
-      },
-      "why": {
-        "title": "Why Did I Make This Project?",
-        "description": "I know how important CV preparation is in career journey. However, most people struggle for hours in Word, face format issues, or need design knowledge to achieve a professional look. To solve this problem, I developed this platform. My goal is for everyone to create a free and professional CV in 5 minutes."
-      },
-      "ats": {
-        "title": "What is ATS Format?",
-        "description": "ATS (Applicant Tracking System) are software that allow companies to automatically scan CVs. 75% of applications pass through ATS systems and CVs that are not in the appropriate format are eliminated.",
-        "correct": "Correct Format",
-        "wrong": "Wrong Format",
-        "correctItems": {
-          "0": "Standard fonts (Arial, Calibri)",
-          "1": "Keyword optimization",
-          "2": "Clean, organized structure"
-        },
-        "wrongItems": {
-          "0": "Fancy fonts",
-          "1": "Tables, images",
-          "2": "Complex layouts"
-        }
-      },
-      "aboutMe": {
-        "title": "About Me",
-        "description": "Hello! I am Aliee, the software developer who developed this application. I love producing user-friendly solutions with modern technologies. CV Maker is one of my personal projects and now it helps thousands of people in their career journey.",
-        "visitWebsite": "Visit My Website"
-      },
-      "footer": {
-        "message": "I hope this application works for you!",
-        "signature": "— CvMaker.Aliee"
-      }
+    "deleteModal": {
+      "title": "Delete Account",
+      "warning": "This action cannot be undone! All your CVs and data will be permanently deleted.",
+      "instruction": "Type 'DELETE' to confirm:",
+      "confirm": "Delete Account",
+      "cancel": "Cancel"
     }
   }
+}

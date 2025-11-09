@@ -25,6 +25,7 @@ import {
 } from '@/components/cv-templates';
 import type { CVData, FormStep, WorkExperience, Education } from '@/types/cv-builder';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useToast } from '@/contexts/ToastContext';
 
 interface CVBuilderClientProps {
   userName: string;
@@ -67,6 +68,7 @@ const initialCVData: CVData = {
 export default function CVBuilderClient({ userName, userEmail, initialData, isEdit }: CVBuilderClientProps) {
   const router = useRouter();
   const { t } = useLanguage();
+  const toast = useToast();
   const [currentStep, setCurrentStep] = useState<FormStep>('template');
   const [cvData, setCVData] = useState<CVData>(() => {
     if (initialData) {
@@ -151,7 +153,7 @@ export default function CVBuilderClient({ userName, userEmail, initialData, isEd
    */
   const handleDownloadPDF = async () => {
     if (!cvPreviewRef.current) {
-      alert('CV önizleme bulunamadı. Lütfen sayfayı yenileyin.');
+      toast.error('CV önizleme bulunamadı. Lütfen sayfayı yenileyin.');
       return;
     }
 
@@ -204,9 +206,9 @@ export default function CVBuilderClient({ userName, userEmail, initialData, isEd
         document.body.removeChild(successToast);
       }, 3000);
 
-    } catch (error) {
-      console.error('PDF generation error:', error);
-      alert('PDF oluşturulurken bir hata oluştu. Lütfen tekrar deneyin.');
+    } catch {
+      // Silent fail - user already sees error toast
+      toast.error('PDF oluşturulurken bir hata oluştu. Lütfen tekrar deneyin.');
     }
   };
 
@@ -266,35 +268,35 @@ export default function CVBuilderClient({ userName, userEmail, initialData, isEd
     try {
       // Validate required fields before submission
       if (!cvData.personalInfo.firstName || !cvData.personalInfo.lastName) {
-        alert(t('cvBuilder.validation.nameRequired'));
+        toast.warning(t('cvBuilder.validation.nameRequired'));
         return;
       }
       if (!cvData.personalInfo.title) {
-        alert(t('cvBuilder.validation.titleRequired'));
+        toast.warning(t('cvBuilder.validation.titleRequired'));
         return;
       }
       if (!cvData.personalInfo.email) {
-        alert(t('cvBuilder.validation.emailRequired'));
+        toast.warning(t('cvBuilder.validation.emailRequired'));
         return;
       }
       if (!cvData.personalInfo.phone) {
-        alert(t('cvBuilder.validation.phoneRequired'));
+        toast.warning(t('cvBuilder.validation.phoneRequired'));
         return;
       }
       if (!cvData.personalInfo.city) {
-        alert(t('cvBuilder.validation.cityRequired'));
+        toast.warning(t('cvBuilder.validation.cityRequired'));
         return;
       }
       
       // Validate summary (required)
       if (!cvData.summary || cvData.summary.trim().length === 0) {
-        alert(t('cvBuilder.validation.summaryRequired'));
+        toast.warning(t('cvBuilder.validation.summaryRequired'));
         return;
       }
       
       // Validate at least one education entry (required)
       if (cvData.education.length === 0) {
-        alert(t('cvBuilder.validation.educationRequired'));
+        toast.warning(t('cvBuilder.validation.educationRequired'));
         return;
       }
       
@@ -303,20 +305,20 @@ export default function CVBuilderClient({ userName, userEmail, initialData, isEd
         !edu.school.trim() || !edu.degree.trim() || !edu.field.trim() || !edu.startDate
       );
       if (invalidEducation) {
-        alert(t('cvBuilder.validation.educationIncomplete'));
+        toast.warning(t('cvBuilder.validation.educationIncomplete'));
         return;
       }
       
       // Validate at least one skill (required)
       if (cvData.skills.length === 0) {
-        alert(t('cvBuilder.validation.skillsRequired'));
+        toast.warning(t('cvBuilder.validation.skillsRequired'));
         return;
       }
       
       // Validate skills
       const invalidSkills = cvData.skills.some(skill => !skill.name.trim());
       if (invalidSkills) {
-        alert(t('cvBuilder.validation.skillsIncomplete'));
+        toast.warning(t('cvBuilder.validation.skillsIncomplete'));
         return;
       }
 
@@ -325,7 +327,7 @@ export default function CVBuilderClient({ userName, userEmail, initialData, isEd
         !exp.company.trim() || !exp.position.trim() || !exp.startDate
       );
       if (invalidWorkExperience) {
-        alert(t('cvBuilder.validation.experienceIncomplete'));
+        toast.warning(t('cvBuilder.validation.experienceIncomplete'));
         return;
       }
 
@@ -406,8 +408,6 @@ export default function CVBuilderClient({ userName, userEmail, initialData, isEd
           })),
       };
 
-      console.log('Sending CV payload:', cvPayload);
-
       let response;
       if (isEdit && initialData?._id) {
         // Update existing CV
@@ -430,16 +430,13 @@ export default function CVBuilderClient({ userName, userEmail, initialData, isEd
       }
 
       if (!response.ok) {
-        const errorText = await response.text();
-        console.error('CV Save Error:', errorText);
         throw new Error('CV kaydedilemedi');
       }
 
       // Redirect to dashboard
       router.push('/dashboard');
-    } catch (error) {
-      console.error('Error saving CV:', error);
-      alert('CV kaydedilirken bir hata oluştu. Lütfen tekrar deneyin.');
+    } catch {
+      toast.error('CV kaydedilirken bir hata oluştu. Lütfen tekrar deneyin.');
     }
   };
 

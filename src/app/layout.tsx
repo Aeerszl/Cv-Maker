@@ -4,6 +4,8 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { SessionProvider } from "@/components/providers/SessionProvider";
+import { ToastProvider } from "@/contexts/ToastContext";
+import { ToastContainer } from "@/components/ui/Toast";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -38,7 +40,10 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <LanguageProvider>
-              {children}
+              <ToastProvider>
+                {children}
+                <ToastContainer />
+              </ToastProvider>
             </LanguageProvider>
           </ThemeProvider>
         </SessionProvider>
