@@ -4,9 +4,9 @@ import { useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { Sidebar } from '@/components/dashboard/Sidebar';
-import ProfileContent from '@/components/profile/ProfileContent';
+import SettingsContent from '@/components/settings/SettingsContent';
 
-export default function ProfilePage() {
+export default function SettingsPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
 
@@ -42,7 +42,7 @@ export default function ProfilePage() {
 
       {/* Main Content */}
       <main className="ml-72 transition-all duration-300">
-        <ProfileContent />
+        <SettingsContent />
       </main>
     </div>
   );

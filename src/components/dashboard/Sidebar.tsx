@@ -25,7 +25,6 @@ import {
   Home,
   FileText, 
   Plus, 
-  User, 
   Settings, 
   LogOut,
   ChevronLeft,
@@ -78,11 +77,6 @@ export function Sidebar({ userName = 'User', userEmail, userAvatar }: SidebarPro
       href: '/cv/create',
       icon: Plus,
       highlight: true,
-    },
-    {
-      label: t('sidebar.profile'),
-      href: '/profile',
-      icon: User,
     },
     {
       label: t('sidebar.settings'),
