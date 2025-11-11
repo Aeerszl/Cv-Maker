@@ -113,27 +113,27 @@ export function Header() {
           
           {/* Right Section: Theme Toggle + Language + Auth */}
           <div className="flex items-center gap-2 sm:gap-3">
-            {/* Theme Toggle */}
+            {/* Theme Toggle - Rotating Icon with Transparent Background */}
             <button
               onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-              className="p-2 rounded-lg hover:bg-accent transition-colors"
+              className="p-2 rounded-lg transition-all duration-300 hover:scale-110 group"
               aria-label="Toggle theme"
             >
               {theme === 'dark' ? (
-                <Sun className="w-5 h-5 text-foreground" />
+                <Sun className="w-5 h-5 text-foreground transition-transform duration-500 group-hover:rotate-180" />
               ) : (
-                <Moon className="w-5 h-5 text-foreground" />
+                <Moon className="w-5 h-5 text-foreground transition-transform duration-500 group-hover:rotate-360" />
               )}
             </button>
 
-            {/* Language Dropdown */}
+            {/* Language Dropdown - Scale on Hover */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button
-                  className="p-2 rounded-lg hover:bg-accent transition-colors flex items-center gap-1"
+                  className="p-2 rounded-lg transition-all duration-300 hover:scale-110 flex items-center gap-1 group"
                   aria-label="Change language"
                 >
-                  <Languages className="w-5 h-5 text-foreground" />
+                  <Languages className="w-5 h-5 text-foreground transition-transform duration-500 group-hover:rotate-12" />
                   <span className="text-xs font-medium text-foreground hidden sm:inline">
                     {language.toUpperCase()}
                   </span>

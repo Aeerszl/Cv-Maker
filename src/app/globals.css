@@ -562,3 +562,13 @@ html {
   }
 }
 
+/* Hide Next.js development error overlay button (N 1 issue) */
+#nextjs__container_errors_label,
+nextjs-portal,
+[data-nextjs-toast],
+[data-nextjs-dialog-overlay],
+[data-nextjs-dialog-left-right],
+.__next-dev-overlay,
+nextjs-portal > * {
+  display: none !important;
+}

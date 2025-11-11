@@ -326,40 +326,79 @@ const sampleCVData: CVData = {
         style={{ transition: 'transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)' }}
       />
 
-      {/* Optimized Background Blobs */}
+      {/* Enhanced Animated Gradient Blobs - Ultra Smooth */}
       <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
-        {/* Purple Blob */}
+        {/* Indigo Blob - Top Left - Slowest pulse */}
         <div 
           ref={blob1Ref}
-          className="absolute w-[500px] h-[500px] bg-purple-400 rounded-full mix-blend-multiply filter blur-3xl opacity-25 animate-blob will-change-transform"
+          className="absolute w-[700px] h-[700px] bg-indigo-400/30 dark:bg-indigo-500/20 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-3xl animate-pulse will-change-transform"
           style={{ 
-            left: '10%',
-            top: '10%',
-            transition: 'transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+            left: '5%',
+            top: '5%',
+            transition: 'transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+            animationDuration: '10s'
           }}
         />
         
-        {/* Blue Blob */}
+        {/* Purple Blob - Top Right - Medium pulse */}
         <div 
           ref={blob2Ref}
-          className="absolute w-[450px] h-[450px] bg-blue-400 rounded-full mix-blend-multiply filter blur-3xl opacity-25 animate-blob will-change-transform"
+          className="absolute w-[650px] h-[650px] bg-purple-400/30 dark:bg-purple-500/20 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-3xl animate-pulse will-change-transform"
           style={{ 
-            right: '10%',
+            right: '5%',
             top: '10%',
-            transition: 'transform 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-            animationDelay: '2s'
+            transition: 'transform 0.9s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+            animationDelay: '3s',
+            animationDuration: '12s'
           }}
         />
         
-        {/* Pink Blob */}
+        {/* Pink Blob - Bottom Center - Fastest pulse */}
         <div 
           ref={blob3Ref}
-          className="absolute w-[420px] h-[420px] bg-pink-400 rounded-full mix-blend-multiply filter blur-3xl opacity-25 animate-blob will-change-transform"
+          className="absolute w-[600px] h-[600px] bg-pink-400/30 dark:bg-pink-500/20 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-3xl animate-pulse will-change-transform"
           style={{ 
-            left: '30%',
-            bottom: '10%',
-            transition: 'transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-            animationDelay: '4s'
+            left: '35%',
+            bottom: '5%',
+            transition: 'transform 1s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+            animationDelay: '6s',
+            animationDuration: '14s'
+          }}
+        />
+        
+        {/* Additional Ambient Blobs - No mouse tracking, pure animation */}
+        {/* Small Blue Accent - Top Center */}
+        <div 
+          className="absolute w-[400px] h-[400px] bg-blue-300/20 dark:bg-blue-400/15 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-3xl animate-pulse"
+          style={{ 
+            left: '50%',
+            top: '15%',
+            transform: 'translateX(-50%)',
+            animationDelay: '1s',
+            animationDuration: '8s'
+          }}
+        />
+        
+        {/* Small Rose Accent - Bottom Right */}
+        <div 
+          className="absolute w-[350px] h-[350px] bg-rose-300/20 dark:bg-rose-400/15 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-3xl animate-pulse"
+          style={{ 
+            right: '15%',
+            bottom: '20%',
+            animationDelay: '4s',
+            animationDuration: '11s'
+          }}
+        />
+        
+        {/* Small Violet Accent - Left Center */}
+        <div 
+          className="absolute w-[380px] h-[380px] bg-violet-300/20 dark:bg-violet-400/15 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-3xl animate-pulse"
+          style={{ 
+            left: '20%',
+            top: '50%',
+            transform: 'translateY(-50%)',
+            animationDelay: '2s',
+            animationDuration: '9s'
           }}
         />
       </div>
