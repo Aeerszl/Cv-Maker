@@ -20,6 +20,11 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "CV Maker - Professional CV Builder | Profesyonel CV Oluşturucu",
   description: "Create your professional CV with ATS-friendly templates | ATS uyumlu şablonlar ile profesyonel CV'nizi kolayca oluşturun",
+  icons: {
+    icon: '/Logo.png',
+    shortcut: '/Logo.png',
+    apple: '/Logo.png',
+  },
 };
 
 export default function RootLayout({
