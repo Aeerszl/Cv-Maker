@@ -1,30 +1,30 @@
 /**
- * Email Service using Resend
+ * Email Service using SendGrid
  * 
  * Handles all email sending functionality for the application
- * Tracks email usage for Resend API limit monitoring
+ * Tracks email usage for monitoring
  * 
  * @module lib/email
  */
 
-import { Resend } from 'resend';
+import sgMail from '@sendgrid/mail';
 import { AnalyticsService } from '@/services/AnalyticsService';
 import { logger } from '@/lib/logger';
 
-// Validate RESEND_API_KEY
-if (!process.env.RESEND_API_KEY) {
-  console.error('❌ RESEND_API_KEY is not defined in environment variables');
-  throw new Error('RESEND_API_KEY is required for email functionality');
+// Validate SENDGRID_API_KEY
+if (!process.env.SENDGRID_API_KEY) {
+  console.error('❌ SENDGRID_API_KEY is not defined in environment variables');
+  throw new Error('SENDGRID_API_KEY is required for email functionality');
 }
 
-// Initialize Resend with API key from environment
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Initialize SendGrid with API key from environment
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 /**
  * Get formatted email FROM address
  */
 function getEmailFrom(): string {
-  const emailFrom = process.env.EMAIL_FROM || 'onboarding@resend.dev';
+  const emailFrom = process.env.EMAIL_FROM || 'noreply@cvmaker.com';
   // If already formatted with name, use as is
   if (emailFrom.includes('<')) {
     return emailFrom;
@@ -225,49 +225,31 @@ export async function sendVerificationEmail(
   `;
 
   try {
-    console.log('🔄 Attempting to send email via Resend...', {
+    console.log('🔄 Attempting to send email via SendGrid...', {
       to: email,
       from: getEmailFrom(),
-      hasApiKey: !!process.env.RESEND_API_KEY,
-      apiKeyPrefix: process.env.RESEND_API_KEY?.substring(0, 8) + '...',
+      hasApiKey: !!process.env.SENDGRID_API_KEY,
+      apiKeyPrefix: process.env.SENDGRID_API_KEY?.substring(0, 8) + '...',
     });
 
-    const { data, error } = await resend.emails.send({
+    const msg = {
+      to: email,
       from: getEmailFrom(),
-      to: [email],
       subject,
       html: htmlContent,
-    });
+    };
 
-    if (error) {
-      console.error('❌ Resend API returned error:', error);
-      logger.error('Email sending error', { error: String(error), recipient: email });
-      
-      // Development mode: Log email instead of throwing error
-      if (process.env.NODE_ENV === 'development') {
-        console.log('📧 [DEV MODE] Email would be sent to:', email);
-        console.log('📧 [DEV MODE] Verification code:', code);
-        console.log('💡 Resend test domain only sends to your verified email (aliee.developer@gmail.com)');
-        
-        // Track email attempt even in dev mode (for testing analytics)
-        try {
-          await AnalyticsService.trackEmailSent();
-        } catch {
-          // Silent fail - tracking is secondary
-        }
-        
-        // Return false to indicate email wasn't sent
-        return false;
-      }
-      
-      throw new Error(`Email gönderilemedi / Failed to send email: ${JSON.stringify(error)}`);
-    }
+    const response = await sgMail.send(msg);
 
-    console.log('✅ Email sent successfully via Resend', { 
+    console.log('✅ Email sent successfully via SendGrid', { 
       recipient: email,
-      emailId: data?.id 
+      statusCode: response[0]?.statusCode,
+      messageId: response[0]?.headers['x-message-id']
     });
-    logger.info('Email sent successfully', { recipient: email, emailId: data?.id });
+    logger.info('Email sent successfully', { 
+      recipient: email, 
+      statusCode: response[0]?.statusCode 
+    });
     
     // Track successful email send for API usage monitoring
     try {
@@ -442,19 +424,19 @@ export async function sendWelcomeEmail(
   `;
 
   try {
-    const { data, error } = await resend.emails.send({
+    const msg = {
+      to: email,
       from: getEmailFrom(),
-      to: [email],
       subject,
       html: htmlContent,
+    };
+
+    const response = await sgMail.send(msg);
+
+    console.log('✅ Welcome email sent via SendGrid:', {
+      statusCode: response[0]?.statusCode,
+      recipient: email
     });
-
-    if (error) {
-      console.error('❌ Welcome email error:', error);
-      throw new Error('Welcome email gönderilemedi');
-    }
-
-    console.log('✅ Welcome email sent:', data);
     
     // Track welcome email for API usage monitoring
     try {
@@ -464,7 +446,7 @@ export async function sendWelcomeEmail(
       console.error('⚠️ Failed to track welcome email usage:', trackError);
     }
     
-    return data;
+    return response;
   } catch (error) {
     console.error('❌ Welcome email service error:', error);
     throw error;
