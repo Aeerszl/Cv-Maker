@@ -23,8 +23,6 @@ import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function Home() {
   const { t } = useLanguage();
-  const [scrollY, setScrollY] = useState(0);
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [selectedTemplatePreview, setSelectedTemplatePreview] = useState<string | null>(null);
   
   // Refs for direct DOM manipulation (much faster than React state)
@@ -241,12 +239,6 @@ const sampleCVData: CVData = {
 };
 
   useEffect(() => {
-    const handleScroll = () => setScrollY(window.scrollY);
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  useEffect(() => {
     let rafId: number;
     let lastUpdate = 0;
     const throttle = 16; // ~60fps
@@ -287,9 +279,6 @@ const sampleCVData: CVData = {
           if (blob3Ref.current) {
             blob3Ref.current.style.transform = `translate(${x * 0.018}px, ${-y * 0.018}px)`;
           }
-          
-          // Update state only for elements that need it (minimal)
-          setMousePosition({ x, y });
         });
       }
     };
