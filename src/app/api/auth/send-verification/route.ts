@@ -18,28 +18,44 @@ import { rateLimit, RATE_LIMITS } from '@/lib/rateLimit';
 import { handleError } from '@/lib/errorHandler';
 
 export async function POST(request: NextRequest) {
+  console.log('📨 [send-verification] API endpoint called');
+  
   // ✅ RATE LIMIT: Email spam önleme
   const rateLimitResult = rateLimit(request, RATE_LIMITS.EMAIL_SEND);
-  if (rateLimitResult) return rateLimitResult;
+  if (rateLimitResult) {
+    console.log('⚠️ [send-verification] Rate limited');
+    return rateLimitResult;
+  }
   
   try {
     const { email, language = 'tr' } = await request.json();
+    console.log('📨 [send-verification] Request payload:', { email, language });
 
     // Validate email
     if (!email || !/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email)) {
+      console.log('❌ [send-verification] Invalid email format:', email);
       return NextResponse.json(
         { error: 'Geçerli bir email adresi giriniz / Please enter a valid email' },
         { status: 400 }
       );
     }
 
+    console.log('🔄 [send-verification] Connecting to database...');
     await dbConnect();
+    console.log('✅ [send-verification] Database connected');
 
     // Check if user exists (pending or verified)
     const user = await User.findOne({ email: email.toLowerCase() });
     const pendingUser = await PendingUser.findOne({ email: email.toLowerCase() });
     
+    console.log('🔍 [send-verification] User lookup:', {
+      userExists: !!user,
+      pendingUserExists: !!pendingUser,
+      emailVerified: user?.emailVerified
+    });
+    
     if (!user && !pendingUser) {
+      console.log('❌ [send-verification] User not found');
       return NextResponse.json(
         { error: 'Kullanıcı bulunamadı / User not found' },
         { status: 404 }
@@ -48,6 +64,7 @@ export async function POST(request: NextRequest) {
 
     // Check if user is already verified
     if (user && user.emailVerified) {
+      console.log('⚠️ [send-verification] Email already verified');
       return NextResponse.json(
         { error: 'Email zaten doğrulanmış / Email already verified' },
         { status: 400 }
@@ -61,10 +78,12 @@ export async function POST(request: NextRequest) {
     });
 
     if (recentCode) {
+      const waitTime = 60 - Math.floor((Date.now() - recentCode.createdAt.getTime()) / 1000);
+      console.log('⏳ [send-verification] Rate limited - recent code exists:', { waitTime });
       return NextResponse.json(
         {
           error: 'Lütfen 60 saniye bekleyin / Please wait 60 seconds',
-          waitTime: 60 - Math.floor((Date.now() - recentCode.createdAt.getTime()) / 1000),
+          waitTime,
         },
         { status: 429 }
       );
@@ -72,6 +91,7 @@ export async function POST(request: NextRequest) {
 
     // Generate verification code
     const code = generateVerificationCode();
+    console.log('🔑 [send-verification] Generated code:', code);
 
     // Save verification code to database
     await VerificationCode.create({
@@ -79,9 +99,12 @@ export async function POST(request: NextRequest) {
       code,
       expiresAt: new Date(Date.now() + 5 * 60 * 1000), // 5 minutes
     });
+    console.log('💾 [send-verification] Code saved to database');
 
     // Send verification email
+    console.log('📧 [send-verification] Attempting to send email...');
     const emailSent = await sendVerificationEmail(email, code, language);
+    console.log('📧 [send-verification] Email send result:', { emailSent });
 
     return NextResponse.json(
       {
@@ -93,6 +116,7 @@ export async function POST(request: NextRequest) {
       { status: 200 }
     );
   } catch (error) {
+    console.error('❌ [send-verification] Error:', error);
     return handleError(error, 'Send verification code');
   }
 }

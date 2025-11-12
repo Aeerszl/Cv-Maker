@@ -11,6 +11,12 @@ import { Resend } from 'resend';
 import { AnalyticsService } from '@/services/AnalyticsService';
 import { logger } from '@/lib/logger';
 
+// Validate RESEND_API_KEY
+if (!process.env.RESEND_API_KEY) {
+  console.error('❌ RESEND_API_KEY is not defined in environment variables');
+  throw new Error('RESEND_API_KEY is required for email functionality');
+}
+
 // Initialize Resend with API key from environment
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -219,6 +225,13 @@ export async function sendVerificationEmail(
   `;
 
   try {
+    console.log('🔄 Attempting to send email via Resend...', {
+      to: email,
+      from: getEmailFrom(),
+      hasApiKey: !!process.env.RESEND_API_KEY,
+      apiKeyPrefix: process.env.RESEND_API_KEY?.substring(0, 8) + '...',
+    });
+
     const { data, error } = await resend.emails.send({
       from: getEmailFrom(),
       to: [email],
@@ -227,6 +240,7 @@ export async function sendVerificationEmail(
     });
 
     if (error) {
+      console.error('❌ Resend API returned error:', error);
       logger.error('Email sending error', { error: String(error), recipient: email });
       
       // Development mode: Log email instead of throwing error
@@ -246,10 +260,14 @@ export async function sendVerificationEmail(
         return false;
       }
       
-      throw new Error('Email gönderilemedi / Failed to send email');
+      throw new Error(`Email gönderilemedi / Failed to send email: ${JSON.stringify(error)}`);
     }
 
-    logger.info('Email sent successfully', { recipient: email });
+    console.log('✅ Email sent successfully via Resend', { 
+      recipient: email,
+      emailId: data?.id 
+    });
+    logger.info('Email sent successfully', { recipient: email, emailId: data?.id });
     
     // Track successful email send for API usage monitoring
     try {
