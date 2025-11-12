@@ -130,7 +130,7 @@ export function Header() {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button
-                  className="p-2 rounded-lg transition-all duration-300 hover:scale-110 flex items-center gap-1 group"
+                  className="p-2 rounded-lg transition-all duration-300 hover:scale-110 flex items-center gap-1 group focus:outline-none"
                   aria-label="Change language"
                 >
                   <Languages className="w-5 h-5 text-foreground transition-transform duration-500 group-hover:rotate-12" />
@@ -139,16 +139,16 @@ export function Header() {
                   </span>
                 </button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
+              <DropdownMenuContent align="end" className="bg-background/95 backdrop-blur-md border-border/50">
                 <DropdownMenuItem 
                   onClick={() => setLanguage('tr')}
-                  className={language === 'tr' ? 'bg-accent' : ''}
+                  className={`cursor-pointer hover:bg-foreground/5 ${language === 'tr' ? 'font-semibold text-primary' : ''}`}
                 >
                   🇹🇷 Türkçe
                 </DropdownMenuItem>
                 <DropdownMenuItem 
                   onClick={() => setLanguage('en')}
-                  className={language === 'en' ? 'bg-accent' : ''}
+                  className={`cursor-pointer hover:bg-foreground/5 ${language === 'en' ? 'font-semibold text-primary' : ''}`}
                 >
                   🇬🇧 English
                 </DropdownMenuItem>

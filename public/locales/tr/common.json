@@ -6,6 +6,9 @@
     "signin": "Giriş Yap",
     "signup": "Ücretsiz Başla"
   },
+  "templates": {
+    "clickToEnlarge": "Büyütmek için tıkla"
+  },
   "profile": {
     "title": "Profil Ayarları",
     "saveChanges": "Değişiklikleri Kaydet",

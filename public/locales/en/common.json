@@ -6,6 +6,9 @@
     "signin": "Sign In",
     "signup": "Get Started Free"
   },
+  "templates": {
+    "clickToEnlarge": "Click to enlarge"
+  },
   "profile": {
     "title": "Profile Settings",
     "saveChanges": "Save Changes",

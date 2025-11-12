@@ -25,6 +25,7 @@ export default function Home() {
   const { t } = useLanguage();
   const [scrollY, setScrollY] = useState(0);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [selectedTemplatePreview, setSelectedTemplatePreview] = useState<string | null>(null);
   
   // Refs for direct DOM manipulation (much faster than React state)
   const cursorRef = useRef<HTMLDivElement>(null);
@@ -33,6 +34,7 @@ export default function Home() {
   const blob1Ref = useRef<HTMLDivElement>(null);
   const blob2Ref = useRef<HTMLDivElement>(null);
   const blob3Ref = useRef<HTMLDivElement>(null);
+  const templatesScrollRef = useRef<HTMLDivElement>(null);
 
   // Define templates with translations - memoized to update when language changes
   const templates = useMemo(() => [
@@ -296,7 +298,28 @@ const sampleCVData: CVData = {
 
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
-      if (rafId) cancelAnimationFrame(rafId);
+      cancelAnimationFrame(rafId);
+    };
+  }, []);
+
+  // Mouse wheel horizontal scroll for templates
+  useEffect(() => {
+    const handleWheel = (e: WheelEvent) => {
+      if (templatesScrollRef.current && templatesScrollRef.current.contains(e.target as Node)) {
+        e.preventDefault();
+        templatesScrollRef.current.scrollLeft += e.deltaY;
+      }
+    };
+
+    const scrollElement = templatesScrollRef.current;
+    if (scrollElement) {
+      scrollElement.addEventListener('wheel', handleWheel, { passive: false });
+    }
+
+    return () => {
+      if (scrollElement) {
+        scrollElement.removeEventListener('wheel', handleWheel);
+      }
     };
   }, []);
 
@@ -613,11 +636,15 @@ const sampleCVData: CVData = {
             </p>
           </div>
 
-          <div className="flex gap-6 overflow-x-auto pb-4 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 dark:scrollbar-thumb-gray-600 dark:scrollbar-track-gray-800">
+          <div 
+            ref={templatesScrollRef}
+            className="flex gap-6 overflow-x-auto pb-4 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 dark:scrollbar-thumb-gray-600 dark:scrollbar-track-gray-800 cursor-grab active:cursor-grabbing"
+          >
             {templates.map((template, index) => (
               <div
                 key={template.id}
-                className="group relative p-6 rounded-xl border-2 border-border hover:border-primary/50 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 text-left shrink-0 w-80 animate-fade-in-up"
+                onClick={() => setSelectedTemplatePreview(template.id)}
+                className="group relative p-6 rounded-xl border-2 border-border hover:border-primary/50 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 text-left shrink-0 w-80 animate-fade-in-up cursor-pointer"
                 style={{ animationDelay: `${index * 0.1}s` }}
               >
                 {/* Template Preview - CV Thumbnail */}
@@ -633,8 +660,15 @@ const sampleCVData: CVData = {
                       {template.id === 'minimal' && <MinimalTemplate data={sampleCVData} />}
                     </div>
                     
-                    {/* Overlay Gradient */}
-                    <div className="absolute inset-0 bg-linear-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    {/* Click to enlarge overlay */}
+                    <div className="absolute inset-0 bg-linear-to-t from-background/90 via-background/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-3">
+                      <span className="text-xs font-medium text-primary flex items-center gap-1.5 bg-background/80 backdrop-blur-sm px-3 py-1.5 rounded-full">
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
+                        </svg>
+                        {t('templates.clickToEnlarge') || 'Click to enlarge'}
+                      </span>
+                    </div>
                     
                     {/* Template Name Badge - Top Right */}
                     <div className="absolute top-2 right-2">
@@ -741,6 +775,41 @@ const sampleCVData: CVData = {
           </p>
         </div>
       </footer>
+
+      {/* Template Preview Modal */}
+      {selectedTemplatePreview && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-fade-in"
+          onClick={() => setSelectedTemplatePreview(null)}
+        >
+          <div 
+            className="relative bg-white dark:bg-gray-900 rounded-lg shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close Button */}
+            <button
+              onClick={() => setSelectedTemplatePreview(null)}
+              className="sticky top-4 right-4 float-right z-10 p-2 bg-black/60 hover:bg-black/80 text-white rounded-full transition-colors"
+              aria-label="Close preview"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+
+            {/* Full CV Preview */}
+            <div className="p-8">
+              <div className="transform scale-90 origin-top">
+                {selectedTemplatePreview === 'modern' && <ModernTemplate data={sampleCVData} />}
+                {selectedTemplatePreview === 'classic' && <ClassicTemplate data={sampleCVData} />}
+                {selectedTemplatePreview === 'creative' && <CreativeTemplate data={sampleCVData} />}
+                {selectedTemplatePreview === 'professional' && <ProfessionalTemplate data={sampleCVData} />}
+                {selectedTemplatePreview === 'minimal' && <MinimalTemplate data={sampleCVData} />}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
