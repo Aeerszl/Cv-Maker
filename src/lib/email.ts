@@ -15,6 +15,19 @@ import { logger } from '@/lib/logger';
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 /**
+ * Get formatted email FROM address
+ */
+function getEmailFrom(): string {
+  const emailFrom = process.env.EMAIL_FROM || 'onboarding@resend.dev';
+  // If already formatted with name, use as is
+  if (emailFrom.includes('<')) {
+    return emailFrom;
+  }
+  // Otherwise, add CvMaker.Aliee name
+  return `CvMaker.Aliee <${emailFrom}>`;
+}
+
+/**
  * Generate a 6-digit verification code
  */
 export function generateVerificationCode(): string {
@@ -207,7 +220,7 @@ export async function sendVerificationEmail(
 
   try {
     const { data, error } = await resend.emails.send({
-      from: process.env.EMAIL_FROM || 'CvMaker.Aliee <onboarding@resend.dev>',
+      from: getEmailFrom(),
       to: [email],
       subject,
       html: htmlContent,
@@ -412,7 +425,7 @@ export async function sendWelcomeEmail(
 
   try {
     const { data, error } = await resend.emails.send({
-      from: process.env.EMAIL_FROM || 'CvMaker.Aliee <onboarding@resend.dev>',
+      from: getEmailFrom(),
       to: [email],
       subject,
       html: htmlContent,
