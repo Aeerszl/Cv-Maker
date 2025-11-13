@@ -446,7 +446,7 @@ export default function CVBuilderClient({ userName, userEmail, initialData, isEd
       <Sidebar userName={userName} userEmail={userEmail} />
 
       {/* Main Content */}
-      <main className="ml-72 transition-all duration-300 py-8">
+      <main className="lg:ml-72 transition-all duration-300 py-8">
         <div className="container max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Page Header */}
           <div className="mb-8">
@@ -484,7 +484,7 @@ export default function CVBuilderClient({ userName, userEmail, initialData, isEd
                   key={step}
                   onClick={() => setCurrentStep(step)}
                   className={`
-                    px-4 py-2 rounded-lg text-sm font-medium transition-all
+                    px-3 py-2 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-all
                     ${currentStep === step
                       ? 'bg-primary text-primary-foreground shadow-md'
                       : index < currentStepIndex
@@ -493,13 +493,14 @@ export default function CVBuilderClient({ userName, userEmail, initialData, isEd
                     }
                   `}
                 >
-                  <span className="flex items-center gap-2">
+                  <span className="flex items-center gap-1 sm:gap-2">
                     {index < currentStepIndex && (
-                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                       </svg>
                     )}
-                    {stepTitles[step]}
+                    <span className="hidden sm:inline">{stepTitles[step]}</span>
+                    <span className="sm:hidden">{index + 1}</span>
                   </span>
                 </button>
               ))}
@@ -1495,7 +1496,7 @@ export default function CVBuilderClient({ userName, userEmail, initialData, isEd
                 </div>
 
                 {/* Template Preview */}
-                <div id="cv-preview" ref={cvPreviewRef} className="bg-gray-100 dark:bg-gray-800 p-8 rounded-lg overflow-auto max-h-[800px]">
+                <div id="cv-preview" ref={cvPreviewRef} className="bg-gray-100 dark:bg-gray-800 p-4 sm:p-8 rounded-lg overflow-auto max-h-[600px] sm:max-h-[800px]">
                   <div className="transform scale-75 origin-top">
                     {cvData.template === 'modern' && <ModernTemplate data={cvData} />}
                     {cvData.template === 'classic' && <ClassicTemplate data={cvData} />}

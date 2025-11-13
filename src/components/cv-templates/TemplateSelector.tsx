@@ -262,7 +262,7 @@ export function TemplateSelector({ selectedTemplate, onSelectTemplate }: Templat
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         {templates.map((template) => {
           const isSelected = selectedTemplate === template.id;
           
@@ -270,7 +270,7 @@ export function TemplateSelector({ selectedTemplate, onSelectTemplate }: Templat
             <div
               key={template.id}
               className={`
-                relative p-6 rounded-xl border-2 transition-all duration-300 text-left
+                relative p-4 sm:p-6 rounded-xl border-2 transition-all duration-300 text-left
                 hover:shadow-xl hover:-translate-y-1 group cursor-pointer
                 ${isSelected 
                   ? `${template.borderColor} shadow-lg scale-105 bg-primary/5` 
@@ -289,9 +289,9 @@ export function TemplateSelector({ selectedTemplate, onSelectTemplate }: Templat
               {/* Template Preview - CV Thumbnail */}
               <div className="relative mb-4 group overflow-hidden rounded-lg">
                 {/* CV Thumbnail Container */}
-                <div className="h-40 bg-white dark:bg-gray-900 rounded-lg border border-border overflow-hidden shadow-sm group-hover:shadow-lg transition-all duration-500">
+                <div className="h-32 sm:h-36 lg:h-40 bg-white dark:bg-gray-900 rounded-lg border border-border overflow-hidden shadow-sm group-hover:shadow-lg transition-all duration-500">
                   {/* Actual CV Template Preview */}
-                  <div className="transform scale-[0.25] origin-top-left w-[400%] h-[400%] group-hover:scale-[0.28] transition-transform duration-500 ease-out">
+                  <div className="transform scale-[0.2] sm:scale-[0.22] lg:scale-[0.25] origin-top-left w-[500%] sm:w-[450%] lg:w-[400%] h-[500%] sm:h-[450%] lg:h-[400%] group-hover:scale-[0.22] sm:group-hover:scale-[0.24] lg:group-hover:scale-[0.28] transition-transform duration-500 ease-out">
                     {template.id === 'modern' && <ModernTemplate data={sampleCVData} />}
                     {template.id === 'classic' && <ClassicTemplate data={sampleCVData} />}
                     {template.id === 'creative' && <CreativeTemplate data={sampleCVData} />}
@@ -323,10 +323,10 @@ export function TemplateSelector({ selectedTemplate, onSelectTemplate }: Templat
               </div>
 
               {/* Template Info - Minimal */}
-              <div className="space-y-3">
+              <div className="space-y-2 sm:space-y-3">
                 {/* ATS Score Badge */}
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-bold text-gray-900 dark:text-gray-100">
+                  <span className="text-sm sm:text-base font-bold text-gray-900 dark:text-gray-100">
                     {template.name}
                   </span>
                   <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300">
@@ -384,30 +384,30 @@ export function TemplateSelector({ selectedTemplate, onSelectTemplate }: Templat
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
-            <div className="sticky top-0 z-10 bg-white dark:bg-gray-900 border-b border-border px-6 py-4 flex items-center justify-between">
+            <div className="sticky top-0 z-10 bg-white dark:bg-gray-900 border-b border-border px-4 sm:px-6 py-4 flex items-center justify-between">
               <div>
-                <h3 className="text-xl font-bold text-foreground">
+                <h3 className="text-lg sm:text-xl font-bold text-foreground">
                   {templates.find(t => t.id === previewTemplate)?.name} {t('templateSelector.modalTitle')}
                 </h3>
                 <p className="text-sm text-muted-foreground">
                   {t('templateSelector.modalSubtitle')}
                 </p>
               </div>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 sm:gap-3">
                 <button
                   onClick={() => {
                     onSelectTemplate(previewTemplate as 'modern' | 'classic' | 'creative' | 'professional' | 'minimal' | 'executive' | 'techpro' | 'elegant' | 'bold');
                     setPreviewTemplate(null);
                   }}
-                  className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors"
+                  className="px-3 sm:px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors"
                 >
                   {t('templateSelector.selectTemplate')}
                 </button>
                 <button
                   onClick={() => setPreviewTemplate(null)}
-                  className="w-10 h-10 rounded-lg bg-gray-100 dark:bg-gray-800 text-foreground hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors flex items-center justify-center"
+                  className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gray-100 dark:bg-gray-800 text-foreground hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors flex items-center justify-center"
                 >
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 </button>
@@ -415,8 +415,8 @@ export function TemplateSelector({ selectedTemplate, onSelectTemplate }: Templat
             </div>
 
             {/* Modal Content - CV Preview */}
-            <div className="overflow-auto p-8 bg-gray-100 dark:bg-gray-800 max-h-[calc(90vh-80px)]">
-              <div className="transform scale-75 origin-top mx-auto">
+            <div className="overflow-auto p-4 sm:p-8 bg-gray-100 dark:bg-gray-800 max-h-[calc(90vh-80px)]">
+              <div className="transform scale-75 sm:scale-90 lg:scale-100 origin-top mx-auto">
                 {previewTemplate === 'modern' && <ModernTemplate data={sampleCVData} />}
                 {previewTemplate === 'classic' && <ClassicTemplate data={sampleCVData} />}
                 {previewTemplate === 'creative' && <CreativeTemplate data={sampleCVData} />}

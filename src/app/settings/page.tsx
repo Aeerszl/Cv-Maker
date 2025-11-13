@@ -41,7 +41,7 @@ export default function SettingsPage() {
       />
 
       {/* Main Content */}
-      <main className="ml-72 transition-all duration-300">
+      <main className="lg:ml-72 transition-all duration-300">
         <SettingsContent />
       </main>
     </div>

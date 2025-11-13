@@ -108,7 +108,7 @@ export function CVCard({
   return (
     <div className="group relative bg-white dark:bg-gray-900 rounded-xl border border-border hover:border-primary/50 transition-all duration-300 hover:shadow-lg">
       {/* Template Preview */}
-      <div className={`relative h-48 rounded-t-xl bg-linear-to-br ${TEMPLATE_COLORS[template]} overflow-hidden`}>
+      <div className={`relative h-32 sm:h-40 lg:h-48 rounded-t-xl bg-linear-to-br ${TEMPLATE_COLORS[template]} overflow-hidden`}>
         <div className="absolute inset-0 flex items-center justify-center">
           <FileText className="w-16 h-16 text-white/30" />
         </div>
@@ -123,14 +123,14 @@ export function CVCard({
       </div>
 
       {/* Content */}
-      <div className="p-4">
+      <div className="p-3 sm:p-4">
         {/* Title */}
-        <h3 className="text-lg font-semibold text-foreground mb-2 truncate">
+        <h3 className="text-base sm:text-lg font-semibold text-foreground mb-2 truncate">
           {title}
         </h3>
 
         {/* Meta Info */}
-        <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
+        <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground mb-4">
           <Clock className="w-4 h-4" />
           <span>{formatDate(lastModified)}</span>
         </div>
@@ -140,7 +140,7 @@ export function CVCard({
           <Link
             href={`/cv/edit/${id}`}
             onClick={() => onEdit?.(id)}
-            className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors"
+            className="flex-1 flex items-center justify-center gap-2 px-3 py-2 sm:px-4 sm:py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors"
           >
             <Edit className="w-4 h-4" />
             <span>{t('cvCard.edit')}</span>

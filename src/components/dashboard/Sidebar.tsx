@@ -16,7 +16,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
@@ -34,7 +34,9 @@ import {
   Globe,
   Shield,
   BarChart3,
-  Users
+  Users,
+  Menu,
+  X
 } from 'lucide-react';
 import { signOut, useSession } from 'next-auth/react';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -50,6 +52,7 @@ interface SidebarProps {
  */
 export function Sidebar({ userName = 'User', userEmail, userAvatar }: SidebarProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isLanguageOpen, setIsLanguageOpen] = useState(false);
   const pathname = usePathname();
   const { theme, setTheme } = useTheme();
@@ -57,6 +60,25 @@ export function Sidebar({ userName = 'User', userEmail, userAvatar }: SidebarPro
   const { data: session } = useSession();
   
   const isAdmin = session?.user?.role === 'admin';
+
+  // Close mobile menu on route change
+  useEffect(() => {
+    const timer = setTimeout(() => setIsMobileOpen(false), 0);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname]);
+
+  // Prevent body scroll when mobile menu is open
+  useEffect(() => {
+    if (isMobileOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isMobileOpen]);
 
   /**
    * Navigation items configuration
@@ -134,16 +156,51 @@ export function Sidebar({ userName = 'User', userEmail, userAvatar }: SidebarPro
   };
 
   return (
-    <aside
-      className={`
-        fixed left-0 top-0 z-40 h-screen
-        bg-white dark:bg-gray-900 border-r border-border
-        transition-all duration-300 ease-in-out
-        ${isCollapsed ? 'w-20' : 'w-72'}
-        shadow-xl
-      `}
-    >
+    <>
+        {/* Mobile Hamburger Button - Only when sidebar is closed */}
+        {!isMobileOpen && (
+          <button
+            onClick={() => setIsMobileOpen(true)}
+            className="lg:hidden fixed top-4 left-4 z-50 p-3 bg-primary text-primary-foreground rounded-lg shadow-lg hover:bg-primary/90 transition-all hover:scale-105"
+            aria-label="Toggle menu"
+          >
+            <Menu className="w-5 h-5" />
+          </button>
+        )}
+
+      {/* Mobile Top Spacing for content */}
+      <div className="lg:hidden h-16" />
+
+      {/* Mobile Overlay */}
+      {isMobileOpen && (
+        <div
+          className="lg:hidden fixed inset-0 bg-black/50 z-30 backdrop-blur-sm"
+          onClick={() => setIsMobileOpen(false)}
+        />
+      )}
+
+      {/* Sidebar */}
+      <aside
+        className={`
+          fixed left-0 top-0 z-40 h-screen
+          bg-white dark:bg-gray-900 border-r border-border
+          transition-all duration-300 ease-in-out
+          shadow-xl
+          ${isCollapsed ? 'w-20' : 'w-72'}
+          ${isMobileOpen ? 'translate-x-0' : '-translate-x-full'}
+          lg:translate-x-0
+        `}
+      >
       <div className="h-full flex flex-col">
+        {/* Mobile Close Button - Top Right */}
+        <button
+          onClick={() => setIsMobileOpen(false)}
+          className="lg:hidden absolute top-4 right-4 z-50 p-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+          aria-label="Close menu"
+        >
+          <X className="w-5 h-5" />
+        </button>
+
         {/* Header with Logo and Collapse Button */}
         <div className="p-4 border-b border-border flex items-center justify-between">
           {!isCollapsed && (
@@ -174,9 +231,10 @@ export function Sidebar({ userName = 'User', userEmail, userAvatar }: SidebarPro
             </Link>
           )}
           
+          {/* Collapse Button - Desktop Only */}
           <button
             onClick={() => setIsCollapsed(!isCollapsed)}
-            className="p-2 rounded-lg hover:bg-accent transition-colors ml-auto"
+            className="hidden lg:block p-2 rounded-lg hover:bg-accent transition-colors ml-auto"
             aria-label="Toggle sidebar"
           >
             {isCollapsed ? (
@@ -411,6 +469,7 @@ export function Sidebar({ userName = 'User', userEmail, userAvatar }: SidebarPro
         </div>
       </div>
     </aside>
+    </>
   );
 }
 

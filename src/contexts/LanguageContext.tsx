@@ -46,7 +46,7 @@ const translations = {
     // Simple Steps
     'steps.1.title': 'Ücretsiz Başla',
     'steps.1.desc': 'Hemen kayıt ol',
-    'steps.2.title': '5 ATS Şablon',
+    'steps.2.title': 'Şablon Seç',
     'steps.2.desc': 'Şablonunu seç',
     'steps.3.title': 'Hızlı İndir',
     'steps.3.desc': 'PDF olarak indir',
@@ -66,8 +66,8 @@ const translations = {
     'features.pdf.desc': 'CV\'nizi yüksek kaliteli PDF formatında saniyeler içinde indirin.',
     'features.pdf.badge': 'Anında',
     'features.ai.title': 'Profesyonel Şablonlar',
-    'features.ai.desc': '5 farklı modern ve klasik tasarım seçeneği ile her sektöre uygun CV.',
-    'features.ai.badge': '5 Şablon',
+    'features.ai.desc': 'Farklı modern ve klasik tasarım seçeneği ile her sektöre uygun CV.',
+    'features.ai.badge': 'Farklı Şablonlar',
     
     // CTA
     'cta.title1': 'Profesyonel Kariyeriniz İçin',
@@ -80,7 +80,7 @@ const translations = {
 
     // Template Selector
     'templateSelector.title': 'CV Şablonu Seçin',
-    'templateSelector.subtitle': '5 farklı ATS uyumlu profesyonel şablon arasından size en uygun olanı seçin. Tüm şablonlar başvuru takip sistemleri tarafından kolayca okunabilir.',
+    'templateSelector.subtitle': 'Farklı profesyonel şablon arasından size en uygun olanı seçin. Tüm şablonlar başvuru takip sistemleri tarafından kolayca okunabilir.',
     'templateSelector.preview': 'Önizle',
     'templateSelector.selectTemplate': 'Bu Şablonu Seç',
     'templateSelector.modalTitle': 'Şablonu - Örnek CV',
@@ -498,7 +498,7 @@ const translations = {
     // Simple Steps
     'steps.1.title': 'Start Free',
     'steps.1.desc': 'Sign up now',
-    'steps.2.title': '5 ATS Templates',
+    'steps.2.title': 'Choose Template',
     'steps.2.desc': 'Choose template',
     'steps.3.title': 'Quick Download',
     'steps.3.desc': 'Download as PDF',
@@ -518,8 +518,8 @@ const translations = {
     'features.pdf.desc': 'Download your CV in high-quality PDF format within seconds.',
     'features.pdf.badge': 'Instant',
     'features.ai.title': 'Professional Templates',
-    'features.ai.desc': '5 different modern and classic design options suitable for every sector.',
-    'features.ai.badge': '5 Templates',
+    'features.ai.desc': 'Different modern and classic design options suitable for every sector.',
+    'features.ai.badge': 'Different Templates',
     
     // CTA
     'cta.title1': 'For Your Professional Career',
@@ -532,7 +532,7 @@ const translations = {
 
     // Template Selector
     'templateSelector.title': 'Choose CV Template',
-    'templateSelector.subtitle': 'Choose the most suitable one from 5 different ATS-friendly professional templates. All templates can be easily read by application tracking systems.',
+    'templateSelector.subtitle': 'Choose the most suitable one from different professional templates. All templates can be easily read by application tracking systems.',
     'templateSelector.preview': 'Preview',
     'templateSelector.selectTemplate': 'Select This Template',
     'templateSelector.modalTitle': 'Template - Sample CV',

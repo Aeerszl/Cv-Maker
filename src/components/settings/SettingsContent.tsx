@@ -232,61 +232,61 @@ export default function SettingsContent() {
       </div>
 
       {/* Tabs - Modern Design with Icons */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-8">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 sm:gap-3 mb-8">
         <button
           onClick={() => setActiveTab('account')}
-          className={`flex flex-col items-center gap-2 p-4 rounded-xl font-medium transition-all ${
+          className={`flex flex-col items-center gap-1 sm:gap-2 p-3 sm:p-4 rounded-xl font-medium transition-all text-xs sm:text-sm ${
             activeTab === 'account'
               ? 'bg-linear-to-br from-blue-500 to-blue-600 text-white shadow-lg scale-105'
               : 'bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:scale-105'
           }`}
         >
-          <User size={24} />
-          <span className="text-sm">Account</span>
+          <User size={20} className="sm:w-6 sm:h-6" />
+          <span>Account</span>
         </button>
         <button
           onClick={() => setActiveTab('security')}
-          className={`flex flex-col items-center gap-2 p-4 rounded-xl font-medium transition-all ${
+          className={`flex flex-col items-center gap-1 sm:gap-2 p-3 sm:p-4 rounded-xl font-medium transition-all text-xs sm:text-sm ${
             activeTab === 'security'
               ? 'bg-linear-to-br from-red-500 to-red-600 text-white shadow-lg scale-105'
               : 'bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:scale-105'
           }`}
         >
-          <Lock size={24} />
-          <span className="text-sm">Security</span>
+          <Lock size={20} className="sm:w-6 sm:h-6" />
+          <span>Security</span>
         </button>
         <button
           onClick={() => setActiveTab('preferences')}
-          className={`flex flex-col items-center gap-2 p-4 rounded-xl font-medium transition-all ${
+          className={`flex flex-col items-center gap-1 sm:gap-2 p-3 sm:p-4 rounded-xl font-medium transition-all text-xs sm:text-sm ${
             activeTab === 'preferences'
               ? 'bg-linear-to-br from-purple-500 to-purple-600 text-white shadow-lg scale-105'
               : 'bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:scale-105'
           }`}
         >
-          <Palette size={24} />
-          <span className="text-sm">Preferences</span>
+          <Palette size={20} className="sm:w-6 sm:h-6" />
+          <span>Preferences</span>
         </button>
         <button
           onClick={() => setActiveTab('stats')}
-          className={`flex flex-col items-center gap-2 p-4 rounded-xl font-medium transition-all ${
+          className={`flex flex-col items-center gap-1 sm:gap-2 p-3 sm:p-4 rounded-xl font-medium transition-all text-xs sm:text-sm ${
             activeTab === 'stats'
               ? 'bg-linear-to-br from-green-500 to-green-600 text-white shadow-lg scale-105'
               : 'bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:scale-105'
           }`}
         >
-          <BarChart3 size={24} />
-          <span className="text-sm">Statistics</span>
+          <BarChart3 size={20} className="sm:w-6 sm:h-6" />
+          <span>Statistics</span>
         </button>
         <button
           onClick={() => setActiveTab('sessions')}
-          className={`flex flex-col items-center gap-2 p-4 rounded-xl font-medium transition-all ${
+          className={`flex flex-col items-center gap-1 sm:gap-2 p-3 sm:p-4 rounded-xl font-medium transition-all text-xs sm:text-sm ${
             activeTab === 'sessions'
               ? 'bg-linear-to-br from-orange-500 to-orange-600 text-white shadow-lg scale-105'
               : 'bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:scale-105'
           }`}
         >
-          <Shield size={24} />
-          <span className="text-sm">Sessions</span>
+          <Shield size={20} className="sm:w-6 sm:h-6" />
+          <span>Sessions</span>
         </button>
       </div>
 

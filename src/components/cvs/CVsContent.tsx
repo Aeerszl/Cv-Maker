@@ -170,12 +170,12 @@ export function CVsContent({ initialCVs }: CVsContentProps) {
   };
 
   return (
-    <>
+    <div className="px-2 sm:px-4 md:px-8 max-w-full w-full">
       {/* Page Header */}
       <div className="mb-8">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-foreground mb-2">
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">
               {t('cvs.title')}
             </h1>
             <p className="text-muted-foreground">
@@ -184,7 +184,7 @@ export function CVsContent({ initialCVs }: CVsContentProps) {
           </div>
           <Link
             href="/cv/create"
-            className="flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors shadow-md hover:shadow-lg"
+            className="flex items-center gap-2 px-4 py-2 sm:px-6 sm:py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors shadow-md hover:shadow-lg"
           >
             <Plus className="w-5 h-5" />
             <span>{t('cvs.createNew')}</span>
@@ -193,7 +193,7 @@ export function CVsContent({ initialCVs }: CVsContentProps) {
       </div>
 
       {/* Statistics */}
-      <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         <div className="bg-white dark:bg-gray-900 rounded-lg border border-border p-4">
           <p className="text-sm text-muted-foreground mb-1">{t('cvs.stats.total')}</p>
           <p className="text-2xl font-bold text-foreground">{cvs.length}</p>
@@ -224,7 +224,7 @@ export function CVsContent({ initialCVs }: CVsContentProps) {
 
       {/* CV Grid */}
       {cvs.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
           {cvs.map((cv) => (
             <CVCard
               key={cv.id}
@@ -237,11 +237,11 @@ export function CVsContent({ initialCVs }: CVsContentProps) {
           ))}
         </div>
       ) : (
-        <div className="text-center py-16 bg-white dark:bg-gray-900 rounded-xl border border-border">
-          <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-linear-to-br from-blue-600 to-purple-600 flex items-center justify-center">
-            <Plus className="w-10 h-10 text-white" />
+        <div className="text-center py-12 sm:py-16 bg-white dark:bg-gray-900 rounded-xl border border-border">
+          <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-6 rounded-full bg-linear-to-br from-blue-600 to-purple-600 flex items-center justify-center">
+            <Plus className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
           </div>
-          <h3 className="text-xl font-bold text-foreground mb-2">
+          <h3 className="text-lg sm:text-xl font-bold text-foreground mb-2">
             {t('cvs.emptyState.title')}
           </h3>
           <p className="text-muted-foreground mb-8 max-w-md mx-auto">
@@ -249,13 +249,13 @@ export function CVsContent({ initialCVs }: CVsContentProps) {
           </p>
           <Link
             href="/cv/create"
-            className="inline-flex items-center gap-2 px-8 py-4 bg-linear-to-r from-blue-600 to-purple-600 text-white rounded-xl font-semibold hover:shadow-xl hover:scale-105 transition-all duration-300"
+            className="inline-flex items-center gap-2 px-6 py-3 sm:px-8 sm:py-4 bg-linear-to-r from-blue-600 to-purple-600 text-white rounded-xl font-semibold hover:shadow-xl hover:scale-105 transition-all duration-300"
           >
             <Plus className="w-6 h-6" />
             <span>{t('cvs.emptyState.button')}</span>
           </Link>
         </div>
       )}
-    </>
+    </div>
   );
 }

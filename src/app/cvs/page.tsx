@@ -9,7 +9,7 @@
 import { redirect } from 'next/navigation';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import { Sidebar } from '@/components/dashboard/Sidebar';
+import SidebarClient from './SidebarClient';
 import { CVsContent } from '@/components/cvs/CVsContent';
 
 /**
@@ -24,12 +24,11 @@ export default async function CVsPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Sidebar 
+      <SidebarClient 
         userName={session.user.name || 'User'} 
         userEmail={session.user.email || undefined}
       />
-
-      <main className="ml-72 transition-all duration-300 py-8">
+      <main className="lg:ml-72 transition-all duration-300 py-8">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <CVsContent initialCVs={[]} />
         </div>

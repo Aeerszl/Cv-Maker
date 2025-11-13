@@ -84,15 +84,15 @@ export default function DashboardPage() {
         userEmail={session.user.email || undefined}
       />
 
-      {/* Main Content */}
-      <main className="ml-72 transition-all duration-300">
-        <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* Main Content - Responsive margin */}
+      <main className="lg:ml-72 transition-all duration-300">
+        <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 pt-20 lg:pt-8">
           {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-foreground mb-2">
+          <div className="mb-6 sm:mb-8">
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">
               {t('dashboard.title')}
             </h1>
-            <p className="text-muted-foreground">
+            <p className="text-sm sm:text-base text-muted-foreground">
               {t('dashboard.subtitle')}
             </p>
           </div>

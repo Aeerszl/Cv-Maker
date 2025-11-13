@@ -233,6 +233,29 @@ function VerifyEmailContent() {
             </p>
           </div>
 
+          {/* Spam Warning Banner */}
+          <div className="mb-6 p-4 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 border-2 border-blue-300 dark:border-blue-600 rounded-xl shadow-sm animate-pulse">
+            <div className="flex items-start gap-3">
+              <div className="shrink-0 w-10 h-10 bg-blue-500 dark:bg-blue-600 rounded-full flex items-center justify-center">
+                <Mail className="w-5 h-5 text-white" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-semibold text-blue-900 dark:text-blue-100 mb-1">
+                  📧 {language === 'tr' ? 'Email\'inizi Kontrol Edin!' : 'Check Your Email!'}
+                </p>
+                <p className="text-xs text-blue-700 dark:text-blue-300 leading-relaxed">
+                  {language === 'tr' 
+                    ? 'Gelen kutunuzu kontrol edin. Email bulamadıysanız '
+                    : 'Check your inbox. If you don\'t see the email, '}
+                  <span className="font-bold text-orange-600 dark:text-orange-400">
+                    {language === 'tr' ? 'SPAM klasörünü' : 'check your SPAM folder'}
+                  </span>
+                  {language === 'tr' ? ' kontrol etmeyi unutmayın!' : ' too!'}
+                </p>
+              </div>
+            </div>
+          </div>
+
           {/* Code Input */}
           <div className="mb-6">
             {/* Development Mode Code Display */}
