@@ -8,9 +8,10 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
-import puppeteer from 'puppeteer';
+import puppeteer from 'puppeteer-core';
+import chromium from '@sparticuz/chromium';
 import connectDB from '@/lib/mongodb';
-import CV from '@/models/CV';
+import CV, { ICV } from '@/models/CV';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { rateLimit, RATE_LIMITS } from '@/lib/rateLimit';
 import { handleError } from '@/lib/errorHandler';
@@ -54,10 +55,11 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
     // Generate HTML for the CV
     const htmlContent = generateCVHTML(cv);
 
-    // Launch Puppeteer
+    // Launch Puppeteer with Vercel-compatible config
     const browser = await puppeteer.launch({
+      args: chromium.args,
+      executablePath: await chromium.executablePath(),
       headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox']
     });
 
     const page = await browser.newPage();
@@ -92,7 +94,7 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
   }
 }
 
-function generateCVHTML(cv: any): string {
+function generateCVHTML(cv: ICV): string {
   const personalInfo = cv.personalInfo || {};
   const fullName = personalInfo.fullName || 'İsim Soyisim';
   const title = personalInfo.title || '';
@@ -263,7 +265,7 @@ function generateCVHTML(cv: any): string {
         ${cv.workExperience && cv.workExperience.length > 0 ? `
         <div class="section">
             <div class="section-title">İş Deneyimi</div>
-            ${cv.workExperience.map((exp: any) => `
+            ${cv.workExperience?.map((exp) => `
                 <div class="experience-item">
                     <div class="item-title">${exp.position || ''} ${exp.company ? `at ${exp.company}` : ''}</div>
                     <div class="item-date">${exp.startDate || ''} - ${exp.endDate || (exp.current ? 'Devam Ediyor' : '')}</div>
@@ -276,12 +278,11 @@ function generateCVHTML(cv: any): string {
         ${cv.education && cv.education.length > 0 ? `
         <div class="section">
             <div class="section-title">Eğitim</div>
-            ${cv.education.map((edu: any) => `
+            ${cv.education?.map((edu) => `
                 <div class="education-item">
                     <div class="item-title">${edu.degree || ''} ${edu.field ? `in ${edu.field}` : ''}</div>
                     <div class="item-subtitle">${edu.school || ''}</div>
                     <div class="item-date">${edu.startDate || ''} - ${edu.endDate || (edu.current ? 'Devam Ediyor' : '')}</div>
-                    ${edu.description ? `<div class="item-description">${edu.description}</div>` : ''}
                 </div>
             `).join('')}
         </div>
@@ -291,7 +292,7 @@ function generateCVHTML(cv: any): string {
         <div class="section">
             <div class="section-title">Yetenekler</div>
             <div class="skills-grid">
-                ${cv.skills.map((skill: any) => `
+                ${cv.skills?.map((skill) => `
                     <div class="skill-item">
                         <span>${skill.name || ''}</span>
                         <span class="level-indicator">${getLevelText(skill.level)}</span>
@@ -305,7 +306,7 @@ function generateCVHTML(cv: any): string {
         <div class="section">
             <div class="section-title">Dil Bilgileri</div>
             <div class="languages-grid">
-                ${cv.languages.map((lang: any) => `
+                ${cv.languages?.map((lang) => `
                     <div class="language-item">
                         <span>${lang.name || ''}</span>
                         <span class="level-indicator">${getLanguageLevelText(lang.level)}</span>

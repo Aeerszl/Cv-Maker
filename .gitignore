@@ -54,3 +54,5 @@ credentials.json
 secrets.json
 admin-info.txt
 ADMIN_CREDENTIALS.md
+
+.vercel
