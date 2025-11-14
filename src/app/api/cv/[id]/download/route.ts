@@ -52,6 +52,23 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
       );
     }
 
+    // Validate required fields for PDF generation
+    const errors: string[] = [];
+    
+    if (!cv.title) errors.push('CV başlığı eksik');
+    if (!cv.personalInfo?.fullName) errors.push('Ad Soyad eksik');
+    if (!cv.personalInfo?.email) errors.push('E-posta eksik');
+
+    if (errors.length > 0) {
+      return NextResponse.json(
+        { 
+          error: 'PDF oluşturmak için zorunlu bilgiler eksik. Lütfen CV başlığını, adınızı soyadınızı ve e-posta adresinizi doldurun.',
+          missingFields: errors
+        },
+        { status: 400 }
+      );
+    }
+
     // Generate HTML for the CV
     const htmlContent = generateCVHTML(cv);
 

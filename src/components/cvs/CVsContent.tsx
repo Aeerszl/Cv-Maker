@@ -29,21 +29,33 @@ export function CVsContent({ initialCVs }: CVsContentProps) {
   useEffect(() => {
     const fetchCVs = async () => {
       try {
+        console.log('🔍 Fetching CVs from API...');
         const response = await fetch('/api/cv');
-        if (response.ok) {
-          const data = await response.json();
-          const apiCVs = data.cvs || data;
-          const transformedCVs: CVCardType[] = apiCVs.map((cv: { _id: string; title: string; template: string; updatedAt: string; createdAt: string; status: string }) => ({
-            id: cv._id,
-            title: cv.title,
-            template: cv.template as CVCardType['template'],
-            lastModified: new Date(cv.updatedAt),
-            createdAt: new Date(cv.createdAt),
-            isComplete: cv.status === 'completed',
-          }));
-          setCvs(transformedCVs);
+        console.log('📡 API Response status:', response.status);
+        
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('❌ API Error:', response.status, errorText);
+          throw new Error(`API Error: ${response.status} - ${errorText}`);
         }
-      } catch {
+        
+        const data = await response.json();
+        console.log('✅ CVs data received:', data);
+        
+        const apiCVs = data.cvs || data;
+        const transformedCVs: CVCardType[] = apiCVs.map((cv: { _id: string; title: string; template: string; updatedAt: string; createdAt: string; status: string }) => ({
+          id: cv._id,
+          title: cv.title,
+          template: cv.template as CVCardType['template'],
+          lastModified: new Date(cv.updatedAt),
+          createdAt: new Date(cv.createdAt),
+          isComplete: cv.status === 'completed',
+        }));
+        
+        console.log('🔄 Transformed CVs:', transformedCVs);
+        setCvs(transformedCVs);
+      } catch (err) {
+        console.error('💥 Fetch CVs error:', err);
         // Keep initial CVs on error - silently fail
       }
     };
