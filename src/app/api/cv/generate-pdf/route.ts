@@ -34,7 +34,12 @@ export async function POST(req: NextRequest) {
 
     // Launch Puppeteer
     const browser = await puppeteer.launch({
-      args: chromium.args,
+      args: [
+        ...chromium.args,
+        '--hide-scrollbars',
+        '--disable-web-security',
+        '--disable-features=VizDisplayCompositor'
+      ],
       executablePath: await chromium.executablePath(),
       headless: true,
     });

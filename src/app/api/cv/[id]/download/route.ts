@@ -74,7 +74,12 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
 
     // Launch Puppeteer
     const browser = await puppeteer.launch({
-      args: chromium.args,
+      args: [
+        ...chromium.args,
+        '--hide-scrollbars',
+        '--disable-web-security',
+        '--disable-features=VizDisplayCompositor'
+      ],
       executablePath: await chromium.executablePath(),
       headless: true,
     });
@@ -82,7 +87,10 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
     const page = await browser.newPage();
 
     // Set content and wait for load
-    await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
+    await page.setContent(htmlContent, { 
+      waitUntil: 'networkidle0',
+      timeout: 60000 
+    });
 
     // Generate PDF
     const pdfBuffer = await page.pdf({
