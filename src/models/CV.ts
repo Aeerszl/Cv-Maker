@@ -1,7 +1,7 @@
 import mongoose, { Schema, Document, Model } from 'mongoose';
 
 // CV Şablonu tipleri
-export type CVTemplate = 'modern' | 'classic' | 'creative' | 'professional' | 'minimal';
+export type CVTemplate = 'modern' | 'classic' | 'creative' | 'professional' | 'minimal' | 'executive' | 'techpro' | 'elegant' | 'bold';
 
 // Kişisel Bilgiler
 export interface IPersonalInfo {
@@ -110,7 +110,7 @@ const CVSchema: Schema<ICV> = new Schema(
     },
     template: {
       type: String,
-      enum: ['modern', 'classic', 'creative', 'professional', 'minimal'],
+      enum: ['modern', 'classic', 'creative', 'professional', 'minimal', 'executive', 'techpro', 'elegant', 'bold'],
       default: 'modern',
     },
     cvLanguage: {

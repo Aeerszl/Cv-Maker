@@ -8,8 +8,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
-import puppeteer from 'puppeteer-core';
-import chromium from '@sparticuz/chromium';
+import puppeteer from 'puppeteer';
 import connectDB from '@/lib/mongodb';
 import CV, { ICV } from '@/models/CV';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
@@ -72,11 +71,10 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
     // Generate HTML for the CV
     const htmlContent = generateCVHTML(cv);
 
-    // Launch Puppeteer with Vercel-compatible config
+    // Launch Puppeteer
     const browser = await puppeteer.launch({
-      args: chromium.args,
-      executablePath: await chromium.executablePath(),
       headless: true,
+      args: ['--no-sandbox', '--disable-setuid-sandbox']
     });
 
     const page = await browser.newPage();
