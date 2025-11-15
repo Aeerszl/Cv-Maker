@@ -9,6 +9,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import puppeteer from 'puppeteer';
+import chromium from '@sparticuz/chromium';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 
 export async function POST(req: NextRequest) {
@@ -33,8 +34,9 @@ export async function POST(req: NextRequest) {
 
     // Launch Puppeteer
     const browser = await puppeteer.launch({
+      args: chromium.args,
+      executablePath: await chromium.executablePath(),
       headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--disable-accelerated-2d-canvas', '--no-first-run', '--no-zygote', '--disable-gpu']
     });
 
     const page = await browser.newPage();
