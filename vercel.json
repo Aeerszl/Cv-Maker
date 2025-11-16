@@ -1,0 +1,10 @@
+{
+  "functions": {
+    "src/app/api/cv/generate-pdf/route.ts": {
+      "runtime": "@vercel/node"
+    },
+    "src/app/api/cv/[id]/download/route.ts": {
+      "runtime": "@vercel/node"
+    }
+  }
+}
