@@ -80,7 +80,8 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
         '--disable-web-security',
         '--disable-features=VizDisplayCompositor'
       ],
-      executablePath: await chromium.executablePath(),
+      // @ts-expect-error chromium.executablePath() returns Promise<string> but should be string
+      executablePath: chromium.executablePath(),
       headless: true,
     });
 

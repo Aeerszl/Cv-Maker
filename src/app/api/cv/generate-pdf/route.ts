@@ -40,6 +40,7 @@ export async function POST(req: NextRequest) {
         '--disable-web-security',
         '--disable-features=VizDisplayCompositor'
       ],
+      // @ts-expect-error chromium.executablePath() returns Promise<string> but should be string
       executablePath: chromium.executablePath(),
       headless: true,
     });
