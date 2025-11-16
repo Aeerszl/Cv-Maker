@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
         '--disable-web-security',
         '--disable-features=VizDisplayCompositor'
       ],
-      executablePath: await chromium.executablePath(),
+      executablePath: chromium.executablePath(),
       headless: true,
     });
 
