@@ -76,21 +76,11 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
     const browser = await puppeteer.launch({
       args: [
         ...chromium.args,
-        '--no-sandbox',
-        '--disable-setuid-sandbox',
-        '--disable-dev-shm-usage',
-        '--disable-accelerated-2d-canvas',
-        '--no-first-run',
-        '--no-zygote',
-        '--single-process',
-        '--disable-gpu'
+        '--hide-scrollbars',
+        '--disable-web-security',
+        '--disable-features=VizDisplayCompositor'
       ],
-      defaultViewport: {
-        width: 1920,
-        height: 1080,
-      },
-      // @ts-expect-error chromium.executablePath() returns Promise<string> but should be string
-      executablePath: chromium.executablePath(),
+      executablePath: await chromium.executablePath(),
       headless: true,
     });
 

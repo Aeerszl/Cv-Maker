@@ -9,7 +9,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { Document, Page, Text, View, StyleSheet, renderToBuffer } from '@react-pdf/renderer';
-import * as cheerio from 'cheerio';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 
 export async function POST(req: NextRequest) {
@@ -33,8 +32,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Parse HTML and extract text
-    const $ = cheerio.load(html);
-    const text = $.text();
+    const text = html.replace(/<[^>]*>/g, '').trim();
 
     // Create PDF document
     const styles = StyleSheet.create({
