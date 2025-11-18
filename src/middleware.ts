@@ -16,6 +16,7 @@ const PROTECTED_ROUTES = [
   '/dashboard',
   '/cv/create',
   '/cv/edit',
+  '/cvs',
   '/profile',
 ];
 
