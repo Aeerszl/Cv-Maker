@@ -8,8 +8,9 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
-import { Document, Page, Text, View, StyleSheet, renderToBuffer } from '@react-pdf/renderer';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import puppeteer from 'puppeteer-core';
+import chromium from '@sparticuz/chromium';
 
 export async function POST(req: NextRequest) {
   try {
@@ -31,35 +32,71 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Parse HTML and extract text
-    const text = html.replace(/<[^>]*>/g, '').trim();
+    // Launch browser
+    const browser = process.env.NODE_ENV === 'production' 
+      ? await puppeteer.launch({
+          args: chromium.args,
+          defaultViewport: chromium.defaultViewport,
+          executablePath: await chromium.executablePath(),
+          headless: chromium.headless,
+        })
+      : await puppeteer.launch({
+          headless: true,
+          args: ['--no-sandbox', '--disable-setuid-sandbox'],
+        });
 
-    // Create PDF document
-    const styles = StyleSheet.create({
-      page: {
-        flexDirection: 'column',
-        backgroundColor: '#ffffff',
-        padding: 30,
-      },
-      text: {
-        fontSize: 12,
-        lineHeight: 1.5,
-        color: '#000000',
+    const page = await browser.newPage();
+
+    // Set content with proper styling
+    const styledHtml = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="utf-8">
+          <style>
+            body {
+              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+              margin: 0;
+              padding: 20px;
+              line-height: 1.6;
+              color: #333;
+            }
+            * {
+              box-sizing: border-box;
+            }
+            .cv-container {
+              max-width: 800px;
+              margin: 0 auto;
+            }
+            @media print {
+              body { margin: 0; }
+              .cv-container { width: 100%; }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="cv-container">
+            ${html}
+          </div>
+        </body>
+      </html>
+    `;
+
+    await page.setContent(styledHtml, { waitUntil: 'networkidle0' });
+
+    // Generate PDF
+    const pdfBuffer = await page.pdf({
+      format: 'A4',
+      printBackground: true,
+      margin: {
+        top: '20px',
+        right: '20px',
+        bottom: '20px',
+        left: '20px',
       },
     });
 
-    const MyDocument = () => (
-      <Document>
-        <Page size="A4" style={styles.page}>
-          <View>
-            <Text style={styles.text}>{text}</Text>
-          </View>
-        </Page>
-      </Document>
-    );
-
-    // Generate PDF buffer
-    const pdfBuffer = await renderToBuffer(<MyDocument />);
+    await browser.close();
 
     // Return PDF as response
     const fileName = filename || 'cv.pdf';

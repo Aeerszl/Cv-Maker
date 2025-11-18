@@ -73,16 +73,21 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
     const htmlContent = generateCVHTML(cv);
 
     // Launch Puppeteer
-    const browser = await puppeteer.launch({
-      args: [
-        ...chromium.args,
-        '--hide-scrollbars',
-        '--disable-web-security',
-        '--disable-features=VizDisplayCompositor'
-      ],
-      executablePath: await chromium.executablePath(),
-      headless: true,
-    });
+    const browser = process.env.NODE_ENV === 'production'
+      ? await puppeteer.launch({
+          args: [
+            ...chromium.args,
+            '--hide-scrollbars',
+            '--disable-web-security',
+            '--disable-features=VizDisplayCompositor'
+          ],
+          executablePath: await chromium.executablePath(),
+          headless: true,
+        })
+      : await puppeteer.launch({
+          headless: true,
+          args: ['--no-sandbox', '--disable-setuid-sandbox'],
+        });
 
     const page = await browser.newPage();
 
