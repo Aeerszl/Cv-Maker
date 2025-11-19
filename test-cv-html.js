@@ -1,130 +1,26 @@
-/**
- * CV PDF Download API
- *
- * Generates and downloads PDF version of a CV
- *
- * @module app/api/cv/[id]/download/route
- */
-
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth/next';
-import puppeteer from 'puppeteer-core';
-import chromium from '@sparticuz/chromium';
-import connectDB from '@/lib/mongodb';
-import CV, { ICV } from '@/models/CV';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import { rateLimit, RATE_LIMITS } from '@/lib/rateLimit';
-import { handleError } from '@/lib/errorHandler';
-
-interface RouteParams {
-  params: Promise<{
-    id: string;
-  }>;
-}
-
-export async function GET(req: NextRequest, { params }: RouteParams) {
-  // ✅ RATE LIMIT: PDF download spam önleme
-  const rateLimitResult = rateLimit(req, RATE_LIMITS.CV_OPERATIONS);
-  if (rateLimitResult) return rateLimitResult;
-  
-  try {
-    const session = await getServerSession(authOptions);
-
-    if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: 'Oturum açmanız gerekiyor' },
-        { status: 401 }
-      );
-    }
-
-    await connectDB();
-
-    const { id } = await params;
-    const cv = await CV.findOne({
-      _id: id,
-      userId: session.user.id,
-    });
-
-    if (!cv) {
-      return NextResponse.json(
-        { error: 'CV bulunamadı' },
-        { status: 404 }
-      );
-    }
-
-    // Validate required fields for PDF generation
-    const errors: string[] = [];
-    
-    if (!cv.title) errors.push('CV başlığı eksik');
-    if (!cv.personalInfo?.fullName) errors.push('Ad Soyad eksik');
-    if (!cv.personalInfo?.email) errors.push('E-posta eksik');
-
-    if (errors.length > 0) {
-      return NextResponse.json(
-        { 
-          error: 'PDF oluşturmak için zorunlu bilgiler eksik. Lütfen CV başlığını, adınızı soyadınızı ve e-posta adresinizi doldurun.',
-          missingFields: errors
-        },
-        { status: 400 }
-      );
-    }
-
-    // Generate HTML for the CV using the selected template
-    const htmlContent = await generateCVHTML(cv);
-
-    // Launch Puppeteer
-    const browser = process.env.NODE_ENV === 'production'
-      ? await puppeteer.launch({
-          args: [
-            ...chromium.args,
-            '--hide-scrollbars',
-            '--disable-web-security',
-            '--disable-features=VizDisplayCompositor'
-          ],
-          executablePath: await chromium.executablePath(),
-          headless: true,
-        })
-      : await puppeteer.launch({
-          headless: true,
-          args: ['--no-sandbox', '--disable-setuid-sandbox'],
-        });
-
-    const page = await browser.newPage();
-
-    // Set content and wait for load
-    await page.setContent(htmlContent, { 
-      waitUntil: 'networkidle0',
-      timeout: 60000 
-    });
-
-    // Generate PDF
-    const pdfBuffer = await page.pdf({
-      format: 'A4',
-      printBackground: true,
-      margin: {
-        top: '20px',
-        right: '20px',
-        bottom: '20px',
-        left: '20px',
-      },
-    });
-
-    await browser.close();
-
-    // Return PDF as response
-    return new NextResponse(Buffer.from(pdfBuffer), {
-      headers: {
-        'Content-Type': 'application/pdf',
-        'Content-Disposition': `attachment; filename="${cv.title.replace(/[^a-zA-Z0-9]/g, '_')}.pdf"`,
-      },
-    });
-
-  } catch (error) {
-    return handleError(error, 'PDF generation');
+// Test script for generateCVHTML function
+function getLevelText(level) {
+  switch (level) {
+    case 'beginner': return 'Başlangıç';
+    case 'intermediate': return 'Orta';
+    case 'advanced': return 'İleri';
+    case 'expert': return 'Uzman';
+    default: return 'Belirtilmemiş';
   }
 }
 
-function generateCVHTML(cv: ICV): string {
+function getLanguageLevelText(level) {
+  switch (level) {
+    case 'basic': return 'Temel';
+    case 'intermediate': return 'Orta';
+    case 'advanced': return 'İleri';
+    case 'fluent': return 'Akıcı';
+    case 'native': return 'Anadil';
+    default: return 'Belirtilmemiş';
+  }
+}
+
+function generateCVHTML(cv) {
   const personalInfo = cv.personalInfo || {};
   const fullName = personalInfo.fullName || 'İsim Soyisim';
   const title = personalInfo.title || '';
@@ -288,22 +184,52 @@ function generateCVHTML(cv: ICV): string {
   `;
 }
 
-function getLevelText(level: string): string {
-  const levels: { [key: string]: string } = {
-    'beginner': 'Başlangıç',
-    'intermediate': 'Orta',
-    'advanced': 'İleri',
-    'expert': 'Uzman'
-  };
-  return levels[level] || level;
-}
+// Test with different templates
+const testCV = {
+  title: 'Test CV',
+  template: 'modern',
+  personalInfo: {
+    fullName: 'Ahmet Yılmaz',
+    title: 'Senior Software Developer',
+    email: 'ahmet@example.com',
+    phone: '+90 555 123 4567',
+    location: 'İstanbul, Türkiye',
+    linkedin: 'linkedin.com/in/ahmetyilmaz'
+  },
+  summary: 'Deneyimli yazılım geliştirici, modern teknolojiler ve agile metodolojiler konusunda uzman.',
+  workExperience: [
+    {
+      position: 'Senior Developer',
+      company: 'Tech Company',
+      startDate: '2022-01',
+      endDate: '2024-01',
+      description: 'Full-stack development, React, Node.js, MongoDB'
+    }
+  ],
+  education: [
+    {
+      degree: 'Bachelor',
+      field: 'Computer Science',
+      school: 'İstanbul Üniversitesi',
+      startDate: '2018-09',
+      endDate: '2022-06'
+    }
+  ],
+  skills: [
+    { name: 'JavaScript', level: 'advanced' },
+    { name: 'React', level: 'expert' },
+    { name: 'Node.js', level: 'advanced' }
+  ],
+  languages: [
+    { name: 'Türkçe', level: 'native' },
+    { name: 'English', level: 'fluent' }
+  ]
+};
 
-function getLanguageLevelText(level: string): string {
-  const levels: { [key: string]: string } = {
-    'basic': 'Temel',
-    'intermediate': 'Orta',
-    'fluent': 'Akıcı',
-    'native': 'Anadil'
-  };
-  return levels[level] || level;
-}
+console.log('Testing Modern template:');
+console.log(generateCVHTML(testCV).substring(0, 500) + '...');
+
+// Test different template
+testCV.template = 'techpro';
+console.log('\nTesting TechPro template:');
+console.log(generateCVHTML(testCV).substring(0, 500) + '...');
