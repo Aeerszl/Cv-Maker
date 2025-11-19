@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
     const extractedText = $.text();
 
     // Create PDF document
-    const styles = StyleSheet.create({
+    const pdfStyles = StyleSheet.create({
       page: {
         flexDirection: 'column',
         backgroundColor: '#ffffff',
@@ -52,9 +52,9 @@ export async function POST(req: NextRequest) {
 
     const MyDocument = () => (
       <Document>
-        <Page size="A4" style={styles.page}>
+        <Page size="A4" style={pdfStyles.page}>
           <View>
-            <Text style={styles.text}>{extractedText}</Text>
+            <Text style={pdfStyles.text}>{extractedText}</Text>
           </View>
         </Page>
       </Document>
