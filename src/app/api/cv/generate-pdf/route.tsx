@@ -8,8 +8,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
-import { Document, Page, Text, View, StyleSheet, renderToBuffer } from '@react-pdf/renderer';
-import * as cheerio from 'cheerio';
+import puppeteer from 'puppeteer-core';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 
 export async function POST(req: NextRequest) {
@@ -32,40 +31,34 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Parse HTML and extract text
-    const $ = cheerio.load(html);
-    const extractedText = $.text();
+    // Launch browser
+    const browser = await puppeteer.launch({
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+      headless: true,
+    });
 
-    // Create PDF document
-    const pdfStyles = StyleSheet.create({
-      page: {
-        flexDirection: 'column',
-        backgroundColor: '#ffffff',
-        padding: 30,
-      },
-      text: {
-        fontSize: 12,
-        lineHeight: 1.5,
-        color: '#000000',
+    const page = await browser.newPage();
+
+    // Set content
+    await page.setContent(html, { waitUntil: 'networkidle0' });
+
+    // Generate PDF
+    const pdfBuffer = await page.pdf({
+      format: 'A4',
+      printBackground: true,
+      margin: {
+        top: '20px',
+        right: '20px',
+        bottom: '20px',
+        left: '20px',
       },
     });
 
-    const MyDocument = () => (
-      <Document>
-        <Page size="A4" style={pdfStyles.page}>
-          <View>
-            <Text style={pdfStyles.text}>{extractedText}</Text>
-          </View>
-        </Page>
-      </Document>
-    );
-
-    // Generate PDF buffer
-    const pdfBuffer = await renderToBuffer(<MyDocument />);
+    await browser.close();
 
     // Return PDF as response
     const fileName = filename || 'cv.pdf';
-    return new NextResponse(Buffer.from(pdfBuffer), {
+    return new NextResponse(pdfBuffer as any, {
       headers: {
         'Content-Type': 'application/pdf',
         'Content-Disposition': `attachment; filename="${fileName}"`,
