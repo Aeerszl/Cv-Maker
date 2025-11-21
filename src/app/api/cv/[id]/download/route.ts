@@ -75,21 +75,13 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
     console.log('Starting PDF generation for CV:', id);
 
     // Launch Puppeteer
-    const browser = process.env.NODE_ENV === 'production'
-      ? await puppeteer.launch({
-          args: [
-            ...chromium.args,
-            '--hide-scrollbars',
-            '--disable-web-security',
-            '--disable-features=VizDisplayCompositor'
-          ],
-          executablePath: await chromium.executablePath(),
-          headless: true,
-        })
-      : await puppeteer.launch({
-          headless: true,
-          args: ['--no-sandbox', '--disable-setuid-sandbox'],
-        });
+    console.log('Chromium path:', await chromium.executablePath());
+    console.log('Starting Puppeteer...');
+    const browser = await puppeteer.launch({
+      args: chromium.args,
+      executablePath: await chromium.executablePath(),
+      headless: true,
+    });
 
     const page = await browser.newPage();
 
