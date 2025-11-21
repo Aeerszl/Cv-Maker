@@ -70,7 +70,9 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
     }
 
     // Generate HTML for the CV using the selected template
-    const htmlContent = await generateCVHTML(cv);
+    const htmlContent = generateCVHTML(cv);
+
+    console.log('Starting PDF generation for CV:', id);
 
     // Launch Puppeteer
     const browser = process.env.NODE_ENV === 'production'
@@ -93,8 +95,8 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
 
     // Set content and wait for load
     await page.setContent(htmlContent, { 
-      waitUntil: 'domcontentloaded',
-      timeout: 60000 
+      waitUntil: 'networkidle0',
+      timeout: 120000 
     });
 
     // Generate PDF
@@ -111,6 +113,8 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
 
     await browser.close();
 
+    console.log('PDF generated successfully, size:', pdfBuffer.length);
+
     // Return PDF as response
     return new NextResponse(Buffer.from(pdfBuffer), {
       headers: {
@@ -120,6 +124,7 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
     });
 
   } catch (error) {
+    console.error('PDF generation error:', error);
     return handleError(error, 'PDF generation');
   }
 }
@@ -201,7 +206,7 @@ function generateCVHTML(cv: ICV): string {
         <style>
           /* Minimal Tailwind CSS inline */
           * { box-sizing: border-box; }
-          body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.5; }
+          body { margin: 0; font-family: Arial, sans-serif; line-height: 1.5; }
           .max-w-4xl { max-width: 56rem; margin: 0 auto; padding: 2rem; }
           .mb-8 { margin-bottom: 2rem; }
           .mb-6 { margin-bottom: 1.5rem; }
