@@ -93,7 +93,7 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
 
     // Set content and wait for load
     await page.setContent(htmlContent, { 
-      waitUntil: 'networkidle0',
+      waitUntil: 'domcontentloaded',
       timeout: 60000 
     });
 
@@ -198,10 +198,73 @@ function generateCVHTML(cv: ICV): string {
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>${cv.title}</title>
-        <script src="https://cdn.tailwindcss.com"></script>
         <style>
-          @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-          body { font-family: 'Inter', sans-serif; }
+          /* Minimal Tailwind CSS inline */
+          * { box-sizing: border-box; }
+          body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.5; }
+          .max-w-4xl { max-width: 56rem; margin: 0 auto; padding: 2rem; }
+          .mb-8 { margin-bottom: 2rem; }
+          .mb-6 { margin-bottom: 1.5rem; }
+          .mb-4 { margin-bottom: 1rem; }
+          .mb-3 { margin-bottom: 0.75rem; }
+          .mb-2 { margin-bottom: 0.5rem; }
+          .mt-4 { margin-top: 1rem; }
+          .pt-6 { padding-top: 1.5rem; }
+          .pb-4 { padding-bottom: 1rem; }
+          .pb-6 { padding-bottom: 1.5rem; }
+          .pl-4 { padding-left: 1rem; }
+          .p-8 { padding: 2rem; }
+          .p-6 { padding: 1.5rem; }
+          .p-3 { padding: 0.75rem; }
+          .px-8 { padding-left: 2rem; padding-right: 2rem; }
+          .py-8 { padding-top: 2rem; padding-bottom: 2rem; }
+          .py-6 { padding-top: 1.5rem; padding-bottom: 1.5rem; }
+          .py-4 { padding-top: 1rem; padding-bottom: 1rem; }
+          .text-4xl { font-size: 2.25rem; font-weight: bold; }
+          .text-2xl { font-size: 1.5rem; font-weight: bold; }
+          .text-xl { font-size: 1.25rem; }
+          .text-lg { font-size: 1.125rem; }
+          .text-sm { font-size: 0.875rem; }
+          .font-bold { font-weight: bold; }
+          .font-semibold { font-weight: 600; }
+          .font-medium { font-weight: 500; }
+          .font-mono { font-family: 'Courier New', monospace; }
+          .leading-relaxed { line-height: 1.625; }
+          .opacity-90 { opacity: 0.9; }
+          .text-center { text-align: center; }
+          .text-blue-600 { color: #2563eb; }
+          .text-gray-800 { color: #1f2937; }
+          .text-gray-700 { color: #374151; }
+          .text-gray-600 { color: #4b5563; }
+          .text-white { color: #ffffff; }
+          .text-green-400 { color: #4ade80; }
+          .bg-white { background-color: #ffffff; }
+          .bg-gray-800 { background-color: #1f2937; }
+          .bg-gray-100 { background-color: #f3f4f6; }
+          .bg-gray-900 { background-color: #111827; }
+          .bg-black { background-color: #000000; }
+          .bg-blue-600 { background-color: #2563eb; }
+          .bg-blue-900 { background-color: #1e3a8a; }
+          .bg-red-600 { background-color: #dc2626; }
+          .bg-gradient-to-r { background: linear-gradient(to right, var(--tw-gradient-stops)); }
+          .from-purple-500 { --tw-gradient-from: #a855f7; --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, rgba(168, 85, 247, 0)); }
+          .to-pink-500 { --tw-gradient-to: #ec4899; }
+          .from-gray-100 { --tw-gradient-from: #f3f4f6; --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, rgba(243, 244, 246, 0)); }
+          .to-gray-200 { --tw-gradient-to: #e5e7eb; }
+          .border { border-width: 1px; border-color: #d1d5db; }
+          .border-t { border-top-width: 1px; border-color: #d1d5db; }
+          .border-b { border-bottom-width: 1px; border-color: #d1d5db; }
+          .border-b-2 { border-bottom-width: 2px; border-color: #d1d5db; }
+          .border-l-4 { border-left-width: 4px; border-color: #2563eb; }
+          .border-2 { border-width: 2px; border-color: #dc2626; }
+          .rounded-lg { border-radius: 0.5rem; }
+          .shadow-md { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
+          .flex { display: flex; }
+          .flex-wrap { flex-wrap: wrap; }
+          .gap-4 { gap: 1rem; }
+          .grid { display: grid; }
+          .grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+          .md\\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
         </style>
     </head>
     <body class="${bodyStyle} max-w-4xl mx-auto p-8">
