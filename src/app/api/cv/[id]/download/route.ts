@@ -264,7 +264,9 @@ function generateCVHTML(cv: ICV): string {
           .gap-4 { gap: 1rem; }
           .grid { display: grid; }
           .grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-          .md\\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+          .border-gray-300 { border-color: #d1d5db; }
+          .border-gray-200 { border-color: #e5e7eb; }
+          .bg-gray-50 { background-color: #f9fafb; }
         </style>
     </head>
     <body class="${bodyStyle} max-w-4xl mx-auto p-8">
