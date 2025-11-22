@@ -78,7 +78,17 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
     console.log('Chromium path:', await chromium.executablePath());
     console.log('Starting Puppeteer...');
     const browser = await puppeteer.launch({
-      args: chromium.args,
+      args: [
+        ...chromium.args,
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',
+        '--disable-accelerated-2d-canvas',
+        '--no-first-run',
+        '--no-zygote',
+        '--single-process', // NOT RECOMMENDED FOR PRODUCTION
+        '--disable-gpu'
+      ],
       executablePath: await chromium.executablePath(),
       headless: true,
     });
