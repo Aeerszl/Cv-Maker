@@ -3,5 +3,10 @@
   "buildCommand": "npm run build",
   "env": {
     "TURBO_FORCE": "false"
+  },
+  "functions": {
+    "api/cv/[id]/download.ts": {
+      "includeFiles": "node_modules/@sparticuz/chromium/bin/**"
+    }
   }
 }
