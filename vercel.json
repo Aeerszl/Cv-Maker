@@ -5,7 +5,7 @@
     "TURBO_FORCE": "false"
   },
   "functions": {
-    "api/cv/[id]/download.ts": {
+    "src/app/api/cv/[id]/download/route.ts": {
       "includeFiles": "node_modules/@sparticuz/chromium/bin/**"
     }
   }
