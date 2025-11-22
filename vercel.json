@@ -1,5 +1,7 @@
 {
-  "engines": {
-    "node": "20.x"
+  "outputDirectory": ".next",
+  "buildCommand": "npm run build",
+  "env": {
+    "TURBO_FORCE": "false"
   }
 }
