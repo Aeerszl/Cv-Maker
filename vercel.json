@@ -1,12 +1,5 @@
 {
-  "outputDirectory": ".next",
-  "buildCommand": "npm run build",
-  "env": {
-    "TURBO_FORCE": "false"
-  },
-  "functions": {
-    "src/app/api/cv/[id]/download/route.ts": {
-      "includeFiles": "node_modules/@sparticuz/chromium/bin/**"
-    }
+  "engines": {
+    "node": "20.x"
   }
 }
