@@ -44,6 +44,7 @@ export interface IEducation {
 export interface ISkill {
   name: string;
   level: 'beginner' | 'intermediate' | 'advanced' | 'expert';
+  years?: number;
 }
 
 // Dil
@@ -174,6 +175,7 @@ const CVSchema: Schema<ICV> = new Schema(
           enum: ['beginner', 'intermediate', 'advanced', 'expert'],
           default: 'intermediate',
         },
+        years: { type: Number, min: 0, max: 50 },
         _id: false,
       },
     ],
