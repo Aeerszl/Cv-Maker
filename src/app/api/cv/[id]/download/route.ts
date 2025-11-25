@@ -78,7 +78,16 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
     console.log('Chromium path:', await chromium.executablePath());
     console.log('Starting Puppeteer...');
     const browser = await puppeteer.launch({
-      args: chromium.args,
+      args: [
+        ...chromium.args,
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',
+        '--disable-accelerated-2d-canvas',
+        '--no-first-run',
+        '--no-zygote',
+        '--disable-gpu'
+      ],
       executablePath: await chromium.executablePath(),
       headless: true,
     });
@@ -347,16 +356,6 @@ function generateCVHTML(cv: ICV): string {
     </body>
     </html>
   `;
-}
-
-function getLevelText(level: string): string {
-  const levels: { [key: string]: string } = {
-    'beginner': 'Başlangıç',
-    'intermediate': 'Orta',
-    'advanced': 'İleri',
-    'expert': 'Uzman'
-  };
-  return levels[level] || level;
 }
 
 function getLanguageLevelText(level: string): string {

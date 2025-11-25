@@ -385,6 +385,7 @@ export default function CVBuilderClient({ userName, userEmail, initialData, isEd
         skills: filteredSkills.map(skill => ({
           name: skill.name,
           level: skill.level,
+          years: skill.years,
         })),
         languages: cvData.languages
           .filter(lang => lang.name.trim() !== '') // Boş dil isimlerini filtrele
