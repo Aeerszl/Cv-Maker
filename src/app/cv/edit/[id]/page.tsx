@@ -93,7 +93,7 @@ export default async function EditPage({ params }: EditPageProps) {
         id: `skill-${index}`,
         name: skill.name || '',
         level: (skill.level as 'beginner' | 'intermediate' | 'advanced' | 'expert') || 'intermediate',
-        years: undefined, // ISkill doesn't have years field
+        years: skill.years,
       })) || [],
       languages: cv.languages?.map((lang, index) => ({
         id: `lang-${index}`,

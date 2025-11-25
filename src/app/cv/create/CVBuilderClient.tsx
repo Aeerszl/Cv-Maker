@@ -152,11 +152,6 @@ export default function CVBuilderClient({ userName, userEmail, initialData, isEd
    * Handle PDF download with clickable links and selectable text
    */
   const handleDownloadPDF = async () => {
-    if (!cvPreviewRef.current) {
-      toast.error('CV önizleme bulunamadı. Lütfen sayfayı yenileyin.');
-      return;
-    }
-
     try {
       // Show loading indicator
       const loadingToast = document.createElement('div');
@@ -164,20 +159,34 @@ export default function CVBuilderClient({ userName, userEmail, initialData, isEd
       loadingToast.textContent = 'PDF oluşturuluyor...';
       document.body.appendChild(loadingToast);
 
-      // Get HTML content from preview
-      const htmlContent = cvPreviewRef.current.innerHTML;
+      let response;
 
-      // Send to backend for PDF generation
-      const response = await fetch('/api/cv/generate-pdf', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          html: htmlContent,
-          filename: `${cvData.personalInfo.firstName}_${cvData.personalInfo.lastName}_CV.pdf`.replace(/\s+/g, '_'),
-        }),
-      });
+      // If editing an existing CV, use the download endpoint for saved CVs
+      if (isEdit && initialData?._id) {
+        response = await fetch(`/api/cv/${initialData._id}/download`, {
+          method: 'GET',
+        });
+      } else {
+        // For new/unsaved CVs, generate PDF from current form data
+        // Get the HTML from the preview element instead of regenerating
+        if (cvPreviewRef.current) {
+          const htmlContent = cvPreviewRef.current.innerHTML;
+          
+          // Send to backend for PDF generation
+          response = await fetch('/api/cv/generate-pdf', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              html: `<html><head><style>body { margin: 0; padding: 0; }</style></head><body>${htmlContent}</body></html>`,
+              filename: `${cvData.personalInfo.firstName}_${cvData.personalInfo.lastName}_CV.pdf`.replace(/\s+/g, '_'),
+            }),
+          });
+        } else {
+          throw new Error('CV önizlemesi bulunamadı');
+        }
+      }
 
       if (!response.ok) {
         throw new Error('PDF oluşturulamadı');
