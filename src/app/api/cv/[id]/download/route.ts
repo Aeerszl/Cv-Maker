@@ -8,14 +8,12 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
-import puppeteer from 'puppeteer-core';
-import chromium from '@sparticuz/chromium';
+import { jsPDF } from 'jspdf';
 import connectDB from '@/lib/mongodb';
 import CV from '@/models/CV';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { rateLimit, RATE_LIMITS } from '@/lib/rateLimit';
 import { handleError } from '@/lib/errorHandler';
-import { generateCVHTML } from '@/utils/cvHtmlGenerator';
 
 interface RouteParams {
   params: Promise<{
@@ -76,74 +74,123 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
       );
     }
 
-    // Generate HTML for the CV using the selected template
-    const htmlContent = generateCVHTML(cv);
+    // Create PDF with jsPDF
+    const doc = new jsPDF();
+    let yPos = 20;
 
-    console.log('Starting PDF generation for CV:', id);
+    // Personal Info
+    doc.setFontSize(20);
+    doc.text(cv.personalInfo.fullName, 20, yPos);
+    yPos += 10;
 
-    // Launch Puppeteer with better error handling
-    console.log('Chromium path:', await chromium.executablePath());
-    console.log('Starting Puppeteer...');
-
-    let browser;
-    try {
-      const isVercel = !!process.env.VERCEL;
-      browser = await puppeteer.launch({
-        args: isVercel ? chromium.args : [],
-        executablePath: isVercel ? await chromium.executablePath() : undefined,
-        headless: true,
-      });
-
-      const page = await browser.newPage();
-
-      // Set viewport
-      await page.setViewport({ width: 1200, height: 800 });
-
-      // Set content and wait for load
-      await page.setContent(htmlContent, {
-        waitUntil: 'networkidle0',
-        timeout: 30000
-      });
-
-      // Wait a bit more for rendering
-      await new Promise(resolve => setTimeout(resolve, 2000));
-
-      // Generate PDF
-      const pdfBuffer = await page.pdf({
-        format: 'A4',
-        printBackground: true,
-        margin: {
-          top: '20px',
-          right: '20px',
-          bottom: '20px',
-          left: '20px',
-        },
-        preferCSSPageSize: true,
-      });
-
-      await browser.close();
-
-      console.log('PDF generated successfully, size:', pdfBuffer.length);
-
-      // Return PDF as response
-      return new NextResponse(Buffer.from(pdfBuffer), {
-        headers: {
-          'Content-Type': 'application/pdf',
-          'Content-Disposition': `attachment; filename="${cv.title.replace(/[^a-zA-Z0-9]/g, '_')}.pdf"`,
-          'Content-Length': pdfBuffer.length.toString(),
-          'Cache-Control': 'no-cache, no-store, must-revalidate',
-          'Pragma': 'no-cache',
-          'Expires': '0',
-        },
-      });
-
-    } catch (browserError) {
-      console.error('Browser launch error:', browserError);
-      if (browser) {
-        await browser.close().catch(() => {});
-      }
-      throw browserError;
+    doc.setFontSize(12);
+    if (cv.personalInfo.email) {
+      doc.text(cv.personalInfo.email, 20, yPos);
+      yPos += 7;
     }
+    if (cv.personalInfo.phone) {
+      doc.text(cv.personalInfo.phone, 20, yPos);
+      yPos += 7;
+    }
+    if (cv.personalInfo.location) {
+      doc.text(cv.personalInfo.location, 20, yPos);
+      yPos += 7;
+    }
+
+    yPos += 5;
+
+    // Summary
+    if (cv.summary) {
+      doc.setFontSize(14);
+      doc.text('Summary', 20, yPos);
+      yPos += 7;
+      doc.setFontSize(11);
+      const summaryText = typeof cv.summary === 'string' ? cv.summary : '';
+      const splitSummary = doc.splitTextToSize(summaryText, 170);
+      doc.text(splitSummary, 20, yPos);
+      yPos += splitSummary.length * 5 + 5;
+    }
+
+    // Experience
+    if (cv.workExperience && cv.workExperience.length > 0) {
+      doc.setFontSize(14);
+      doc.text('Experience', 20, yPos);
+      yPos += 7;
+      
+      cv.workExperience.forEach((exp) => {
+        if (yPos > 270) {
+          doc.addPage();
+          yPos = 20;
+        }
+        doc.setFontSize(12);
+        doc.text(exp.position || '', 20, yPos);
+        yPos += 6;
+        doc.setFontSize(11);
+        doc.text(`${exp.company || ''} | ${exp.startDate || ''} - ${exp.endDate || 'Present'}`, 20, yPos);
+        yPos += 6;
+        if (exp.description) {
+          const splitDesc = doc.splitTextToSize(exp.description, 170);
+          doc.text(splitDesc, 20, yPos);
+          yPos += splitDesc.length * 5 + 3;
+        }
+        yPos += 3;
+      });
+    }
+
+    // Education
+    if (cv.education && cv.education.length > 0) {
+      if (yPos > 250) {
+        doc.addPage();
+        yPos = 20;
+      }
+      doc.setFontSize(14);
+      doc.text('Education', 20, yPos);
+      yPos += 7;
+      
+      cv.education.forEach((edu) => {
+        if (yPos > 270) {
+          doc.addPage();
+          yPos = 20;
+        }
+        doc.setFontSize(12);
+        doc.text(edu.degree || '', 20, yPos);
+        yPos += 6;
+        doc.setFontSize(11);
+        doc.text(`${edu.school || ''} | ${edu.startDate || ''} - ${edu.endDate || 'Present'}`, 20, yPos);
+        yPos += 8;
+      });
+    }
+
+    // Skills
+    if (cv.skills && cv.skills.length > 0) {
+      if (yPos > 260) {
+        doc.addPage();
+        yPos = 20;
+      }
+      doc.setFontSize(14);
+      doc.text('Skills', 20, yPos);
+      yPos += 7;
+      doc.setFontSize(11);
+      const skillsText = cv.skills.map((s) => s.name).join(', ');
+      const splitSkills = doc.splitTextToSize(skillsText, 170);
+      doc.text(splitSkills, 20, yPos);
+    }
+
+    const pdfBuffer = Buffer.from(doc.output('arraybuffer'));
+
+    console.log('PDF generated successfully, size:', pdfBuffer.length);
+
+    // Return PDF as response
+    return new NextResponse(pdfBuffer, {
+      headers: {
+        'Content-Type': 'application/pdf',
+        'Content-Disposition': `attachment; filename="${cv.title.replace(/[^a-zA-Z0-9]/g, '_')}.pdf"`,
+        'Content-Length': pdfBuffer.length.toString(),
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0',
+      },
+    });
 
   } catch (error) {
     console.error('PDF generation error:', error);
