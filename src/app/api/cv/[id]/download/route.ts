@@ -81,22 +81,11 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
 
     let browser;
     try {
+      const isVercel = !!process.env.VERCEL;
       browser = await puppeteer.launch({
-        args: process.env.VERCEL ? [
-          ...chromium.args,
-          '--no-sandbox',
-          '--disable-setuid-sandbox',
-          '--disable-dev-shm-usage',
-          '--disable-accelerated-2d-canvas',
-          '--no-first-run',
-          '--no-zygote',
-          '--disable-gpu',
-          '--disable-web-security',
-          '--disable-features=VizDisplayCompositor'
-        ] : ['--no-sandbox', '--disable-setuid-sandbox'],
-        executablePath: process.env.VERCEL ? await chromium.executablePath() : undefined,
+        args: isVercel ? chromium.args : [],
+        executablePath: isVercel ? await chromium.executablePath() : undefined,
         headless: true,
-        ignoreDefaultArgs: process.env.VERCEL ? ['--disable-extensions'] : undefined,
       });
 
       const page = await browser.newPage();
@@ -135,6 +124,10 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
         headers: {
           'Content-Type': 'application/pdf',
           'Content-Disposition': `attachment; filename="${cv.title.replace(/[^a-zA-Z0-9]/g, '_')}.pdf"`,
+          'Content-Length': pdfBuffer.length.toString(),
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0',
         },
       });
 

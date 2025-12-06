@@ -167,15 +167,31 @@ export function CVsContent({ initialCVs }: CVsContentProps) {
    */
   const handleDownload = async (id: string) => {
     try {
-      // Create a temporary link to download the PDF
+      toast.info(t('cvs.download.started'));
+      
+      // Fetch the PDF from the API
+      const response = await fetch(`/api/cv/${id}/download`, {
+        method: 'GET',
+      });
+
+      if (!response.ok) {
+        throw new Error('PDF download failed');
+      }
+
+      // Get the PDF blob
+      const blob = await response.blob();
+      
+      // Create download link
+      const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
-      link.href = `/api/cv/${id}/download`;
+      link.href = url;
       link.download = `cv_${id}.pdf`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
 
-      toast.info(t('cvs.download.started'));
+      toast.success('PDF başarıyla indirildi!');
     } catch {
       toast.error(t('cvs.download.error'));
     }

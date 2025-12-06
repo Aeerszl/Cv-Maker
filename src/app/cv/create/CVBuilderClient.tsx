@@ -152,9 +152,10 @@ export default function CVBuilderClient({ userName, userEmail, initialData, isEd
    * Handle PDF download with clickable links and selectable text
    */
   const handleDownloadPDF = async () => {
+    let loadingToast: HTMLDivElement | null = null;
     try {
       // Show loading indicator
-      const loadingToast = document.createElement('div');
+      loadingToast = document.createElement('div');
       loadingToast.style.cssText = 'position:fixed;top:20px;right:20px;background:#1f2937;color:white;padding:16px 24px;border-radius:8px;z-index:9999;box-shadow:0 4px 6px rgba(0,0,0,0.1);';
       loadingToast.textContent = 'PDF oluşturuluyor...';
       document.body.appendChild(loadingToast);
@@ -167,25 +168,17 @@ export default function CVBuilderClient({ userName, userEmail, initialData, isEd
           method: 'GET',
         });
       } else {
-        // For new/unsaved CVs, generate PDF from current form data
-        // Get the HTML from the preview element instead of regenerating
-        if (cvPreviewRef.current) {
-          const htmlContent = cvPreviewRef.current.innerHTML;
-          
-          // Send to backend for PDF generation
-          response = await fetch('/api/cv/generate-pdf', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              html: `<html><head><style>body { margin: 0; padding: 0; }</style></head><body>${htmlContent}</body></html>`,
-              filename: `${cvData.personalInfo.firstName}_${cvData.personalInfo.lastName}_CV.pdf`.replace(/\s+/g, '_'),
-            }),
-          });
-        } else {
-          throw new Error('CV önizlemesi bulunamadı');
-        }
+        // For new/unsaved CVs, send CV data (not HTML) to generate-pdf endpoint
+        response = await fetch('/api/cv/generate-pdf', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            cv: cvData,
+            filename: `${cvData.personalInfo.firstName}_${cvData.personalInfo.lastName}_CV.pdf`.replace(/\s+/g, '_'),
+          }),
+        });
       }
 
       if (!response.ok) {
@@ -204,7 +197,9 @@ export default function CVBuilderClient({ userName, userEmail, initialData, isEd
       window.URL.revokeObjectURL(url);
 
       // Remove loading indicator
-      document.body.removeChild(loadingToast);
+      if (loadingToast && document.body.contains(loadingToast)) {
+        document.body.removeChild(loadingToast);
+      }
 
       // Show success message
       const successToast = document.createElement('div');
@@ -212,11 +207,17 @@ export default function CVBuilderClient({ userName, userEmail, initialData, isEd
       successToast.textContent = '✓ PDF başarıyla indirildi!';
       document.body.appendChild(successToast);
       setTimeout(() => {
-        document.body.removeChild(successToast);
+        if (document.body.contains(successToast)) {
+          document.body.removeChild(successToast);
+        }
       }, 3000);
 
-    } catch {
-      // Silent fail - user already sees error toast
+    } catch (error) {
+      // Remove loading indicator if it exists
+      if (loadingToast && document.body.contains(loadingToast)) {
+        document.body.removeChild(loadingToast);
+      }
+      console.error('PDF download error:', error);
       toast.error('PDF oluşturulurken bir hata oluştu. Lütfen tekrar deneyin.');
     }
   };
