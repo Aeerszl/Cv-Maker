@@ -24,23 +24,29 @@ interface RouteParams {
 }
 
 export async function GET(req: NextRequest, { params }: RouteParams) {
+  console.log('📥 Download request received:', req.method, req.url);
+  
   // ✅ RATE LIMIT: PDF download spam önleme
   const rateLimitResult = rateLimit(req, RATE_LIMITS.CV_OPERATIONS);
   if (rateLimitResult) return rateLimitResult;
   
   try {
+    console.log('🔐 Checking session...');
     const session = await getServerSession(authOptions);
 
     if (!session?.user?.id) {
+      console.error('❌ No session found');
       return NextResponse.json(
         { error: 'Oturum açmanız gerekiyor' },
         { status: 401 }
       );
     }
 
+    console.log('✅ Session valid:', session.user.id);
     await connectDB();
 
     const { id } = await params;
+    console.log('🔍 Looking for CV:', id);
     const cv = await CV.findOne({
       _id: id,
       userId: session.user.id,
